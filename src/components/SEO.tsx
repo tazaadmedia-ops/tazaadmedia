@@ -28,7 +28,7 @@ const SEO: React.FC<SEOProps> = ({
     const fullUrl = `${siteUrl}${slug ? (slug.startsWith('/') ? slug : `/${slug}`) : ''}`;
     const fullImage = image ? (image.startsWith('http') ? image : `${siteUrl}${image}`) : `${siteUrl}/default-og.jpg`;
 
-    const baseTitle = "Open Editorial";
+    const baseTitle = "Tazaad - Sindhi";
     const fullTitle = title === baseTitle ? title : `${title} | ${baseTitle}`;
 
     // Base Schema

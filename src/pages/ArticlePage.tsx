@@ -129,7 +129,7 @@ const ArticlePage: React.FC = () => {
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>Article not found.</div>;
 
     return (
-        <article className="container" style={{ marginTop: '2.5rem', fontFamily: 'var(--font-main)' }}>
+        <article className="container article-page-container" style={{ marginTop: '2.5rem', fontFamily: 'var(--font-main)' }}>
             <SEO
                 title={article.title}
                 description={article.subdeck || article.title}
@@ -142,14 +142,14 @@ const ArticlePage: React.FC = () => {
             />
 
             {/* Header */}
-            <header style={{ marginBottom: '3rem', textAlign: 'right', direction: 'rtl', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
-                <div style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.9rem', marginBottom: '1.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <header className="article-header" style={{ marginBottom: '3rem', textAlign: 'right', direction: 'rtl', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <div style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     ● {categoryName}
                 </div>
-                <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', lineHeight: 1.1, marginBottom: '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
+                <h1 className="article-title" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', lineHeight: 1.1, marginBottom: '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
                     {article.title}
                 </h1>
-                <p style={{ fontSize: '1.25rem', lineHeight: 1.6, color: '#666', marginBottom: '2rem' }}>
+                <p className="article-subdeck" style={{ fontSize: '1.25rem', lineHeight: 1.6, color: '#666', marginBottom: '2rem' }}>
                     {article.subdeck}
                 </p>
 
