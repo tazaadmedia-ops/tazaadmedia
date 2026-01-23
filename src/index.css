@@ -1,3 +1,12 @@
+@font-face {
+  font-family: "SF Arabic";
+  src: url("./assets/fonts/SF-Arabic.woff2") format("woff2"),
+    url("./assets/fonts/SF-Arabic.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --color-bg: #FAFAFA;
   /* Softer background, easier on eyes */
@@ -12,8 +21,8 @@
   --color-border: #E8E8E8;
   /* Subtle border */
 
-  /* SF Arabic only - Apple's premium font for Arabic/Sindhi */
-  --font-main: "SF Arabic", "SF Arabic Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI Arabic", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* SF Arabic - Now hosted locally for cross-platform support */
+  --font-main: "SF Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI Arabic", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: "SF Arabic", "New York", -apple-system, Georgia, serif;
 
   --spacing-xs: 0.25rem;
