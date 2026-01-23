@@ -4,40 +4,39 @@ import { createClient } from '@supabase/supabase-js';
 let supabase: ReturnType<typeof createClient> | null = null;
 
 export default async function handler(request: any, response: any) {
+    let html = '';
+    const protocol = request.headers['x-forwarded-proto'] || 'https';
+    const host = request.headers['x-forwarded-host'] || request.headers.host;
+    const baseUrl = `${protocol}://${host}`;
+
     try {
         let { slug } = request.query;
         if (!slug) return response.status(400).send('Missing slug');
 
-        // Clean slug (remove trailing slash or query params if passed through source)
+        // Clean slug
         if (typeof slug === 'string') {
             slug = slug.split('/')[0].split('?')[0].trim();
         }
 
-        // 1. Env Check & Init
-        if (!supabase) {
-            const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-            const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-
-            if (!url || !key) {
-                console.error("Missing Supabase Env Vars");
-                return response.status(500).send('Server Configuration Error: Missing Supabase Env Vars');
-            }
-            supabase = createClient(url, key);
-        }
-
-        // 2. Fetch the raw index.html
-        const protocol = request.headers['x-forwarded-proto'] || 'https';
-        const host = request.headers['x-forwarded-host'] || request.headers.host;
-        const baseUrl = `${protocol}://${host}`;
-
-        let html = '';
+        // 1. Fetch the raw index.html FIRST (Graceful Fallback)
         try {
             const resHtml = await fetch(`${baseUrl}/index.html`);
-            if (!resHtml.ok) throw new Error(`HTTP ${resHtml.status}`);
-            html = await resHtml.text();
+            if (resHtml.ok) html = await resHtml.text();
         } catch (e) {
             console.error("Failed to fetch index.html", e);
-            return response.status(500).send(`Server Error: Failed to fetch template. ${e}`);
+        }
+
+        // 2. Env Check & Init
+        const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+        const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+
+        if (!url || !key) {
+            console.warn("Supabase Env Vars missing, falling back to CSR");
+            return response.send(html || 'Loading...'); // Fallback to CSR
+        }
+
+        if (!supabase) {
+            supabase = createClient(url, key);
         }
 
         // 3. Fetch Article Data
@@ -50,8 +49,7 @@ export default async function handler(request: any, response: any) {
         const article: any = data;
 
         if (error || !article) {
-            if (error) console.error("Supabase Error:", error);
-            // Serve original html if article not found, so client handles 404
+            if (error) console.warn("Supabase Fetch Error:", error);
             return response.send(html);
         }
 
@@ -67,10 +65,8 @@ export default async function handler(request: any, response: any) {
         const articleUrl = `${baseUrl}/article/${slug}`;
 
         // 5. Inject Metadata
-        // Replace existing title
         html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
 
-        // Inject dynamic tags immediately after <head> for fastest discovery
         const metaTags = `
     <!-- Dynamic Social Tags -->
     <meta name="description" content="${description}" />
@@ -95,7 +91,8 @@ export default async function handler(request: any, response: any) {
 
     } catch (err: any) {
         console.error("SSR Crash:", err);
-        return response.status(500).send(`Internal Server Error: ${err.message}`);
+        return response.send(html || `Error: ${err.message}`);
     }
 }
+
 
