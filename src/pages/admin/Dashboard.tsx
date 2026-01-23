@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
+import { Eye, Trash2, Edit2 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
@@ -12,6 +13,7 @@ const Dashboard: React.FC = () => {
     }, []);
 
     const fetchArticles = async () => {
+        setLoading(true);
         const { data } = await supabase
             .from('articles')
             .select('*')
@@ -19,6 +21,17 @@ const Dashboard: React.FC = () => {
 
         if (data) setArticles(data);
         setLoading(false);
+    };
+
+    const handleDelete = async (id: string, title: string) => {
+        if (!confirm(`ڇا توھان پڪ سان ھن مضمون کي ختم ڪرڻ چاھيو ٿا؟\n"${title}"\n(Are you sure you want to delete this article?)`)) return;
+
+        const { error } = await supabase.from('articles').delete().eq('id', id);
+        if (error) {
+            alert('Error deleting: ' + error.message);
+        } else {
+            setArticles(articles.filter(a => a.id !== id));
+        }
     };
 
     return (
@@ -95,7 +108,39 @@ const Dashboard: React.FC = () => {
                                         </span>
                                     </td>
                                     <td style={{ padding: '1.2rem 1.5rem' }}>
-                                        <Link to={`/admin/edit/${article.id}`} style={{ color: 'var(--color-accent)', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Edit</Link>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <a
+                                                href={`/article/${article.slug}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ color: '#666', transition: 'color 0.2s' }}
+                                                title="View"
+                                            >
+                                                <Eye size={18} />
+                                            </a>
+                                            <Link
+                                                to={`/admin/edit/${article.id}`}
+                                                style={{ color: 'var(--color-accent)', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                            >
+                                                <Edit2 size={16} /> Edit
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(article.id, article.title)}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    color: '#ef4444',
+                                                    cursor: 'pointer',
+                                                    padding: 0,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    transition: 'opacity 0.2s'
+                                                }}
+                                                title="Delete"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
