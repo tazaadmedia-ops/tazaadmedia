@@ -113,7 +113,7 @@ const CategoryPage: React.FC = () => {
                                         {art.subdeck}
                                     </p>
                                     <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem', fontWeight: 700, color: '#888' }}>
-                                        <span>پاران: {art.article_authors?.[0]?.users?.full_name || 'اسٽاف'}</span>
+                                        <span>قلمڪار: {art.article_authors?.[0]?.users?.full_name || 'اسٽاف'}</span>
                                         <span>{new Date(art.published_at || art.created_at).toLocaleDateString()}</span>
                                     </div>
                                 </Link>
