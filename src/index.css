@@ -73,8 +73,8 @@ h5,
 h6 {
   font-family: var(--font-main);
   /* SF Arabic for all headings */
-  font-weight: 800;
-  /* Bolder default for headings */
+  font-weight: 900;
+  /* Extra Bold for headings */
   line-height: 1.4;
   /* Better heading line-height */
   margin-bottom: var(--spacing-sm);

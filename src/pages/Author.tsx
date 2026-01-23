@@ -159,7 +159,7 @@ const AuthorPage: React.FC = () => {
                                 <Link to={`/article/${art.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <h3 style={{
                                         fontSize: '1.6rem',
-                                        fontWeight: 800,
+                                        fontWeight: 900,
                                         lineHeight: 1.3,
                                         marginBottom: '0.75rem',
                                         color: '#000',

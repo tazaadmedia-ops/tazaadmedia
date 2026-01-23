@@ -162,7 +162,7 @@ const Home: React.FC = () => {
                 return (
                     <div key={section.title} style={{ marginBottom: '3rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid black', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{section.title}</h2>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 900 }}>{section.title}</h2>
                             <Link
                                 to={`/category/${section.slug}`}
                                 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#666', textDecoration: 'none' }}
@@ -181,7 +181,7 @@ const Home: React.FC = () => {
                                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ddd', fontSize: '0.8rem' }}>No Image</div>
                                         )}
                                     </div>
-                                    <h3 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 700, marginBottom: '0.3rem', color: '#111' }}>
+                                    <h3 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', color: '#111' }}>
                                         {story.title}
                                     </h3>
                                     <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>

@@ -81,7 +81,7 @@ const SearchPage: React.FC = () => {
                                 <Link to={`/article/${art.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <h2 style={{
                                         fontSize: '1.8rem',
-                                        fontWeight: 800,
+                                        fontWeight: 900,
                                         lineHeight: 1.3,
                                         marginBottom: '1rem',
                                         color: '#000',
