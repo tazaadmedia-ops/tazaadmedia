@@ -178,7 +178,7 @@ const ArticlePage: React.FC = () => {
             )}
 
             {/* Content */}
-            <div style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '2', color: '#2c2c2c' }}>
+            <div className="article-content" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.65', color: '#2c2c2c' }}>
                 <EditorContent editor={editor} />
             </div>
 

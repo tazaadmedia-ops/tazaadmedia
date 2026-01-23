@@ -214,8 +214,8 @@ img {
   margin: 0 auto;
   font-size: 1.2rem;
   /* Slightly larger for comfortable reading */
-  line-height: 1.7;
-  /* Generous line-height for long-form reading */
+  line-height: 1.65;
+  /* Balanced line-height for long-form reading */
   color: #2A2A2A;
   /* Softer black, easier on eyes */
   font-weight: 400;
@@ -226,8 +226,8 @@ img {
 }
 
 .article-content p {
-  margin-bottom: 1.75rem;
-  /* More breathing room between paragraphs */
+  margin-bottom: 1.5rem;
+  /* Compact paragraph spacing */
 }
 
 .article-content h3 {
