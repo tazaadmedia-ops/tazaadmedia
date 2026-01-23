@@ -59,6 +59,7 @@ const ArticleEditor: React.FC = () => {
     // Core Data
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
+    const [initialSlug, setInitialSlug] = useState(''); // Track loaded slug
     const [subdeck, setSubdeck] = useState('');
     const [categories, setCategories] = useState<any[]>([]);
     const [categoryId, setCategoryId] = useState<string | null>(null);
@@ -150,6 +151,7 @@ const ArticleEditor: React.FC = () => {
                 if (article) {
                     setTitle(article.title);
                     setSlug(article.slug || '');
+                    setInitialSlug(article.slug || '');
                     setSubdeck(article.subdeck || '');
                     setCategoryId(article.primary_category_id);
                     setFeaturedImageUrl(article.featured_image_url || ''); // Assuming we add this column
@@ -182,15 +184,17 @@ const ArticleEditor: React.FC = () => {
             if (!finalSlug) finalSlug = Math.random().toString(36).substring(2, 10);
         }
 
-        // Pre-save uniqueness check
-        const unique = await isSlugUnique(finalSlug, id);
-        if (!unique) {
-            setIsSaving(false);
-            if (confirm('هن عنوان سان لنڪ پهريان ئي موجود آهي. ڇا نئين لنڪ تيار ڪجي؟ (Link already exists. Generate a new one?)')) {
-                const randomPart = Math.random().toString(36).substring(2, 6);
-                setSlug(finalSlug + '-' + randomPart);
+        // Pre-save uniqueness check (only if changed)
+        if (finalSlug !== initialSlug) {
+            const unique = await isSlugUnique(finalSlug, id);
+            if (!unique) {
+                setIsSaving(false);
+                if (confirm('هن عنوان سان لنڪ پهريان ئي موجود آهي. ڇا نئين لنڪ تيار ڪجي؟ (Link already exists. Generate a new one?)')) {
+                    const randomPart = Math.random().toString(36).substring(2, 6);
+                    setSlug(finalSlug + '-' + randomPart);
+                }
+                return;
             }
-            return;
         }
 
         const payload: any = {
@@ -231,8 +235,14 @@ const ArticleEditor: React.FC = () => {
                 if (authError) console.error('Error saving authors:', authError);
             }
 
-            if (id === 'new') navigate(`/admin/edit/${articleId}`);
-            else alert('Saved successfully!');
+            if (id === 'new') {
+                setInitialSlug(finalSlug);
+                navigate(`/admin/edit/${articleId}`);
+            }
+            else {
+                setInitialSlug(finalSlug);
+                alert('Saved successfully!');
+            }
         }
 
         setIsSaving(false);
