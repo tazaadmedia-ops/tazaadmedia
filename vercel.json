@@ -1,5 +1,8 @@
-{
   "rewrites": [
+    {
+      "source": "/article/(.*)",
+      "destination": "/api/ssr?slug=$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
