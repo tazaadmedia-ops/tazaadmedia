@@ -50,8 +50,10 @@ body {
   /* Subtle letter spacing for better kerning */
   font-feature-settings: 'kern' 1, 'liga' 1;
   /* Enable kerning and ligatures */
-  text-rendering: optimizeLegibility;
   /* Better text rendering */
+  width: 100%;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
 }
 
 h1,

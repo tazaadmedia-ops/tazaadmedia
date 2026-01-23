@@ -148,7 +148,7 @@ const AuthorPage: React.FC = () => {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginBottom: '4rem' }}>
                     {articles.length > 0 ? articles.map((art) => (
-                        <div key={art.id} style={{
+                        <div key={art.id} className="mobile-grid-1" style={{
                             display: 'grid',
                             gridTemplateColumns: '280px 1fr',
                             gap: '2.5rem',
