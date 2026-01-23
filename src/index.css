@@ -1,0 +1,348 @@
+:root {
+  --color-bg: #FAFAFA;
+  /* Softer background, easier on eyes */
+  --color-text: #2A2A2A;
+  /* Softer black for better readability */
+  --color-text-light: #5A5A5A;
+  /* Balanced gray */
+  --color-text-lighter: #7A7A7A;
+  /* Lighter gray with proper contrast */
+  --color-accent: #C41E3A;
+  /* More balanced red, less harsh */
+  --color-border: #E8E8E8;
+  /* Subtle border */
+
+  /* SF Arabic only - Apple's premium font for Arabic/Sindhi */
+  --font-main: "SF Arabic", "SF Arabic Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI Arabic", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "SF Arabic", "New York", -apple-system, Georgia, serif;
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 3rem;
+
+  --container-width: 1080px;
+  --article-width: 65ch;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  line-height: 1.9;
+  /* Increased for better readability */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Better font rendering on macOS */
+  font-size: 17px;
+  /* Slightly larger for comfort */
+  direction: rtl;
+  word-spacing: 0.05em;
+  /* Better word spacing for Sindhi */
+  letter-spacing: 0.01em;
+  /* Subtle letter spacing for better kerning */
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  /* Enable kerning and ligatures */
+  text-rendering: optimizeLegibility;
+  /* Better text rendering */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-main);
+  /* SF Arabic for all headings */
+  font-weight: 800;
+  /* Bolder default for headings */
+  line-height: 1.4;
+  /* Better heading line-height */
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: -0.015em;
+  /* Optimized for Sindhi script */
+  color: #1A1A1A;
+  /* Slightly softer black */
+  font-feature-settings: 'kern' 1;
+  /* Enable kerning for headings */
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  /* Extra bold for main headings */
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  /* Tighter for large headings */
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  /* Extra bold */
+  line-height: 1.35;
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 900;
+  /* Extra bold */
+  line-height: 1.45;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+a:hover {
+  opacity: 1;
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover h1,
+a:hover h2,
+a:hover h3,
+a:hover h4,
+a:hover h5,
+a:hover h6 {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-user-drag: none !important;
+  pointer-events: auto;
+  /* Keep clicks working */
+}
+
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.sans {
+  font-family: var(--font-sans);
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+}
+
+.border-top {
+  border-top: 1px solid var(--color-border);
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Utilities */
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Article specific */
+.article-content {
+  max-width: var(--article-width);
+  margin: 0 auto;
+  font-size: 1.2rem;
+  /* Slightly larger for comfortable reading */
+  line-height: 1.7;
+  /* Generous line-height for long-form reading */
+  color: #2A2A2A;
+  /* Softer black, easier on eyes */
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  /* Better kerning */
+  word-spacing: 0.05em;
+  /* Improved word spacing */
+}
+
+.article-content p {
+  margin-bottom: 1.75rem;
+  /* More breathing room between paragraphs */
+}
+
+.article-content h3 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  margin-top: 3rem;
+  /* More space before headings */
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+  color: #1A1A1A;
+}
+
+.article-content blockquote {
+  border-right: 3px solid var(--color-accent);
+  /* Slightly thinner border */
+  padding: 1.25rem 2.5rem 1.25rem 0;
+  margin: 3rem 0;
+  /* More space around blockquotes */
+  font-style: italic;
+  font-size: 1.45rem;
+  color: #4A4A4A;
+  /* Softer color for quotes */
+  line-height: 1.7;
+  /* Better line-height for quotes */
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+
+.dropcap::first-letter {
+  font-size: 4.5rem;
+  /* Slightly larger */
+  float: right;
+  line-height: 0.85;
+  margin-left: 0.6rem;
+  margin-top: 0.15rem;
+  color: var(--color-accent);
+  font-weight: 900;
+}
+
+/* Tiptap Editor Customization */
+.ProseMirror {
+  outline: none !important;
+  min-height: 300px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: right;
+  /* RTL support */
+  height: 0;
+  pointer-events: none;
+}
+
+/* Ensure images in editor are responsive */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+/* Video embeds */
+.ProseMirror video,
+.ProseMirror iframe {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border: none;
+}
+
+/* Figure & Caption */
+.ProseMirror figure {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.ProseMirror figure img {
+  margin-bottom: 0.5rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ProseMirror figcaption {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  font-style: italic;
+  font-family: var(--font-main);
+  direction: rtl;
+  /* Ensure caption is RTL */
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  :root {
+    --container-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  /* Grid adaptations will be handled via inline styles if needed, 
+     but we can add general utility classes here. */
+  .mobile-stack {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .mobile-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+}
