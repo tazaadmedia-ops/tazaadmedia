@@ -101,6 +101,28 @@ const ArticleEditor: React.FC = () => {
         },
     });
 
+    // --- Utilities ---
+    const slugify = (text: string) => {
+        return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')     // Replace spaces with -
+            .replace(/[^\w\u0600-\u06FF-]+/g, '') // Keep alphanumeric, Sindhi/Arabic chars and -
+            .replace(/--+/g, '-')      // Replace multiple - with single -
+            .substring(0, 100);        // Limit length
+    };
+
+    const isSlugUnique = async (testSlug: string, articleId?: string) => {
+        let query = supabase.from('articles').select('id').eq('slug', testSlug);
+        if (articleId && articleId !== 'new') {
+            query = query.neq('id', articleId);
+        }
+        const { data, error } = await query.maybeSingle();
+        if (error) return true; // Assume unique on error to let DB handle it, or handle specifically
+        return !data;
+    };
+
     useEffect(() => {
         const init = async () => {
             setIsLoading(true);
@@ -152,14 +174,30 @@ const ArticleEditor: React.FC = () => {
 
         setIsSaving(true);
 
-        // Use existing slug or generate new one if empty
-        const finalSlug = slug || (Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 8));
+        // Use existing slug or generate new one from title if empty
+        let finalSlug = slug.trim();
+        if (!finalSlug) {
+            finalSlug = slugify(title);
+            // If title is empty or non-latin/sindhi, fallback to random
+            if (!finalSlug) finalSlug = Math.random().toString(36).substring(2, 10);
+        }
+
+        // Pre-save uniqueness check
+        const unique = await isSlugUnique(finalSlug, id);
+        if (!unique) {
+            setIsSaving(false);
+            if (confirm('هن عنوان سان لنڪ پهريان ئي موجود آهي. ڇا نئين لنڪ تيار ڪجي؟ (Link already exists. Generate a new one?)')) {
+                const randomPart = Math.random().toString(36).substring(2, 6);
+                setSlug(finalSlug + '-' + randomPart);
+            }
+            return;
+        }
 
         const payload: any = {
             title,
             subdeck,
             primary_category_id: categoryId,
-            featured_image_url: featuredImageUrl, // New Field
+            featured_image_url: featuredImageUrl,
             slug: finalSlug,
             content_json: editor.getJSON(),
             content_text: editor.getText(),
@@ -172,10 +210,10 @@ const ArticleEditor: React.FC = () => {
         if (id && id !== 'new') {
             payload.id = id;
             const { error } = await supabase.from('articles').update(payload).eq('id', id);
-            if (error) { alert('Error saving: ' + error.message); setIsSaving(false); return; }
+            if (error) { alert('بچائڻ ۾ غلطي (Error saving): ' + error.message); setIsSaving(false); return; }
         } else {
             const { data, error } = await supabase.from('articles').insert([payload]).select().single();
-            if (error) { alert('Error creating: ' + error.message); setIsSaving(false); return; }
+            if (error) { alert('تخليق ۾ غلطي (Error creating): ' + error.message); setIsSaving(false); return; }
             if (data) {
                 articleId = data.id;
             }
@@ -396,8 +434,10 @@ const ArticleEditor: React.FC = () => {
                         />
                         <button
                             onClick={() => {
-                                if (confirm('Regenerate slug? This will change the public URL.')) {
-                                    setSlug(Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 8));
+                                if (confirm('لنڪ ٻيهر تيار ڪجي؟ (Regenerate slug?)')) {
+                                    const base = slugify(title) || 'article';
+                                    const random = Math.random().toString(36).substring(2, 6);
+                                    setSlug(base + '-' + random);
                                 }
                             }}
                             title="Regenerate Slug"
