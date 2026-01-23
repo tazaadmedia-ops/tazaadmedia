@@ -136,7 +136,7 @@ const AuthorPage: React.FC = () => {
                     justifyContent: 'space-between',
                     alignItems: 'baseline'
                 }}>
-                    <h2 style={{ fontSize: '1.4rem', fontWeight: 900 }}>تازو لکڻيون</h2>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 900 }}>تازيون لکڻيون</h2>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginBottom: '4rem' }}>
