@@ -5,8 +5,13 @@ let supabase: ReturnType<typeof createClient> | null = null;
 
 export default async function handler(request: any, response: any) {
     try {
-        const { slug } = request.query;
+        let { slug } = request.query;
         if (!slug) return response.status(400).send('Missing slug');
+
+        // Clean slug (remove trailing slash or query params if passed through source)
+        if (typeof slug === 'string') {
+            slug = slug.split('/')[0].split('?')[0].trim();
+        }
 
         // 1. Env Check & Init
         if (!supabase) {
@@ -15,8 +20,6 @@ export default async function handler(request: any, response: any) {
 
             if (!url || !key) {
                 console.error("Missing Supabase Env Vars");
-                // Fallback to static HTML if env vars are missing, don't crash
-                // But better to explain
                 return response.status(500).send('Server Configuration Error: Missing Supabase Env Vars');
             }
             supabase = createClient(url, key);
@@ -29,7 +32,6 @@ export default async function handler(request: any, response: any) {
 
         let html = '';
         try {
-            // Fetch from self (static asset)
             const resHtml = await fetch(`${baseUrl}/index.html`);
             if (!resHtml.ok) throw new Error(`HTTP ${resHtml.status}`);
             html = await resHtml.text();
@@ -47,43 +49,43 @@ export default async function handler(request: any, response: any) {
 
         const article: any = data;
 
-        if (error) {
-            console.error("Supabase Error:", error);
-            // If error is not 404 (PGRST116), it might be connection.
-            // But if simply not found, serve the app so client can handle 404.
-        }
-
-        if (!article) {
+        if (error || !article) {
+            if (error) console.error("Supabase Error:", error);
+            // Serve original html if article not found, so client handles 404
             return response.send(html);
         }
 
-        // 4. Replace Metadata
-        const title = article.title ? article.title.replace(/"/g, '&quot;') : 'Tazaad - Sindhi';
-        const description = article.subdeck ? article.subdeck.replace(/"/g, '&quot;') : 'Leading Sindhi digital media platform.';
-        const image = article.featured_image_url || `${baseUrl}/default-og.jpg`;
-        const url = `${baseUrl}/article/${slug}`;
+        // 4. Prepare Metadata
+        const title = (article.title ? article.title.replace(/"/g, '&quot;') : 'Tazaad - Sindhi');
+        const description = (article.subdeck ? article.subdeck.replace(/"/g, '&quot;') : 'Leading Sindhi digital media platform.').substring(0, 200);
 
-        // Basic Replacement
-        html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
+        let imageUrl = article.featured_image_url;
+        if (imageUrl && !imageUrl.startsWith('http')) {
+            imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+        }
+        const image = imageUrl || `${baseUrl}/default-og.jpg`;
+        const articleUrl = `${baseUrl}/article/${slug}`;
 
-        // Remove existing OG tags to avoid dupes (rough regex)
-        // html = html.replace(/<meta property="og:.*?>/g, '');
-        // html = html.replace(/<meta name="twitter:.*?>/g, ''); 
+        // 5. Inject Metadata
+        // Replace existing title
+        html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
 
-        // Inject new tags before </head>
+        // Inject dynamic tags immediately after <head> for fastest discovery
         const metaTags = `
-        <meta property="og:title" content="${title}" />
-        <meta property="og:description" content="${description}" />
-        <meta property="og:image" content="${image}" />
-        <meta property="og:url" content="${url}" />
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="${title}" />
-        <meta name="twitter:description" content="${description}" />
-        <meta name="twitter:image" content="${image}" />
-        `;
+    <!-- Dynamic Social Tags -->
+    <meta name="description" content="${description}" />
+    <meta property="og:title" content="${title}" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${image}" />
+    <meta property="og:url" content="${articleUrl}" />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${image}" />
+`;
 
-        html = html.replace('</head>', `${metaTags}</head>`);
+        html = html.replace('<head>', `<head>${metaTags}`);
 
         // Cache for 60 seconds
         response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
@@ -96,3 +98,4 @@ export default async function handler(request: any, response: any) {
         return response.status(500).send(`Internal Server Error: ${err.message}`);
     }
 }
+
