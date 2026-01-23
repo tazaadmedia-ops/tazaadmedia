@@ -214,8 +214,8 @@ img {
   margin: 0 auto;
   font-size: 1.2rem;
   /* Slightly larger for comfortable reading */
-  line-height: 1.65;
-  /* Balanced line-height for long-form reading */
+  line-height: 1.55;
+  /* Extra compact line-height */
   color: #2A2A2A;
   /* Softer black, easier on eyes */
   font-weight: 400;
@@ -226,8 +226,15 @@ img {
 }
 
 .article-content p {
-  margin-bottom: 1.2rem;
-  /* More compact paragraph spacing */
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  /* Very compact paragraph spacing */
+}
+
+/* Target Tiptap specifically to remove its default spacing */
+.article-content .ProseMirror p {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
 }
 
 .article-content h3 {
