@@ -3,7 +3,7 @@
   src: url("./assets/fonts/SF-Arabic.woff2") format("woff2"),
     url("./assets/fonts/SF-Arabic.woff") format("woff"),
     url("./assets/fonts/SF-Arabic.ttf") format("truetype");
-  font-weight: normal;
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
