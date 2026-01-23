@@ -85,16 +85,7 @@ const AuthorPage: React.FC = () => {
             />
 
             {/* Author Profile Header */}
-            <div style={{
-                backgroundColor: '#f9f9f7',
-                padding: '3rem 2rem',
-                marginBottom: '3rem',
-                borderBottom: '1px solid #eee',
-                display: 'flex',
-                gap: '2.5rem',
-                alignItems: 'center',
-                direction: 'rtl' // Consistent with site flow
-            }}>
+            <div className="author-header">
                 <div style={{ flexShrink: 0 }}>
                     <div style={{
                         width: '160px',
@@ -107,13 +98,15 @@ const AuthorPage: React.FC = () => {
                         border: '1px solid #ddd',
                     }} />
                 </div>
-                <div style={{ flex: 1, textAlign: 'right' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '1.5rem', marginBottom: '1rem' }}>
+                <div className="author-info">
+                    <div className="meta-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '1.5rem', marginBottom: '1rem' }}>
                         <h1 style={{
                             fontSize: '2.4rem',
                             fontWeight: 800,
                             margin: 0,
-                            color: '#111'
+                            color: '#111',
+                            display: 'flex',
+                            alignItems: 'center'
                         }}>
                             {author.full_name}
                         </h1>
@@ -127,7 +120,7 @@ const AuthorPage: React.FC = () => {
                     }}>
                         {author.bio || 'هن ليکڪ لاءِ ڪا به بايو موجود ناهي.'}
                     </p>
-                    <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', justifyContent: 'flex-start' }}>
+                    <div className="meta-row" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <span style={{ fontSize: '0.9rem', color: '#666', fontWeight: 600 }}>ليکڪ</span>
                     </div>
                 </div>
@@ -148,14 +141,7 @@ const AuthorPage: React.FC = () => {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', marginBottom: '4rem' }}>
                     {articles.length > 0 ? articles.map((art) => (
-                        <div key={art.id} className="mobile-grid-1" style={{
-                            display: 'grid',
-                            gridTemplateColumns: '280px 1fr',
-                            gap: '2.5rem',
-                            borderBottom: '1px solid #f0f0f0',
-                            paddingBottom: '2.5rem',
-                            textAlign: 'right'
-                        }}>
+                        <div key={art.id} className="article-list-item mobile-grid-1">
                             <div style={{ order: 1 }}>
                                 <Link to={`/article/${art.slug}`}>
                                     <div style={{

@@ -139,7 +139,7 @@ const Header: React.FC = () => {
                                 borderRadius: '20px',
                                 border: '1px solid #ddd',
                                 outline: 'none',
-                                fontSize: '0.9rem',
+                                fontSize: '16px',
                                 backgroundColor: '#f9f9f9',
                                 color: '#333',
                                 fontFamily: 'var(--font-main)'

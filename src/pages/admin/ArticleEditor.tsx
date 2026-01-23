@@ -392,7 +392,7 @@ const ArticleEditor: React.FC = () => {
                         <input
                             value={slug}
                             onChange={(e) => setSlug(e.target.value)}
-                            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.9rem', color: '#555', fontFamily: 'monospace', width: '200px' }}
+                            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '16px', color: '#555', fontFamily: 'monospace', width: '200px' }}
                         />
                         <button
                             onClick={() => {
@@ -462,7 +462,7 @@ const ArticleEditor: React.FC = () => {
                                         onChange={(e) => setAuthorSearch(e.target.value)}
                                         style={{
                                             width: '100%', padding: '6px 8px', borderRadius: '6px',
-                                            border: '1px solid #eee', fontSize: '0.85rem', outline: 'none'
+                                            border: '1px solid #eee', fontSize: '16px', outline: 'none'
                                         }}
                                     />
                                 </div>
