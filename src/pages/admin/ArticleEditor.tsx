@@ -103,16 +103,16 @@ const ArticleEditor: React.FC = () => {
     });
 
     // --- Utilities ---
-    const slugify = (text: string) => {
-        return text
-            .toString()
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')     // Replace spaces with -
-            .replace(/[^\w\u0600-\u06FF-]+/g, '') // Keep alphanumeric, Sindhi/Arabic chars and -
-            .replace(/--+/g, '-')      // Replace multiple - with single -
-            .substring(0, 100);        // Limit length
+    const generateRandomSlug = (length = 12) => {
+        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
     };
+
+
 
     const isSlugUnique = async (testSlug: string, articleId?: string) => {
         let query = supabase.from('articles').select('id').eq('slug', testSlug);
@@ -176,12 +176,11 @@ const ArticleEditor: React.FC = () => {
 
         setIsSaving(true);
 
-        // Use existing slug or generate new one from title if empty
+        // Use existing slug or generate new random one if empty
         let finalSlug = slug.trim();
         if (!finalSlug) {
-            finalSlug = slugify(title);
-            // If title is empty or non-latin/sindhi, fallback to random
-            if (!finalSlug) finalSlug = Math.random().toString(36).substring(2, 10);
+            finalSlug = generateRandomSlug();
+            setSlug(finalSlug);
         }
 
         // Pre-save uniqueness check (only if changed)
@@ -426,7 +425,14 @@ const ArticleEditor: React.FC = () => {
                     type="text"
                     placeholder="Article Title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                        const newTitle = e.target.value;
+                        setTitle(newTitle);
+                        // Auto-generate random slug for new articles if slug is empty
+                        if (id === 'new' && !slug && newTitle.trim().length > 0) {
+                            setSlug(generateRandomSlug());
+                        }
+                    }}
                     style={{
                         width: '100%', fontSize: '2.5rem', fontWeight: 800, border: 'none', outline: 'none',
                         marginBottom: '1rem', background: 'transparent', color: '#111', lineHeight: '1.2', direction: 'rtl'
@@ -445,9 +451,7 @@ const ArticleEditor: React.FC = () => {
                         <button
                             onClick={() => {
                                 if (confirm('لنڪ ٻيهر تيار ڪجي؟ (Regenerate slug?)')) {
-                                    const base = slugify(title) || 'article';
-                                    const random = Math.random().toString(36).substring(2, 6);
-                                    setSlug(base + '-' + random);
+                                    setSlug(generateRandomSlug());
                                 }
                             }}
                             title="Regenerate Slug"
