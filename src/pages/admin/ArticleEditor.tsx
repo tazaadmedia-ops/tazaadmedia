@@ -12,7 +12,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import {
     Plus, X, MoreHorizontal, Image as ImageIcon, List,
     RotateCcw, RotateCw, Bold, Italic, Strikethrough,
-    Code, Link as LinkIcon, Video, Quote, FileText,
+    Code, Link as LinkIcon, Video, Quote,
     ListOrdered, ChevronDown, AlignLeft, AlignCenter, AlignRight,
     Loader, Check
 } from 'lucide-react';
