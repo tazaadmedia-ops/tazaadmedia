@@ -9,7 +9,11 @@ export default async function handler(request: any, response: any) {
     const protocol = request.headers['x-forwarded-proto'] || 'https';
     const host = request.headers['x-forwarded-host'] || request.headers.host;
     const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
-    const baseUrl = vercelUrl || `${protocol}://${host}`;
+
+    // Prefer Vercel URL in production to ensure we can fetch index.html from ourselves
+    // But if running locally (host includes localhost), use host.
+    const isLocal = host.includes('localhost');
+    const baseUrl = isLocal ? `${protocol}://${host}` : (vercelUrl || `${protocol}://${host}`);
 
     try {
         let { slug } = request.query;
@@ -25,22 +29,42 @@ export default async function handler(request: any, response: any) {
 
         // 1. Fetch the raw index.html FIRST (Graceful Fallback)
         try {
-            // In Vercel environment, we might need to fetch from the deployment URL
-            const validBaseUrl = baseUrl.includes('localhost') ? baseUrl : (vercelUrl || baseUrl);
-            const resHtml = await fetch(`${validBaseUrl}/index.html`);
+            const resHtml = await fetch(`${baseUrl}/index.html`);
             if (resHtml.ok) {
                 html = await resHtml.text();
             } else {
-                console.warn(`Failed to fetch index.html from ${validBaseUrl}, status: ${resHtml.status}`);
+                console.warn(`[SSR] Failed to fetch index.html from ${baseUrl}, status: ${resHtml.status}`);
             }
         } catch (e) {
-            console.error("Failed to fetch index.html", e);
+            console.error(`[SSR] Exception fetching index.html from ${baseUrl}`, e);
         }
 
-        // If we failed to get HTML, we can't do server-side injection properly, but we should try to recover or fail gracefully.
-        // For now, let's proceed; if html is empty, we might just return a basic string or error.
-        if (!html && !process.env.VITE_SUPABASE_URL) {
-            return response.send('Error loading application.');
+        const errorPage = `
+            <!DOCTYPE html>
+            <html lang="sd" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Tazaad Media</title>
+                <style>
+                    body { font-family: system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f9f9f9; color: #333; }
+                    h1 { margin-bottom: 1rem; }
+                    a { padding: 10px 20px; background-color: #000; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <h1>معاف ڪجو، ڪا فني خرابي پيش آئي آهي.</h1>
+                <p>Sorry, we encountered a technical issue loading this article.</p>
+                <a href="/">Go to Home / هوم تي وڃو</a>
+            </body>
+            </html>
+        `;
+
+        // If we failed to get HTML, we MUST return something visible, not just "Loading..."
+        if (!html) {
+            console.error("[SSR] Critical: No HTML template found.");
+            // Try to render the error page
+            return response.send(errorPage);
         }
 
         // 2. Env Check & Init
@@ -48,8 +72,8 @@ export default async function handler(request: any, response: any) {
         const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
         if (!url || !key) {
-            console.warn("Supabase Env Vars missing, falling back to CSR");
-            return response.send(html || 'Loading...'); // Fallback to CSR
+            console.warn("[SSR] Supabase Env Vars missing, falling back to CSR");
+            return response.send(html); // Return shell for CSR
         }
 
         if (!supabase) {
@@ -66,8 +90,8 @@ export default async function handler(request: any, response: any) {
         const article: any = data;
 
         if (error || !article) {
-            if (error) console.warn("Supabase Fetch Error:", error);
-            // If article not found, return original HTML so client-side routing can handle 404
+            if (error) console.warn("[SSR] Supabase Fetch Error:", error.message);
+            // If article not found or db error, return original HTML so client-side can handle 404 or retry
             return response.send(html);
         }
 
@@ -82,9 +106,9 @@ export default async function handler(request: any, response: any) {
         const image = imageUrl || `${baseUrl}/default-og.jpg`;
         const articleUrl = `${baseUrl}/article/${slug}`;
 
-        // 5. Inject Metadata - CRITICAL: Strip existing tags first to avoid duplicates
+        // 5. Inject Metadata
 
-        // Remove existing standard meta tags - using [\s\S] to match newlines if any
+        // Remove existing standard meta tags
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
         html = html.replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
         html = html.replace(/<meta\s+property=["']og:.*?["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
@@ -107,8 +131,8 @@ export default async function handler(request: any, response: any) {
 
         html = html.replace('<head>', `<head>${metaTags}`);
 
-        // Add Debug Info (Invisible to user, visible in View Source for diagnosing Vercel config issues)
-        const debugInfo = `<!-- SSR DEBUG: Slug=${slug}, Found=${!!article}, Title=${title.substring(0, 20)}..., EnvURL=${!!url} -->`;
+        // Add Debug Info
+        const debugInfo = `<!-- SSR DEBUG: Slug=${slug}, Found=${!!article}, Title=${title.substring(0, 20)}... -->`;
         html = html.replace('</body>', `${debugInfo}</body>`);
 
         // Cache for 60 seconds
@@ -118,9 +142,22 @@ export default async function handler(request: any, response: any) {
         return response.send(html);
 
     } catch (err: any) {
-        console.error("SSR Crash:", err);
-        // Fallback to pure HTML but with error log
-        const errorHtml = html ? html.replace('</body>', `<!-- SSR ERROR: ${err.message} --></body>`) : `Error: ${err.message}`;
+        console.error("[SSR] Crash:", err);
+        // Fallback to error page instead of broken HTML
+        // If we have HTML, we can try to send it (CSR fallback)
+        if (html) return response.send(html);
+
+        const errorHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head><meta charset="UTF-8"><title>Error</title></head>
+            <body>
+                <h1>Application Error</h1>
+                <p>${err.message}</p>
+                <a href="/">Go Home</a>
+            </body>
+            </html>
+        `;
         return response.send(errorHtml);
     }
 }
