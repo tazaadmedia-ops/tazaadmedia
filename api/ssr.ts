@@ -28,9 +28,11 @@ export default async function handler(request: any, response: any) {
         // 1. Fetch index.html using FILE SYSTEM (More reliable than fetch)
         try {
             // Debug output confirmed index.html is at /var/task/index.html which corresponds to process.cwd()
+            // CRITICAL: We must prefer 'dist/index.html' (production build) over 'index.html' (dev/source).
+            // The source index.html references /src/main.tsx which fails in production.
             const possiblePaths = [
-                path.join(process.cwd(), 'index.html'),
                 path.join(process.cwd(), 'dist', 'index.html'),
+                path.join(process.cwd(), 'index.html'),
             ];
 
             for (const p of possiblePaths) {
