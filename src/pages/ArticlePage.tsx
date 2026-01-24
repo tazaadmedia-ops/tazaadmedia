@@ -126,7 +126,7 @@ const ArticlePage: React.FC = () => {
     }, [slug]);
 
     if (loading) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}><LoadingSpinner /></div>;
-    if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>Article not found.</div>;
+    if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>مضمون نہ مليو</div>;
 
     return (
         <article className="container article-page-container" style={{ marginTop: '2.5rem', fontFamily: 'var(--font-main)' }}>
@@ -137,7 +137,7 @@ const ArticlePage: React.FC = () => {
                 slug={`article/${slug}`}
                 type="article"
                 publishedAt={article.published_at || article.created_at}
-                author={authorName}
+                author={authorName || undefined}
                 schemaType="NewsArticle"
             />
 
