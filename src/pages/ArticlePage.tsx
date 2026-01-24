@@ -60,18 +60,19 @@ const ArticlePage: React.FC = () => {
         },
     });
 
+    // 1. Fetch Article Data
     useEffect(() => {
         const fetchArticleAndRelated = async () => {
             if (!slug) {
                 setLoading(false);
                 return;
             }
-            // Only set loading if not already loaded or if slug changed (optimization)
-            // But for safety, let's keep it simple:
+
             setLoading(true);
+            setArticle(null); // Reset article on slug change
 
             try {
-                // 1. Fetch Main Article by Slug
+                // Fetch Main Article by Slug
                 const { data: art, error } = await supabase
                     .from('articles')
                     .select(`
@@ -105,16 +106,7 @@ const ArticlePage: React.FC = () => {
                         setCategoryName(CATEGORY_MAP[rawName] || rawName);
                     }
 
-                    // Safe editor content update
-                    if (editor) {
-                        try {
-                            editor.commands.setContent(art.content_json || art.content_text || '');
-                        } catch (e) {
-                            console.warn('Error setting editor content:', e);
-                        }
-                    }
-
-                    // 2. Fetch Related Articles (Same Category, excluding current)
+                    // Fetch Related Articles
                     if (art.primary_category_id) {
                         const { data: related } = await supabase
                             .from('articles')
@@ -129,7 +121,6 @@ const ArticlePage: React.FC = () => {
                 }
             } catch (error: any) {
                 console.error('Error fetching article:', error);
-                // Optionally set article to null to trigger "Not Found" state
                 setArticle(null);
             } finally {
                 setLoading(false);
@@ -137,7 +128,23 @@ const ArticlePage: React.FC = () => {
         };
 
         fetchArticleAndRelated();
-    }, [slug, editor]);
+    }, [slug]);
+
+    // 2. Update Editor Content when Article and Editor are ready
+    useEffect(() => {
+        if (editor && article) {
+            try {
+                // const currentContent = editor.getJSON(); // or getText check?
+                // Avoid resetting if already matching to prevent cursor jumps if we were editing (but this is read-only)
+                // For read-only, just set it.
+                // We check if content is empty to avoid double setting? 
+                // Actually, just set it. It's safe given the dependency on 'article'.
+                editor.commands.setContent(article.content_json || article.content_text || '');
+            } catch (e) {
+                console.warn('Error setting editor content:', e);
+            }
+        }
+    }, [editor, article]);
 
     // Scroll to top when slug changes
     useEffect(() => {
