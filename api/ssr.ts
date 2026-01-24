@@ -1,42 +1,58 @@
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 
 // Lazy init to avoid cold start crashes
 let supabase: ReturnType<typeof createClient> | null = null;
 
 export default async function handler(request: any, response: any) {
     let html = '';
-    // Determine Base URL Robustly
+
+    // Determine Base URL Robustly (mainly for metadata generation now)
     const protocol = request.headers['x-forwarded-proto'] || 'https';
     const host = request.headers['x-forwarded-host'] || request.headers.host;
     const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
-
-    // Prefer Vercel URL in production to ensure we can fetch index.html from ourselves
-    // But if running locally (host includes localhost), use host.
     const isLocal = host.includes('localhost');
     const baseUrl = isLocal ? `${protocol}://${host}` : (vercelUrl || `${protocol}://${host}`);
 
     try {
         let { slug } = request.query;
 
-        // Handle potential array of slugs or malformed queries
         if (!slug) return response.status(400).send('Missing slug');
         if (Array.isArray(slug)) slug = slug[0];
 
-        // Clean slug
         if (typeof slug === 'string') {
             slug = slug.split('/')[0].split('?')[0].trim();
         }
 
-        // 1. Fetch the raw index.html FIRST (Graceful Fallback)
+        // 1. Fetch index.html using FILE SYSTEM (More reliable than fetch)
         try {
-            const resHtml = await fetch(`${baseUrl}/index.html`);
-            if (resHtml.ok) {
-                html = await resHtml.text();
-            } else {
-                console.warn(`[SSR] Failed to fetch index.html from ${baseUrl}, status: ${resHtml.status}`);
+            // Try standard locations for Vercel/Node
+            const possiblePaths = [
+                path.join(process.cwd(), 'index.html'),
+                path.join(process.cwd(), 'public', 'index.html'), // Local dev often here
+                path.join(process.cwd(), 'dist', 'index.html'),   // Vite build output
+                path.join(__dirname, 'index.html'),
+                path.join(__dirname, '../index.html')
+            ];
+
+            for (const p of possiblePaths) {
+                if (fs.existsSync(p)) {
+                    html = fs.readFileSync(p, 'utf-8');
+                    // console.log(`[SSR] Loaded index.html from ${p}`);
+                    break;
+                }
             }
-        } catch (e) {
-            console.error(`[SSR] Exception fetching index.html from ${baseUrl}`, e);
+
+            // Fallback to fetch if file not found locally (should rarely happen in prod if built correctly)
+            if (!html) {
+                console.warn('[SSR] index.html not found on disk, falling back to fetch');
+                const resHtml = await fetch(`${baseUrl}/index.html`);
+                if (resHtml.ok) html = await resHtml.text();
+            }
+
+        } catch (e: any) {
+            console.error(`[SSR] Exception loading index.html:`, e.message);
         }
 
         const errorPage = `
@@ -60,10 +76,8 @@ export default async function handler(request: any, response: any) {
             </html>
         `;
 
-        // If we failed to get HTML, we MUST return something visible, not just "Loading..."
         if (!html) {
-            console.error("[SSR] Critical: No HTML template found.");
-            // Try to render the error page
+            console.error("[SSR] Critical: No HTML template found on disk or via fetch.");
             return response.send(errorPage);
         }
 
@@ -73,7 +87,7 @@ export default async function handler(request: any, response: any) {
 
         if (!url || !key) {
             console.warn("[SSR] Supabase Env Vars missing, falling back to CSR");
-            return response.send(html); // Return shell for CSR
+            return response.send(html);
         }
 
         if (!supabase) {
@@ -91,7 +105,6 @@ export default async function handler(request: any, response: any) {
 
         if (error || !article) {
             if (error) console.warn("[SSR] Supabase Fetch Error:", error.message);
-            // If article not found or db error, return original HTML so client-side can handle 404 or retry
             return response.send(html);
         }
 
@@ -107,14 +120,11 @@ export default async function handler(request: any, response: any) {
         const articleUrl = `${baseUrl}/article/${slug}`;
 
         // 5. Inject Metadata
-
-        // Remove existing standard meta tags
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
         html = html.replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
         html = html.replace(/<meta\s+property=["']og:.*?["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
         html = html.replace(/<meta\s+name=["']twitter:.*?["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
 
-        // New Metadata Block
         const metaTags = `
     <title>${title}</title>
     <meta name="description" content="${description}" />
@@ -130,12 +140,9 @@ export default async function handler(request: any, response: any) {
 `;
 
         html = html.replace('<head>', `<head>${metaTags}`);
-
-        // Add Debug Info
-        const debugInfo = `<!-- SSR DEBUG: Slug=${slug}, Found=${!!article}, Title=${title.substring(0, 20)}... -->`;
+        const debugInfo = `<!-- SSR DEBUG: Disk Mode. Slug=${slug}, Found=${!!article} -->`;
         html = html.replace('</body>', `${debugInfo}</body>`);
 
-        // Cache for 60 seconds
         response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
         response.setHeader('Content-Type', 'text/html; charset=utf-8');
 
@@ -143,8 +150,6 @@ export default async function handler(request: any, response: any) {
 
     } catch (err: any) {
         console.error("[SSR] Crash:", err);
-        // Fallback to error page instead of broken HTML
-        // If we have HTML, we can try to send it (CSR fallback)
         if (html) return response.send(html);
 
         const errorHtml = `
@@ -153,7 +158,7 @@ export default async function handler(request: any, response: any) {
             <head><meta charset="UTF-8"><title>Error</title></head>
             <body>
                 <h1>Application Error</h1>
-                <p>${err.message}</p>
+                <p>SSR Error: ${err.message}</p>
                 <a href="/">Go Home</a>
             </body>
             </html>
