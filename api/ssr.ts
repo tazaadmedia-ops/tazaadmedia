@@ -27,35 +27,23 @@ export default async function handler(request: any, response: any) {
 
         // 1. Fetch index.html using FILE SYSTEM (More reliable than fetch)
         try {
-            // Try standard locations for Vercel/Node
+            // Debug output confirmed index.html is at /var/task/index.html which corresponds to process.cwd()
             const possiblePaths = [
                 path.join(process.cwd(), 'index.html'),
-                path.join(process.cwd(), 'public', 'index.html'), // Local dev often here
-                path.join(process.cwd(), 'dist', 'index.html'),   // Vite build output
-                path.join(__dirname, 'index.html'),
-                path.join(__dirname, '../index.html')
+                path.join(process.cwd(), 'dist', 'index.html'),
             ];
 
             for (const p of possiblePaths) {
                 if (fs.existsSync(p)) {
                     html = fs.readFileSync(p, 'utf-8');
-                    // console.log(`[SSR] Loaded index.html from ${p}`);
                     break;
                 }
             }
-
-            // Fallback to fetch if file not found locally (should rarely happen in prod if built correctly)
-            if (!html) {
-                console.warn('[SSR] index.html not found on disk, falling back to fetch');
-                const resHtml = await fetch(`${baseUrl}/index.html`);
-                if (resHtml.ok) html = await resHtml.text();
-            }
-
         } catch (e: any) {
             console.error(`[SSR] Exception loading index.html:`, e.message);
         }
 
-        // Debugging: List files to find where index.html is
+        // Debugging logs (Modified to avoid crashing if __dirname is missing)
         let fileListing = '';
         try {
             const listDir = (dir: string) => {
@@ -65,8 +53,7 @@ export default async function handler(request: any, response: any) {
                     return `Error listing ${dir}: ${e.message}`;
                 }
             };
-            fileListing += listDir(process.cwd()) + '\n\n';
-            fileListing += listDir(__dirname);
+            fileListing += listDir(process.cwd());
         } catch (e) { }
 
         const errorPage = `
@@ -85,7 +72,7 @@ export default async function handler(request: any, response: any) {
             </head>
             <body>
                 <h1>SSR: index.html Not Found</h1>
-                <p>could not find index.html in common paths or via fetch.</p>
+                <p>could not find index.html in confirmed paths.</p>
                 
                 <a href="/">Go to Home (Client Side)</a>
                 <br><br>
@@ -93,7 +80,6 @@ export default async function handler(request: any, response: any) {
                 <div class="debug">
 <strong>Base URL:</strong> ${baseUrl}
 <strong>Current Dir:</strong> ${process.cwd()}
-<strong>Dirname:</strong> ${__dirname}
 
 <strong>File System Listing:</strong>
 ${fileListing}
@@ -103,7 +89,7 @@ ${fileListing}
         `;
 
         if (!html) {
-            console.error("[SSR] Critical: No HTML template found on disk or via fetch.");
+            console.error("[SSR] Critical: No HTML template found on disk.");
             return response.send(errorPage);
         }
 
