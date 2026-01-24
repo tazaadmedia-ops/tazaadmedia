@@ -84,11 +84,11 @@ export default async function handler(request: any, response: any) {
 
         // 5. Inject Metadata - CRITICAL: Strip existing tags first to avoid duplicates
 
-        // Remove existing standard meta tags
-        html = html.replace(/<title>.*?<\/title>/i, '');
-        html = html.replace(/<meta\s+name=["']description["']\s+content=["'].*?["']\s*\/?>/gi, '');
-        html = html.replace(/<meta\s+property=["']og:.*?["']\s+content=["'].*?["']\s*\/?>/gi, '');
-        html = html.replace(/<meta\s+name=["']twitter:.*?["']\s+content=["'].*?["']\s*\/?>/gi, '');
+        // Remove existing standard meta tags - using [\s\S] to match newlines if any
+        html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
+        html = html.replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
+        html = html.replace(/<meta\s+property=["']og:.*?["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
+        html = html.replace(/<meta\s+name=["']twitter:.*?["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
 
         // New Metadata Block
         const metaTags = `
@@ -107,6 +107,10 @@ export default async function handler(request: any, response: any) {
 
         html = html.replace('<head>', `<head>${metaTags}`);
 
+        // Add Debug Info (Invisible to user, visible in View Source for diagnosing Vercel config issues)
+        const debugInfo = `<!-- SSR DEBUG: Slug=${slug}, Found=${!!article}, Title=${title.substring(0, 20)}..., EnvURL=${!!url} -->`;
+        html = html.replace('</body>', `${debugInfo}</body>`);
+
         // Cache for 60 seconds
         response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
         response.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -115,9 +119,8 @@ export default async function handler(request: any, response: any) {
 
     } catch (err: any) {
         console.error("SSR Crash:", err);
-        // Fallback to pure HTML if something goes wrong, so the client app still loads
-        return response.send(html || `Error: ${err.message}`);
+        // Fallback to pure HTML but with error log
+        const errorHtml = html ? html.replace('</body>', `<!-- SSR ERROR: ${err.message} --></body>`) : `Error: ${err.message}`;
+        return response.send(errorHtml);
     }
 }
-
-
