@@ -152,14 +152,46 @@ export default async function handler(request: any, response: any) {
         console.error("[SSR] Crash:", err);
         if (html) return response.send(html);
 
+        // Debugging: List files to find where index.html is
+        let fileListing = '';
+        try {
+            const listDir = (dir: string) => {
+                try {
+                    return `DIR: ${dir}\n` + fs.readdirSync(dir).join('\n');
+                } catch (e: any) {
+                    return `Error listing ${dir}: ${e.message}`;
+                }
+            };
+            fileListing += listDir(process.cwd()) + '\n\n';
+            fileListing += listDir(__dirname);
+        } catch (e) { }
+
         const errorHtml = `
             <!DOCTYPE html>
             <html lang="en">
-            <head><meta charset="UTF-8"><title>Error</title></head>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>SSR Error Debug</title>
+                <style>
+                    body { font-family: monospace; padding: 2rem; background: #333; color: #fff; white-space: pre-wrap; }
+                    h1 { color: #ff6b6b; }
+                    .debug { background: #000; padding: 1rem; border: 1px solid #555; overflow-x: auto; }
+                </style>
+            </head>
             <body>
-                <h1>Application Error</h1>
-                <p>SSR Error: ${err.message}</p>
-                <a href="/">Go Home</a>
+                <h1>SSR Application Error</h1>
+                <p>Failed to load index.html template.</p>
+                <div class="debug">
+<strong>Error:</strong> ${err.message}
+
+<strong>Base URL tried:</strong> ${baseUrl}
+
+<strong>File System Check:</strong>
+${fileListing}
+                </div>
+                <br>
+                <a href="/" style="color: #4dabf7">Go Home (Client Side)</a>
             </body>
             </html>
         `;
