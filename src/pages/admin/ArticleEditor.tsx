@@ -16,6 +16,7 @@ import {
     ListOrdered, ChevronDown, AlignLeft, AlignCenter, AlignRight,
     Loader, Check
 } from 'lucide-react';
+import FloatingMenuExtension from '@tiptap/extension-floating-menu';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 
@@ -59,7 +60,8 @@ const ArticleEditor: React.FC = () => {
     // Core Data
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
-    const [initialSlug, setInitialSlug] = useState(''); // Track loaded slug
+    // const [initialSlug, setInitialSlug] = useState(''); // Removed pre-check
+
     const [subdeck, setSubdeck] = useState('');
     const [categories, setCategories] = useState<any[]>([]);
     const [categoryId, setCategoryId] = useState<string | null>(null);
@@ -93,6 +95,9 @@ const ArticleEditor: React.FC = () => {
             Link.configure({ openOnClick: false }),
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             Placeholder.configure({ placeholder: 'Start writing or press "/" for commands...' }),
+            FloatingMenuExtension.configure({
+                element: document.querySelector('.floating-menu') as HTMLElement,
+            }),
         ],
         editorProps: {
             attributes: {
@@ -114,57 +119,55 @@ const ArticleEditor: React.FC = () => {
 
 
 
-    const isSlugUnique = async (testSlug: string, articleId?: string) => {
-        let query = supabase.from('articles').select('id').eq('slug', testSlug);
-        if (articleId && articleId !== 'new') {
-            query = query.neq('id', articleId);
-        }
-        const { data, error } = await query.maybeSingle();
-        if (error) return true; // Assume unique on error to let DB handle it, or handle specifically
-        return !data;
-    };
+
 
     useEffect(() => {
         const init = async () => {
-            setIsLoading(true);
+            try {
+                // 1. Fetch authors and categories
+                const { data: users } = await supabase.from('users').select('*');
+                if (users) setAllAuthors(users);
 
-            // 1. Fetch authors and categories
-            const { data: users } = await supabase.from('users').select('*');
-            if (users) setAllAuthors(users);
+                const { data: cats } = await supabase.from('categories').select('*');
+                if (cats) setCategories(cats);
 
-            const { data: cats } = await supabase.from('categories').select('*');
-            if (cats) setCategories(cats);
-
-            // 2. If editing, fetch article data
-            if (id && id !== 'new') {
-                const { data: article } = await supabase
-                    .from('articles')
-                    .select(`
+                // 2. If editing, fetch article data
+                if (id && id !== 'new') {
+                    const { data: article, error } = await supabase
+                        .from('articles')
+                        .select(`
                         *,
                         article_authors (
                             users (*)
                         )
                     `)
-                    .eq('id', id)
-                    .single();
+                        .eq('id', id)
+                        .single();
 
-                if (article) {
-                    setTitle(article.title);
-                    setSlug(article.slug || '');
-                    setInitialSlug(article.slug || '');
-                    setSubdeck(article.subdeck || '');
-                    setCategoryId(article.primary_category_id);
-                    setFeaturedImageUrl(article.featured_image_url || ''); // Assuming we add this column
+                    if (error) throw error;
 
-                    if (article.article_authors) {
-                        const authors = article.article_authors.map((aa: any) => aa.users).filter(Boolean);
-                        setSelectedAuthors(authors);
+                    if (article) {
+                        setTitle(article.title);
+                        setSlug(article.slug || '');
+                        // setInitialSlug(article.slug || '');
+                        setSubdeck(article.subdeck || '');
+                        setCategoryId(article.primary_category_id);
+                        setFeaturedImageUrl(article.featured_image_url || ''); // Assuming we add this column
+
+                        if (article.article_authors) {
+                            const authors = article.article_authors.map((aa: any) => aa.users).filter(Boolean);
+                            setSelectedAuthors(authors);
+                        }
+
+                        editor?.commands.setContent(article.content_json || article.content_text || '');
                     }
-
-                    editor?.commands.setContent(article.content_json || article.content_text || '');
                 }
+            } catch (error: any) {
+                console.error('Error loading editor data:', error);
+                alert('Error loading data: ' + error.message);
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
 
         if (editor) init();
@@ -176,75 +179,92 @@ const ArticleEditor: React.FC = () => {
 
         setIsSaving(true);
 
-        // Use existing slug or generate new random one if empty
-        let finalSlug = slug.trim();
-        if (!finalSlug) {
-            finalSlug = generateRandomSlug();
-            setSlug(finalSlug);
+        let currentSlug = slug.trim();
+        if (!currentSlug) {
+            currentSlug = generateRandomSlug();
+            setSlug(currentSlug);
         }
 
-        // Pre-save uniqueness check (only if changed)
-        if (finalSlug !== initialSlug) {
-            const unique = await isSlugUnique(finalSlug, id);
-            if (!unique) {
-                setIsSaving(false);
-                if (confirm('هن عنوان سان لنڪ پهريان ئي موجود آهي. ڇا نئين لنڪ تيار ڪجي؟ (Link already exists. Generate a new one?)')) {
-                    const randomPart = Math.random().toString(36).substring(2, 6);
-                    setSlug(finalSlug + '-' + randomPart);
-                }
-                return;
-            }
-        }
-
-        const payload: any = {
+        const basePayload = {
             title,
             subdeck,
             primary_category_id: categoryId,
             featured_image_url: featuredImageUrl,
-            slug: finalSlug,
             content_json: editor.getJSON(),
             content_text: editor.getText(),
             status: 'published',
             updated_at: new Date().toISOString()
         };
 
-        let articleId = id;
+        // Recursive save helper to handle duplications
+        const saveToDb = async (slugToTry: string, retries = 0): Promise<{ id: string, finalSlug: string }> => {
+            const payload: any = { ...basePayload, slug: slugToTry };
 
-        if (id && id !== 'new') {
-            payload.id = id;
-            const { error } = await supabase.from('articles').update(payload).eq('id', id);
-            if (error) { alert('بچائڻ ۾ غلطي (Error saving): ' + error.message); setIsSaving(false); return; }
-        } else {
-            const { data, error } = await supabase.from('articles').insert([payload]).select().single();
-            if (error) { alert('تخليق ۾ غلطي (Error creating): ' + error.message); setIsSaving(false); return; }
-            if (data) {
-                articleId = data.id;
+            // If updating, include ID in payload just in case, though .update().eq() handles it
+            if (id && id !== 'new') {
+                payload.id = id;
             }
+
+            let errorSg = null;
+            let dataSg = null;
+
+            if (id && id !== 'new') {
+                const { error } = await supabase.from('articles').update(payload).eq('id', id);
+                errorSg = error;
+            } else {
+                const { data, error } = await supabase.from('articles').insert([payload]).select().single();
+                errorSg = error;
+                dataSg = data;
+            }
+
+            if (errorSg) {
+                // Check for unique constraint violation (Postgres code 23505) or explicit slug message
+                if ((errorSg.code === '23505' || errorSg.message.includes('slug') || errorSg.message.includes('unique')) && retries < 3) {
+                    const newSlug = `${slugToTry}-${Math.floor(Math.random() * 10000)}`;
+                    console.warn(`Slug collision for ${slugToTry}, retrying with ${newSlug}`);
+                    return saveToDb(newSlug, retries + 1);
+                }
+                throw errorSg;
+            }
+
+            return { id: id && id !== 'new' ? id : dataSg?.id, finalSlug: slugToTry };
+        };
+
+        try {
+            const { id: savedId, finalSlug } = await saveToDb(currentSlug);
+
+            // Update state if slug was auto-corrected
+            if (finalSlug !== currentSlug) {
+                setSlug(finalSlug);
+                // setInitialSlug(finalSlug);
+            } else {
+                // setInitialSlug(finalSlug);
+            }
+
+            if (savedId) {
+                await supabase.from('article_authors').delete().eq('article_id', savedId);
+
+                if (selectedAuthors.length > 0) {
+                    const authorInserts = selectedAuthors.map(a => ({
+                        article_id: savedId,
+                        author_id: a.id
+                    }));
+                    const { error: authError } = await supabase.from('article_authors').insert(authorInserts);
+                    if (authError) console.error('Error saving authors:', authError);
+                }
+
+                if (id === 'new') {
+                    navigate(`/admin/edit/${savedId}`);
+                } else {
+                    alert('Saved successfully!' + (finalSlug !== currentSlug ? ` (Slug updated to ${finalSlug})` : ''));
+                }
+            }
+        } catch (error: any) {
+            console.error('Save failed:', error);
+            alert('بچائڻ ۾ غلطي (Error saving): ' + (error.message || 'Unknown error'));
+        } finally {
+            setIsSaving(false);
         }
-
-        if (articleId) {
-            await supabase.from('article_authors').delete().eq('article_id', articleId);
-
-            if (selectedAuthors.length > 0) {
-                const authorInserts = selectedAuthors.map(a => ({
-                    article_id: articleId,
-                    author_id: a.id
-                }));
-                const { error: authError } = await supabase.from('article_authors').insert(authorInserts);
-                if (authError) console.error('Error saving authors:', authError);
-            }
-
-            if (id === 'new') {
-                setInitialSlug(finalSlug);
-                navigate(`/admin/edit/${articleId}`);
-            }
-            else {
-                setInitialSlug(finalSlug);
-                alert('Saved successfully!');
-            }
-        }
-
-        setIsSaving(false);
     };
 
     const toggleAuthor = (author: any) => {
@@ -257,11 +277,60 @@ const ArticleEditor: React.FC = () => {
         setAuthorSearch('');
     };
 
-    const handleEditorImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const toggleHeadingWithSplit = (level: any) => {
+        if (!editor) return;
+        const { state } = editor;
+        const { selection } = state;
+        const { empty, $from, $to } = selection;
+
+        // If partial selection, split block first
+        if (!empty && ($from.parentOffset > 0 || $to.parentOffset < $to.parent.content.size)) {
+            editor.chain()
+                .command(({ tr }) => {
+                    // Split at end first to keep start position stable
+                    if ($to.parentOffset < $to.parent.content.size) {
+                        try { tr.split($to.pos); } catch (e) { }
+                    }
+                    // Split at start
+                    if ($from.parentOffset > 0) {
+                        try { tr.split($from.pos); } catch (e) { }
+                    }
+                    return true;
+                })
+                .toggleHeading({ level })
+                .run();
+        } else {
+            // Standard behavior for empty or full-block selection
+            editor.chain().focus().toggleHeading({ level }).run();
+        }
+    };
+
+    const handleEditorImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && editor) {
-            const url = URL.createObjectURL(file);
-            editor.commands.setImage({ src: url });
+            try {
+                // Show some loading state if possible? Or just wait.
+                // Since this is triggered by file input, we can do optimistic update or just wait.
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `article_content_${Date.now()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('avatars') // Shared bucket or create new 'content' bucket? Using avatars for simplicity as per featured image.
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('avatars')
+                    .getPublicUrl(filePath);
+
+                editor.commands.setFigure({ src: publicUrl });
+            } catch (error: any) {
+                console.error('Error uploading inline image:', error);
+                alert('Error uploading image: ' + error.message);
+            }
         }
     };
 
@@ -296,6 +365,39 @@ const ArticleEditor: React.FC = () => {
     };
 
 
+    const [floatingMenuPos, setFloatingMenuPos] = useState<{ top: number, left: number } | null>(null);
+
+    useEffect(() => {
+        if (!editor) return;
+
+        const updateMenu = () => {
+            const { selection } = editor.state;
+            const { $from } = selection;
+            const isEmptyParagraph = selection.empty && $from.parent.type.name === 'paragraph' && $from.parent.content.size === 0;
+
+            if (isEmptyParagraph) {
+                const start = editor.view.coordsAtPos($from.pos);
+                // Use viewport coordinates directly for fixed positioning
+                setFloatingMenuPos({
+                    top: start.top - 5, // Center vertically
+                    left: start.left + 15 // Slight right offset (RTL)
+                });
+            } else {
+                setFloatingMenuPos(null);
+            }
+        };
+
+        editor.on('selectionUpdate', updateMenu);
+        editor.on('update', updateMenu); // Also on content change
+        editor.on('blur', () => setFloatingMenuPos(null)); // Hide on blur? Maybe not if clicking the button
+
+        return () => {
+            editor.off('selectionUpdate', updateMenu);
+            editor.off('update', updateMenu);
+            editor.off('blur');
+        };
+    }, [editor]);
+
     if (!editor) return null;
     if (isLoading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading Editor...</div>;
 
@@ -310,6 +412,37 @@ const ArticleEditor: React.FC = () => {
             <input type="file" ref={featuredImageInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFeaturedImageUpload} />
 
             <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
+
+                {/* Floating Plus Button */}
+                {floatingMenuPos && (
+                    <div style={{
+                        position: 'fixed',
+                        top: floatingMenuPos.top,
+                        left: floatingMenuPos.left,
+                        transform: 'translate(10px, -5px)', // Move to right (RTL gutter) and center vertically
+                        zIndex: 100,
+                        pointerEvents: 'auto'
+                    }}>
+                        <button
+                            onMouseDown={(e) => {
+                                e.preventDefault(); // Prevent focus loss
+                                imageInputRef.current?.click();
+                            }}
+                            title="Add Image"
+                            style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                width: '30px', height: '30px', borderRadius: '50%',
+                                border: '1px solid #ddd', backgroundColor: '#fff',
+                                cursor: 'pointer', color: '#666', boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.color = '#B70100'; e.currentTarget.style.borderColor = '#B70100'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.color = '#666'; e.currentTarget.style.borderColor = '#ddd'; e.currentTarget.style.transform = 'scale(1)'; }}
+                        >
+                            <Plus size={16} />
+                        </button>
+                    </div>
+                )}
 
                 {/* Top Actions */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
@@ -462,16 +595,30 @@ const ArticleEditor: React.FC = () => {
                     </div>
                 </div>
 
-                <input
-                    type="text"
-                    placeholder="Add a short intro..."
-                    value={subdeck}
-                    onChange={(e) => setSubdeck(e.target.value)}
-                    style={{
-                        width: '100%', fontSize: '1.25rem', color: '#666', border: 'none', outline: 'none',
-                        marginBottom: '2rem', background: 'transparent', lineHeight: '1.5', direction: 'rtl'
-                    }}
-                />
+                <div style={{ position: 'relative', marginBottom: '2rem' }}>
+                    <input
+                        type="text"
+                        placeholder="Add a short intro..."
+                        value={subdeck}
+                        maxLength={250}
+                        onChange={(e) => setSubdeck(e.target.value)}
+                        style={{
+                            width: '100%', fontSize: '1.25rem', color: '#666', border: 'none', outline: 'none',
+                            background: 'transparent', lineHeight: '1.5', direction: 'rtl',
+                            paddingBottom: '4px'
+                        }}
+                    />
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '-20px',
+                        left: '0',
+                        fontSize: '0.75rem',
+                        color: subdeck.length >= 250 ? 'red' : '#ccc',
+                        fontVariantNumeric: 'tabular-nums'
+                    }}>
+                        {subdeck.length}/250
+                    </div>
+                </div>
 
                 {/* Bylines */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2.5rem' }}>
@@ -584,22 +731,24 @@ const ArticleEditor: React.FC = () => {
                                     backgroundColor: 'white', borderRadius: '8px', border: '1px solid #eee',
                                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '6px', minWidth: '160px'
                                 }}>
-                                    {[
-                                        { label: 'Normal Text', action: () => editor.chain().focus().setParagraph().run() },
-                                        { label: 'Heading 1', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run() },
-                                        { label: 'Heading 2', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
-                                        { label: 'Heading 3', action: () => editor.chain().focus().toggleHeading({ level: 3 }).run() },
-                                    ].map((opt, i) => (
-                                        <div
-                                            key={i}
-                                            onClick={() => { opt.action(); setShowStyleMenu(false); }}
-                                            style={{ padding: '8px 12px', fontSize: '0.9rem', cursor: 'pointer', borderRadius: '4px' }}
-                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
-                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                                        >
-                                            {opt.label}
-                                        </div>
-                                    ))}
+                                    {
+                                        [
+                                            { label: 'Normal Text', action: () => editor.chain().focus().setParagraph().run() },
+                                            { label: 'Heading 1', action: () => toggleHeadingWithSplit(1) },
+                                            { label: 'Heading 2', action: () => toggleHeadingWithSplit(2) },
+                                            { label: 'Heading 3', action: () => toggleHeadingWithSplit(3) },
+                                        ].map((opt, i) => (
+                                            <div
+                                                key={i}
+                                                onClick={() => { opt.action(); setShowStyleMenu(false); }}
+                                                style={{ padding: '8px 12px', fontSize: '0.9rem', cursor: 'pointer', borderRadius: '4px' }}
+                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                            >
+                                                {opt.label}
+                                            </div>
+                                        ))
+                                    }
                                 </div>
                             )}
                         </div>
@@ -657,6 +806,7 @@ const ArticleEditor: React.FC = () => {
                 {/* Editor Area */}
                 <div style={{ minHeight: '500px', fontSize: '1.1rem', lineHeight: '1.8' }}>
                     <EditorContent editor={editor} />
+
                 </div>
             </div>
         </AdminLayout>

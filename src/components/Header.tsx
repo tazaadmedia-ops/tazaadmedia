@@ -3,53 +3,63 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Search } from 'lucide-react';
 
-const MENU_ITEMS = [
-    { to: "/", label: "هوم", alwaysShow: true },
-    { to: "/category/analysis", label: "تجزيا", dbNames: ['Opinion', 'Analysis', 'تجزيا'] },
-    { to: "/category/special-reports", label: "خصوصي رپورٽون", dbNames: ['Special Reports', 'Special Report', 'خصوصي رپورٽس', 'خصوصي رپورٽون'] },
-    { to: "/category/sindh", label: "سنڌ", dbNames: ['Sindh', 'سنڌ'] },
-    { to: "/category/region", label: "خطو", dbNames: ['Region', 'Nearby', 'خطو'] },
-    { to: "/category/world", label: "دنيا", dbNames: ['World', 'International', 'دنيا'] }
-];
+
 
 const Header: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set());
+    const [menuItems, setMenuItems] = useState<any[]>([
+        { to: "/", label: "هوم", alwaysShow: true }
+    ]);
     const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
-        checkActiveCategories();
+        fetchCategories();
     }, []);
 
-    const checkActiveCategories = async () => {
-        // Fetch all published articles' category names
-        // This is a bit heavy if thousands of articles, but fine for MVP. 
-        // Better approach: RPC 'get_active_categories'
-        const { data } = await supabase
+    const fetchCategories = async () => {
+        // Fetch categories that have at least one published article.
+        // We do this by querying articles that are published and selecting their category relation.
+        // This avoids complex !inner join syntax issues if the relationship name is ambiguous.
+        const { data: articles } = await supabase
             .from('articles')
             .select(`
-                categories ( name )
+                primary_category_id,
+                categories (
+                    id,
+                    name,
+                    slug
+                )
             `)
             .eq('status', 'published');
 
-        if (data) {
-            const activeSet = new Set<string>();
-            data.forEach((row: any) => {
-                if (row.categories?.name) {
-                    activeSet.add(row.categories.name);
+        if (articles) {
+            // Deduplicate categories from the articles
+            const uniqueCategoriesMap = new Map();
+
+            articles.forEach((article: any) => {
+                const cat = article.categories;
+                if (cat && cat.id) {
+                    uniqueCategoriesMap.set(cat.id, cat);
                 }
             });
-            setActiveCategories(activeSet);
-        }
-        // setLoading(false);
-    };
 
-    const isItemVisible = (item: any) => {
-        if (item.alwaysShow) return true;
-        if (!item.dbNames) return true; // Fallback
-        // Check if ANY of the dbNames exist in activeCategories
-        return item.dbNames.some((name: string) => activeCategories.has(name));
+            const uniqueCategories = Array.from(uniqueCategoriesMap.values());
+
+            // Sort by name
+            uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
+
+            const dynItems = uniqueCategories.map(cat => ({
+                to: `/category/${cat.slug}`,
+                label: cat.name,
+                id: cat.id
+            }));
+
+            setMenuItems([
+                { to: "/", label: "هوم", id: 'home' },
+                ...dynItems
+            ]);
+        }
     };
 
     const handleSearch = () => {
@@ -111,19 +121,17 @@ const Header: React.FC = () => {
                     height: '100%'
                 }}>
                     <nav className="nav-scroll" style={{ display: 'flex', gap: '2rem', height: '100%', alignItems: 'center' }}>
-                        {MENU_ITEMS.map((item) => (
-                            isItemVisible(item) && (
-                                <NavMenuItem
-                                    key={item.to}
-                                    to={item.to}
-                                    label={item.label}
-                                    active={location.pathname === item.to}
-                                />
-                            )
+                        {menuItems.map((item) => (
+                            <NavMenuItem
+                                key={item.to}
+                                to={item.to}
+                                label={item.label}
+                                active={location.pathname === item.to || location.pathname.startsWith(item.to + '/')}
+                            />
                         ))}
                     </nav>
 
-                    {/* Search Input (Moved here) */}
+                    {/* Search Input */}
                     <div className="search-container" style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
                         <input
                             type="text"

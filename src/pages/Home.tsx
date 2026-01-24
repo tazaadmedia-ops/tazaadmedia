@@ -5,42 +5,54 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
 
 
-// Config for Dynamic Sections
-const SECTIONS_CONFIG = [
-    { title: 'تجزيا', dbNames: ['Opinion', 'Analysis', 'تجزيا'], slug: 'analysis' },
-    { title: 'خصوصي رپورٽون', dbNames: ['Special Reports', 'Special Report', 'خصوصي رپورٽس'], slug: 'special-reports' },
-    { title: 'سنڌ', dbNames: ['Sindh', 'سنڌ'], slug: 'sindh' },
-    { title: 'خطو', dbNames: ['Region', 'Nearby', 'خطو'], slug: 'region' },
-    { title: 'دنيا', dbNames: ['World', 'International', 'دنيا'], slug: 'world' },
-];
+
 
 const Home: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [sections, setSections] = useState<any[]>([]);
 
     useEffect(() => {
-        fetchArticles();
+        const init = async () => {
+            setLoading(true);
+            await Promise.all([fetchArticles(), fetchSections()]);
+            setLoading(false);
+        };
+        init();
     }, []);
 
+    const fetchSections = async () => {
+        const { data: categories } = await supabase
+            .from('categories')
+            .select('id, name, slug')
+            .order('name');
+
+        if (categories) {
+            setSections(categories.map(c => ({
+                title: c.name,
+                slug: c.slug,
+                id: c.id
+            })));
+        }
+    };
+
     const fetchArticles = async () => {
-        setLoading(true);
         // Fetch more articles to cover sections
         const { data, error } = await supabase
             .from('articles')
             .select(`
                 *,
-                categories ( name, slug ),
+                categories ( name, slug, id ),
                 article_authors (
                     users ( full_name )
                 )
             `)
             .eq('status', 'published')
             .order('updated_at', { ascending: false })
-            .limit(50);
+            .limit(100); // Increased limit due to dynamic sections
 
         if (error) console.error('Error fetching home articles:', error);
         if (data) setArticles(data);
-        setLoading(false);
     };
 
     const getAuthor = (article: any) => {
@@ -52,10 +64,9 @@ const Home: React.FC = () => {
     };
 
     // Filter helper
-    const getArticlesForSection = (dbNames: string[]) => {
+    const getArticlesForSection = (sectionId: string) => {
         return articles.filter(a => {
-            const catName = a.categories?.name;
-            return catName && dbNames.includes(catName);
+            return a.primary_category_id === sectionId;
         }).slice(0, 4); // Limit to 4 per section
     };
 
@@ -159,12 +170,12 @@ const Home: React.FC = () => {
 
             {/* --- DYNAMIC SECTIONS --- */}
 
-            {SECTIONS_CONFIG.map((section) => {
-                const sectionArticles = getArticlesForSection(section.dbNames);
+            {sections.map((section) => {
+                const sectionArticles = getArticlesForSection(section.id);
                 if (sectionArticles.length === 0) return null;
 
                 return (
-                    <div key={section.title} style={{ marginBottom: '3rem' }}>
+                    <div key={section.id} style={{ marginBottom: '3rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e0e0e0', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 900 }}>{section.title}</h2>
                             <Link

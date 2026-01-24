@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
+import { Figure } from '../extensions/Figure';
 import LinkExtension from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
 import TextAlign from '@tiptap/extension-text-align';
@@ -47,7 +47,7 @@ const ArticlePage: React.FC = () => {
         editable: false,
         extensions: [
             StarterKit,
-            Image,
+            Figure,
             Youtube,
             LinkExtension,
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -62,59 +62,78 @@ const ArticlePage: React.FC = () => {
 
     useEffect(() => {
         const fetchArticleAndRelated = async () => {
-            if (!slug) return;
+            if (!slug) {
+                setLoading(false);
+                return;
+            }
+            // Only set loading if not already loaded or if slug changed (optimization)
+            // But for safety, let's keep it simple:
             setLoading(true);
 
-            // 1. Fetch Main Article by Slug
-            const { data: art, error } = await supabase
-                .from('articles')
-                .select(`
+            try {
+                // 1. Fetch Main Article by Slug
+                const { data: art, error } = await supabase
+                    .from('articles')
+                    .select(`
                     *,
                     categories ( name ),
                     article_authors (
                         users ( id, full_name, username )
                     )
                 `)
-                .eq('slug', slug)
-                .single();
+                    .eq('slug', slug)
+                    .single();
 
-            if (art) {
-                setArticle(art);
+                if (error) throw error;
 
-                // Author Extraction (Robust)
-                if (art.article_authors && art.article_authors.length > 0) {
-                    const authorRel = art.article_authors[0];
-                    const user = Array.isArray(authorRel.users) ? authorRel.users[0] : authorRel.users;
-                    if (user && user.full_name) {
-                        setAuthorName(user.full_name);
-                        setAuthorUsername(user.username);
+                if (art) {
+                    setArticle(art);
+
+                    // Author Extraction (Robust)
+                    if (art.article_authors && art.article_authors.length > 0) {
+                        const authorRel = art.article_authors[0];
+                        const user = Array.isArray(authorRel.users) ? authorRel.users[0] : authorRel.users;
+                        if (user && user.full_name) {
+                            setAuthorName(user.full_name);
+                            setAuthorUsername(user.username);
+                        }
+                    }
+
+                    // Category Translation
+                    if (art.categories) {
+                        const rawName = art.categories.name;
+                        setCategoryName(CATEGORY_MAP[rawName] || rawName);
+                    }
+
+                    // Safe editor content update
+                    if (editor) {
+                        try {
+                            editor.commands.setContent(art.content_json || art.content_text || '');
+                        } catch (e) {
+                            console.warn('Error setting editor content:', e);
+                        }
+                    }
+
+                    // 2. Fetch Related Articles (Same Category, excluding current)
+                    if (art.primary_category_id) {
+                        const { data: related } = await supabase
+                            .from('articles')
+                            .select('id, title, slug, featured_image_url, primary_category_id')
+                            .eq('primary_category_id', art.primary_category_id)
+                            .neq('slug', slug)
+                            .eq('status', 'published')
+                            .limit(3);
+
+                        if (related) setRelatedArticles(related);
                     }
                 }
-
-                // Category Translation
-                if (art.categories) {
-                    const rawName = art.categories.name;
-                    setCategoryName(CATEGORY_MAP[rawName] || rawName);
-                }
-
-                editor?.commands.setContent(art.content_json || art.content_text || '');
-
-                // 2. Fetch Related Articles (Same Category, excluding current)
-                if (art.primary_category_id) {
-                    const { data: related } = await supabase
-                        .from('articles')
-                        .select('id, title, slug, featured_image_url, primary_category_id')
-                        .eq('primary_category_id', art.primary_category_id)
-                        .neq('slug', slug)
-                        .eq('status', 'published')
-                        .limit(3);
-
-                    if (related) setRelatedArticles(related);
-                }
-            } else if (error) {
+            } catch (error: any) {
                 console.error('Error fetching article:', error);
+                // Optionally set article to null to trigger "Not Found" state
+                setArticle(null);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         fetchArticleAndRelated();
