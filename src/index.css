@@ -427,3 +427,8 @@ img {
   padding-bottom: 2.5rem;
   text-align: right;
 }
+
+/* Navigation Hover Effects */
+.nav-link:hover {
+  color: var(--color-accent) !important;
+}

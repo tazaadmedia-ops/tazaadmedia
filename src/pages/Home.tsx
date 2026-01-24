@@ -7,11 +7,11 @@ import SEO from '../components/SEO';
 
 // Config for Dynamic Sections
 const SECTIONS_CONFIG = [
-    { title: 'تجزيا', dbNames: ['Opinion', 'Analysis'], slug: 'analysis' },
-    { title: 'خصوصي رپورٽون', dbNames: ['Special Reports', 'Special Report'], slug: 'special-reports' },
-    { title: 'سنڌ', dbNames: ['Sindh'], slug: 'sindh' },
-    { title: 'خطو', dbNames: ['Region', 'Nearby'], slug: 'region' },
-    { title: 'دنيا', dbNames: ['World', 'International'], slug: 'world' },
+    { title: 'تجزيا', dbNames: ['Opinion', 'Analysis', 'تجزيا'], slug: 'analysis' },
+    { title: 'خصوصي رپورٽون', dbNames: ['Special Reports', 'Special Report', 'خصوصي رپورٽس'], slug: 'special-reports' },
+    { title: 'سنڌ', dbNames: ['Sindh', 'سنڌ'], slug: 'sindh' },
+    { title: 'خطو', dbNames: ['Region', 'Nearby', 'خطو'], slug: 'region' },
+    { title: 'دنيا', dbNames: ['World', 'International', 'دنيا'], slug: 'world' },
 ];
 
 const Home: React.FC = () => {
@@ -44,7 +44,7 @@ const Home: React.FC = () => {
     };
 
     const getAuthor = (article: any) => {
-        return article.article_authors?.[0]?.users?.full_name || 'Daadlo Staff';
+        return article.article_authors?.[0]?.users?.full_name || null;
     };
 
     const getCategory = (article: any) => {
@@ -95,9 +95,11 @@ const Home: React.FC = () => {
                                 <span style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>
                                     ● {getCategory(heroStory)}
                                 </span>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
-                                    {getAuthor(heroStory)}
-                                </span>
+                                {getAuthor(heroStory) && (
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
+                                        {getAuthor(heroStory)}
+                                    </span>
+                                )}
                             </div>
                             <h1 style={{ fontSize: '2rem', lineHeight: 1.15, marginBottom: '0.5rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
                                 {heroStory.title}
@@ -133,19 +135,21 @@ const Home: React.FC = () => {
 
             {/* Bottom Text Row */}
             {bottomStories.length > 0 && (
-                <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid var(--color-border)', marginBottom: '3rem' }}>
+                <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid #F0F0F0', marginBottom: '3rem' }}>
                     {bottomStories.map((story, i) => (
                         <div key={story.id} style={{
                             paddingLeft: i < 3 ? '1.5rem' : 0,
-                            borderRight: i < 3 ? '1px solid #E0E0E0' : 'none'
+                            borderRight: i < 3 ? '1px solid #F0F0F0' : 'none'
                         }}>
                             <Link to={`/article/${story.slug}`}>
                                 <h3 style={{ fontSize: '1rem', lineHeight: 1.4, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
                                     {story.title}
                                 </h3>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
-                                    {getAuthor(story)}
-                                </div>
+                                {getAuthor(story) && (
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
+                                        {getAuthor(story)}
+                                    </div>
+                                )}
                             </Link>
                         </div>
                     ))}
@@ -161,7 +165,7 @@ const Home: React.FC = () => {
 
                 return (
                     <div key={section.title} style={{ marginBottom: '3rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid black', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e0e0e0', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 900 }}>{section.title}</h2>
                             <Link
                                 to={`/category/${section.slug}`}

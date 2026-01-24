@@ -5,11 +5,11 @@ import { Search } from 'lucide-react';
 
 const MENU_ITEMS = [
     { to: "/", label: "هوم", alwaysShow: true },
-    { to: "/category/analysis", label: "تجزيا", dbNames: ['Opinion', 'Analysis'] },
-    { to: "/category/special-reports", label: "خصوصي رپورٽون", dbNames: ['Special Reports', 'Special Report'] },
-    { to: "/category/sindh", label: "سنڌ", dbNames: ['Sindh'] },
-    { to: "/category/region", label: "خطو", dbNames: ['Region', 'Nearby'] },
-    { to: "/category/world", label: "دنيا", dbNames: ['World', 'International'] }
+    { to: "/category/analysis", label: "تجزيا", dbNames: ['Opinion', 'Analysis', 'تجزيا'] },
+    { to: "/category/special-reports", label: "خصوصي رپورٽون", dbNames: ['Special Reports', 'Special Report', 'خصوصي رپورٽس', 'خصوصي رپورٽون'] },
+    { to: "/category/sindh", label: "سنڌ", dbNames: ['Sindh', 'سنڌ'] },
+    { to: "/category/region", label: "خطو", dbNames: ['Region', 'Nearby', 'خطو'] },
+    { to: "/category/world", label: "دنيا", dbNames: ['World', 'International', 'دنيا'] }
 ];
 
 const Header: React.FC = () => {
@@ -110,7 +110,7 @@ const Header: React.FC = () => {
                     width: '100%',
                     height: '100%'
                 }}>
-                    <nav className="nav-scroll">
+                    <nav className="nav-scroll" style={{ display: 'flex', gap: '2rem', height: '100%', alignItems: 'center' }}>
                         {MENU_ITEMS.map((item) => (
                             isItemVisible(item) && (
                                 <NavMenuItem
@@ -168,10 +168,11 @@ const Header: React.FC = () => {
 const NavMenuItem: React.FC<{ to: string; label: string; active: boolean }> = ({ to, label, active }) => (
     <NavLink
         to={to}
+        className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
         style={{
             ...navLinkStyle,
-            color: active ? '#000' : '#1a1a1a',
-            borderBottom: active ? '3px solid #000' : '3px solid transparent',
+            color: active ? '#B70100' : '#1a1a1a',
+            borderBottom: active ? '3px solid #B70100' : '3px solid transparent',
             height: '100%',
             display: 'flex',
             alignItems: 'center',
@@ -187,7 +188,8 @@ const navLinkStyle: React.CSSProperties = {
     fontSize: '1.1rem',
     textDecoration: 'none',
     fontFamily: 'var(--font-main)',
-    padding: '0 4px'
+    padding: '0 4px',
+    whiteSpace: 'nowrap'
 };
 
 export default Header;

@@ -38,7 +38,7 @@ const ArticlePage: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [article, setArticle] = useState<any>(null);
     const [relatedArticles, setRelatedArticles] = useState<any[]>([]);
-    const [authorName, setAuthorName] = useState('Staff Editor');
+    const [authorName, setAuthorName] = useState<string | null>(null);
     const [authorUsername, setAuthorUsername] = useState<string | null>(null);
     const [categoryName, setCategoryName] = useState('News');
     const [loading, setLoading] = useState(true);
@@ -154,16 +154,20 @@ const ArticlePage: React.FC = () => {
                 </p>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0', padding: '1.25rem 0' }}>
-                    <div style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>
-                        قلمڪار <span style={{ color: 'var(--color-accent)' }}>
-                            {authorUsername ? (
-                                <Link to={`/author/${authorUsername}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                    {authorName}
-                                </Link>
-                            ) : authorName}
-                        </span>
-                    </div>
-                    <span style={{ color: '#eee' }}>|</span>
+                    {authorName && (
+                        <>
+                            <div style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>
+                                قلمڪار <span style={{ color: 'var(--color-accent)' }}>
+                                    {authorUsername ? (
+                                        <Link to={`/author/${authorUsername}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            {authorName}
+                                        </Link>
+                                    ) : authorName}
+                                </span>
+                            </div>
+                            <span style={{ color: '#eee' }}>|</span>
+                        </>
+                    )}
                     <div style={{ fontSize: '0.9rem', color: '#888' }}>
                         {formatSindhiDate(article.published_at || article.created_at)}
                     </div>

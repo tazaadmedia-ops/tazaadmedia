@@ -5,19 +5,19 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
 
 const CATEGORY_MAP: Record<string, string> = {
-    'analysis': 'تجزيا (Analysis)',
-    'special-reports': 'خصوصي رپورٽون (Special Reports)',
-    'sindh': 'سنڌ (Sindh)',
-    'region': 'خطو (Region)',
-    'world': 'دنيا (World)'
+    'analysis': 'تجزيا',
+    'special-reports': 'خصوصي رپورٽون',
+    'sindh': 'سنڌ',
+    'region': 'خطو',
+    'world': 'دنيا'
 };
 
 const DB_MAPPING: Record<string, string[]> = {
-    'analysis': ['Opinion', 'Analysis'],
-    'special-reports': ['Special Reports', 'Special Report'],
-    'sindh': ['Sindh'],
-    'region': ['Region', 'Nearby'],
-    'world': ['World', 'International']
+    'analysis': ['Opinion', 'Analysis', 'تجزيا'],
+    'special-reports': ['Special Reports', 'Special Report', 'خصوصي رپورٽس'],
+    'sindh': ['Sindh', 'سنڌ'],
+    'region': ['Region', 'Nearby', 'خطو'],
+    'world': ['World', 'International', 'دنيا']
 };
 
 const CategoryPage: React.FC = () => {
@@ -113,7 +113,9 @@ const CategoryPage: React.FC = () => {
                                         {art.subdeck}
                                     </p>
                                     <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem', fontWeight: 700, color: '#888' }}>
-                                        <span>قلمڪار: {art.article_authors?.[0]?.users?.full_name || 'اسٽاف'}</span>
+                                        {art.article_authors?.[0]?.users?.full_name && (
+                                            <span>قلمڪار: {art.article_authors[0].users.full_name}</span>
+                                        )}
                                         <span>{new Date(art.published_at || art.created_at).toLocaleDateString()}</span>
                                     </div>
                                 </Link>
@@ -121,7 +123,7 @@ const CategoryPage: React.FC = () => {
                         </div>
                     )) : (
                         <div style={{ textAlign: 'center', padding: '5rem', color: '#999', fontSize: '1.2rem' }}>
-                            هن ڪيٽيگريءَ ۾ في الحال ڪو مضمون ناهي. (No articles found in this category.)
+                            هن ڪيٽيگريءَ ۾ في الحال ڪو مضمون ناهي.
                         </div>
                     )}
                 </div>
