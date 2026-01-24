@@ -45,19 +45,6 @@ export default async function handler(request: any, response: any) {
             console.error(`[SSR] Exception loading index.html:`, e.message);
         }
 
-        // Debugging logs (Modified to avoid crashing if __dirname is missing)
-        let fileListing = '';
-        try {
-            const listDir = (dir: string) => {
-                try {
-                    return `DIR: ${dir}\n` + fs.readdirSync(dir).join('\n');
-                } catch (e: any) {
-                    return `Error listing ${dir}: ${e.message}`;
-                }
-            };
-            fileListing += listDir(process.cwd());
-        } catch (e) { }
-
         const errorPage = `
             <!DOCTYPE html>
             <html lang="en">
@@ -84,7 +71,7 @@ export default async function handler(request: any, response: any) {
 <strong>Current Dir:</strong> ${process.cwd()}
 
 <strong>File System Listing:</strong>
-${fileListing}
+(File system listing removed for production)
                 </div>
             </body>
             </html>
@@ -134,10 +121,12 @@ ${fileListing}
         const articleUrl = `${baseUrl}/article/${slug}`;
 
         // 5. Inject Metadata
+
+        // Remove existing standard meta tags - aggressive removal
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
-        html = html.replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
-        html = html.replace(/<meta\s+property=["']og:.*?["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
-        html = html.replace(/<meta\s+name=["']twitter:.*?["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
+        html = html.replace(/<meta\s+name=["']description["'][\s\S]*?>/gi, '');
+        html = html.replace(/<meta\s+property=["']og:[\s\S]*?>/gi, '');
+        html = html.replace(/<meta\s+name=["']twitter:[\s\S]*?>/gi, '');
 
         const metaTags = `
     <title>${title}</title>
