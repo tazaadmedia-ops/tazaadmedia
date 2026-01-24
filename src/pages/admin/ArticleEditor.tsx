@@ -104,8 +104,60 @@ const ArticleEditor: React.FC = () => {
                 class: 'prose prose-lg focus:outline-none',
                 style: 'min-height: 300px; padding-bottom: 5rem; font-family: var(--font-main); direction: rtl;',
             },
+            handlePaste: (view, event, slice) => {
+                const item = Array.from(event.clipboardData?.items || []).find(x => x.type.startsWith('image'));
+                if (item) {
+                    event.preventDefault();
+                    const file = item.getAsFile();
+                    if (file) {
+                        handleImagePasteDrop(view, file);
+                    }
+                    return true;
+                }
+                return false;
+            },
+            handleDrop: (view, event, slice, moved) => {
+                if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
+                    const file = event.dataTransfer.files[0];
+                    if (file.type.startsWith('image')) {
+                        event.preventDefault();
+                        handleImagePasteDrop(view, file);
+                        return true;
+                    }
+                }
+                return false;
+            }
         },
     });
+
+    const handleImagePasteDrop = async (view: any, file: File) => {
+        // Optimistic UI could go here (placeholder)
+
+        try {
+            const fileExt = file.name.split('.').pop() || 'png';
+            const fileName = `paste_${Date.now()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+
+            const { schema } = view.state;
+            const node = schema.nodes.figure.create({ src: publicUrl });
+            const transaction = view.state.tr.replaceSelectionWith(node);
+            view.dispatch(transaction);
+
+        } catch (error: any) {
+            console.error('Error handling image paste/drop:', error);
+            alert('Failed to upload image: ' + error.message);
+        }
+    };
 
     // --- Utilities ---
     const generateRandomSlug = (length = 12) => {
