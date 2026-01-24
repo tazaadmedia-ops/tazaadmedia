@@ -55,23 +55,49 @@ export default async function handler(request: any, response: any) {
             console.error(`[SSR] Exception loading index.html:`, e.message);
         }
 
+        // Debugging: List files to find where index.html is
+        let fileListing = '';
+        try {
+            const listDir = (dir: string) => {
+                try {
+                    return `DIR: ${dir}\n` + fs.readdirSync(dir).join('\n');
+                } catch (e: any) {
+                    return `Error listing ${dir}: ${e.message}`;
+                }
+            };
+            fileListing += listDir(process.cwd()) + '\n\n';
+            fileListing += listDir(__dirname);
+        } catch (e) { }
+
         const errorPage = `
             <!DOCTYPE html>
-            <html lang="sd" dir="rtl">
+            <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Tazaad Media</title>
+                <title>SSR Debug</title>
                 <style>
-                    body { font-family: system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f9f9f9; color: #333; }
-                    h1 { margin-bottom: 1rem; }
-                    a { padding: 10px 20px; background-color: #000; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                    body { font-family: monospace; padding: 2rem; background: #333; color: #fff; white-space: pre-wrap; }
+                    h1 { color: #ff6b6b; }
+                    .debug { background: #000; padding: 1rem; border: 1px solid #555; overflow-x: auto; }
+                    a { color: #4dabf7; text-decoration: none; font-size: 1.2rem; }
                 </style>
             </head>
             <body>
-                <h1>معاف ڪجو، ڪا فني خرابي پيش آئي آهي.</h1>
-                <p>Sorry, we encountered a technical issue loading this article.</p>
-                <a href="/">Go to Home / هوم تي وڃو</a>
+                <h1>SSR: index.html Not Found</h1>
+                <p>could not find index.html in common paths or via fetch.</p>
+                
+                <a href="/">Go to Home (Client Side)</a>
+                <br><br>
+
+                <div class="debug">
+<strong>Base URL:</strong> ${baseUrl}
+<strong>Current Dir:</strong> ${process.cwd()}
+<strong>Dirname:</strong> ${__dirname}
+
+<strong>File System Listing:</strong>
+${fileListing}
+                </div>
             </body>
             </html>
         `;
