@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -23,6 +23,11 @@ const LiveArticlePage: React.FC = () => {
     const [authorName, setAuthorName] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
+    const updatesRef = useRef<LiveUpdate[]>([]);
+
+    useEffect(() => {
+        updatesRef.current = updates;
+    }, [updates]);
 
 
 
@@ -96,25 +101,23 @@ const LiveArticlePage: React.FC = () => {
                                 return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
                             });
 
-                            setUpdates(currentUpdates => {
-                                const currentIds = new Set(currentUpdates.map(u => u.id));
-                                const newlyAdded = sorted.filter(u => !currentIds.has(u.id));
+                            const currentIds = new Set(updatesRef.current.map(u => u.id));
+                            const newlyAdded = sorted.filter(u => !currentIds.has(u.id));
 
-                                if (newlyAdded.length > 0) {
-                                    setPendingUpdates(prev => {
-                                        const prevIds = new Set(prev.map(p => p.id));
-                                        const uniqueNew = newlyAdded.filter(n => !prevIds.has(n.id));
-                                        return [...uniqueNew, ...prev];
-                                    });
-                                }
+                            if (newlyAdded.length > 0) {
+                                console.log('Found new pending updates:', newlyAdded.length);
+                                setPendingUpdates(prevPending => {
+                                    const pendingIds = new Set(prevPending.map(p => p.id));
+                                    const trulyNew = newlyAdded.filter(n => !pendingIds.has(n.id));
+                                    if (trulyNew.length === 0) return prevPending;
+                                    return [...trulyNew, ...prevPending];
+                                });
+                            }
 
-                                // Update existing entries safely in-place for Edits/Deletions
-                                const updatedCurrent = currentUpdates.map(cu => {
-                                    const fresh = sorted.find(s => s.id === cu.id);
-                                    return fresh ? fresh : cu;
-                                }).filter(cu => sorted.some(s => s.id === cu.id));
-
-                                return updatedCurrent;
+                            // Sync edits/deletions for currently displayed items
+                            setUpdates(current => {
+                                return current.map(cu => sorted.find(s => s.id === cu.id) || cu)
+                                    .filter(cu => sorted.some(s => s.id === cu.id));
                             });
                         }
                     });
@@ -127,7 +130,9 @@ const LiveArticlePage: React.FC = () => {
     }, [article, autoUpdateEnabled]);
 
 
-    const handleShowPending = () => {
+    const handleShowPending = useCallback(() => {
+        if (pendingUpdates.length === 0) return;
+
         setUpdates(prev => {
             const merged = [...pendingUpdates, ...prev];
             return merged.sort((a, b) => {
@@ -136,7 +141,7 @@ const LiveArticlePage: React.FC = () => {
             });
         });
         setPendingUpdates([]);
-    };
+    }, [pendingUpdates]);
 
     if (loading) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}><LoadingSpinner /></div>;
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
