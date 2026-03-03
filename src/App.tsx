@@ -38,7 +38,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Layout><Home /></Layout>} />
         <Route path="/article/:slug" element={<Layout><ArticlePage /></Layout>} />
-        <Route path="/live/:slug" element={<Layout><LiveArticlePage /></Layout>} />
+        <Route path="/article/live/:slug" element={<Layout><LiveArticlePage /></Layout>} />
         <Route path="/author/:username" element={<Layout><AuthorPage /></Layout>} />
         <Route path="/category/:slug" element={<Layout><CategoryPage /></Layout>} />
         <Route path="/search" element={<Layout><SearchPage /></Layout>} />

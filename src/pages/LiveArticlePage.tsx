@@ -121,76 +121,69 @@ const LiveArticlePage: React.FC = () => {
         <div style={{ backgroundColor: '#f9fafb', minHeight: '100vh', paddingBottom: '4rem' }}>
             <SEO title={`LIVE: ${article.title}`} description={article.subdeck} image={article.featured_image_url} />
 
-            {/* Top Banner (Optional full bleed header) */}
-            <div style={{ backgroundColor: '#fff', borderBottom: '1px solid #e5e7eb', padding: '2rem 0', marginBottom: '2rem' }}>
-                <div className="container" style={{ maxWidth: '1000px' }}>
-
-                    <div style={{ marginBottom: '1rem' }}>
-                        <LivePulseIndicator />
-                    </div>
-
-                    <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, lineHeight: 1.2, color: '#111827', marginBottom: '1rem' }}>
-                        {article.title}
-                    </h1>
-
-                    <p style={{ fontSize: '1.25rem', color: '#4b5563', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-                        {article.subdeck}
-                    </p>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #f3f4f6', paddingTop: '1rem', fontSize: '0.9rem', color: '#6b7280' }}>
-                        {authorName && <div>قلمڪار: <span style={{ fontWeight: 600, color: '#111827' }}>{authorName}</span></div>}
-                        <span>•</span>
-                        <div>{formatSindhiDate(article.published_at || article.created_at)}</div>
-                    </div>
-
+            {/* Featured Media - Full Bleed Top */}
+            {article.featured_image_url && (
+                <div style={{ width: '100%', marginBottom: '3rem' }}>
+                    <img src={article.featured_image_url} alt={article.title} style={{ width: '100%', maxHeight: '65vh', objectFit: 'cover', objectPosition: 'center' }} />
                 </div>
-            </div>
+            )}
 
-            <div className="container" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: '1fr', gap: '3rem' }}>
-                {/* Desktop could be 2 columns, but timeline designs often work best as single column taking center stage, 
-                     or main left rail right. Since RTL, main right rail left. 
-                     Let's do Main Content + Timeline in one flowing column for simplicity matching AlJazeera style closely */
-                }
-
+            <div className="container" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: '1fr', gap: '3rem', paddingTop: article.featured_image_url ? '0' : '4rem' }}>
                 <div>
-                    {/* Featured Media */}
-                    {article.featured_image_url && (
-                        <div style={{ marginBottom: '2.5rem', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-                            <img src={article.featured_image_url} alt={article.title} style={{ width: '100%', height: 'auto', objectFit: 'cover' }} />
+                    {/* Header Content Below Image */}
+                    <div style={{ marginBottom: '2.5rem', textAlign: 'right', direction: 'rtl' }}>
+                        <div style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'flex-start' }}>
+                            <LivePulseIndicator text="لائيو" />
                         </div>
-                    )}
 
-                    {/* Article Summary (The initial writeup) */}
-                    <div style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '3rem' }}>
-                        <div className="article-content" style={{ fontSize: '1.1rem', margin: 0 }}>
-                            <EditorContent editor={editor} />
+                        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, lineHeight: 1.25, color: '#111827', marginBottom: '1.5rem', letterSpacing: '-0.02em', fontFeatureSettings: "'kern' 1" }}>
+                            {article.title}
+                        </h1>
+
+                        <p style={{ fontSize: '1.35rem', color: '#4b5563', marginBottom: '2rem', lineHeight: 1.6, fontWeight: 500 }}>
+                            {article.subdeck}
+                        </p>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '1rem 0', fontSize: '0.95rem', color: '#6b7280' }}>
+                            {authorName && <div>قلمڪار: <span style={{ fontWeight: 700, color: '#111827' }}>{authorName}</span></div>}
+                            <span>•</span>
+                            <div>{formatSindhiDate(article.published_at || article.created_at)}</div>
                         </div>
                     </div>
-
-                    {/* Updates Section Header */}
-                    <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#111827' }}>
-                            {updates.length} اپڊيٽس
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#4b5563' }}>
-                            <label htmlFor="autoUpdateToggle" style={{ cursor: 'pointer' }}>آٽو اپڊيٽس</label>
-                            <input
-                                id="autoUpdateToggle"
-                                type="checkbox"
-                                checked={autoUpdateEnabled}
-                                onChange={(e) => setAutoUpdateEnabled(e.target.checked)}
-                                style={{ width: '40px', height: '20px', cursor: 'pointer', accentColor: '#dc2626' }}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Timeline */}
-                    <LiveUpdateTimeline updates={updates} />
 
                 </div>
+
+
+                {/* Article Summary (The initial writeup) */}
+                <div style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '3rem' }}>
+                    <div className="article-content" style={{ fontSize: '1.1rem', margin: 0 }}>
+                        <EditorContent editor={editor} />
+                    </div>
+                </div>
+
+                {/* Updates Section Header */}
+                <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#111827' }}>
+                        {updates.length} اپڊيٽس
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#4b5563' }}>
+                        <label htmlFor="autoUpdateToggle" style={{ cursor: 'pointer' }}>آٽو اپڊيٽس</label>
+                        <input
+                            id="autoUpdateToggle"
+                            type="checkbox"
+                            checked={autoUpdateEnabled}
+                            onChange={(e) => setAutoUpdateEnabled(e.target.checked)}
+                            style={{ width: '40px', height: '20px', cursor: 'pointer', accentColor: '#dc2626' }}
+                        />
+                    </div>
+                </div>
+
+                {/* Timeline */}
+                <LiveUpdateTimeline updates={updates} />
+
             </div>
         </div>
     );
-}
+};
 
 export default LiveArticlePage;
