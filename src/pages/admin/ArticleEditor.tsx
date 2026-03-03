@@ -679,10 +679,34 @@ const ArticleEditor: React.FC = () => {
                 {/* Live Blog Toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '12px', marginBottom: '2.5rem', direction: 'rtl', backgroundColor: isLive ? '#fef2f2' : '#f9fafb', padding: '12px 16px', borderRadius: '8px', border: `1px solid ${isLive ? '#fecaca' : '#e5e7eb'}`, transition: 'all 0.3s ease' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '1.05rem', fontWeight: 700, color: isLive ? '#dc2626' : '#374151' }}>
+                        <span style={{ fontSize: '1.05rem', fontWeight: 700, color: isLive ? '#dc2626' : '#374151', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             لائيو اپڊيٽس (Live Updates)
+                            {isLive && (
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (window.confirm('Are you sure you want to end this live blog?')) {
+                                            setIsLive(false);
+                                        }
+                                    }}
+                                    style={{
+                                        fontSize: '0.8rem',
+                                        padding: '4px 12px',
+                                        backgroundColor: '#dc2626',
+                                        color: '#fff',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}
+                                >
+                                    لائيو ختم ڪريو
+                                </button>
+                            )}
                         </span>
-                        <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '4px' }}>
                             هن مضمون کي لائيو بلاگ طور سيٽ ڪريو
                         </span>
                     </div>

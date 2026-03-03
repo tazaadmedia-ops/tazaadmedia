@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
+import { RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
@@ -18,6 +19,7 @@ const LiveArticlePage: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [article, setArticle] = useState<any>(null);
     const [updates, setUpdates] = useState<LiveUpdate[]>([]);
+    const [pendingUpdates, setPendingUpdates] = useState<LiveUpdate[]>([]);
     const [authorName, setAuthorName] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
@@ -93,7 +95,27 @@ const LiveArticlePage: React.FC = () => {
                                 if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
                                 return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
                             });
-                            setUpdates(sorted);
+
+                            setUpdates(currentUpdates => {
+                                const currentIds = new Set(currentUpdates.map(u => u.id));
+                                const newlyAdded = sorted.filter(u => !currentIds.has(u.id));
+
+                                if (newlyAdded.length > 0) {
+                                    setPendingUpdates(prev => {
+                                        const prevIds = new Set(prev.map(p => p.id));
+                                        const uniqueNew = newlyAdded.filter(n => !prevIds.has(n.id));
+                                        return [...uniqueNew, ...prev];
+                                    });
+                                }
+
+                                // Update existing entries safely in-place for Edits/Deletions
+                                const updatedCurrent = currentUpdates.map(cu => {
+                                    const fresh = sorted.find(s => s.id === cu.id);
+                                    return fresh ? fresh : cu;
+                                }).filter(cu => sorted.some(s => s.id === cu.id));
+
+                                return updatedCurrent;
+                            });
                         }
                     });
             })
@@ -104,6 +126,17 @@ const LiveArticlePage: React.FC = () => {
         };
     }, [article, autoUpdateEnabled]);
 
+
+    const handleShowPending = () => {
+        setUpdates(prev => {
+            const merged = [...pendingUpdates, ...prev];
+            return merged.sort((a, b) => {
+                if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
+                return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+            });
+        });
+        setPendingUpdates([]);
+    };
 
     if (loading) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}><LoadingSpinner /></div>;
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
@@ -153,20 +186,47 @@ const LiveArticlePage: React.FC = () => {
 
 
                 {/* Updates Section Header */}
-                <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#111827' }}>
-                        {updates.length} اپڊيٽس
+                <div style={{ position: 'relative' }}>
+                    <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#111827' }}>
+                            {updates.length + pendingUpdates.length} اپڊيٽس
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#4b5563' }}>
+                            <label htmlFor="autoUpdateToggle" style={{ cursor: 'pointer' }}>آٽو اپڊيٽس</label>
+                            <input
+                                id="autoUpdateToggle"
+                                type="checkbox"
+                                checked={autoUpdateEnabled}
+                                onChange={(e) => setAutoUpdateEnabled(e.target.checked)}
+                                style={{ width: '40px', height: '20px', cursor: 'pointer', accentColor: '#dc2626' }}
+                            />
+                        </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#4b5563' }}>
-                        <label htmlFor="autoUpdateToggle" style={{ cursor: 'pointer' }}>آٽو اپڊيٽس</label>
-                        <input
-                            id="autoUpdateToggle"
-                            type="checkbox"
-                            checked={autoUpdateEnabled}
-                            onChange={(e) => setAutoUpdateEnabled(e.target.checked)}
-                            style={{ width: '40px', height: '20px', cursor: 'pointer', accentColor: '#dc2626' }}
-                        />
-                    </div>
+
+                    {pendingUpdates.length > 0 && (
+                        <div style={{ display: 'flex', justifyContent: 'center', position: 'absolute', bottom: '-20px', left: 0, right: 0, zIndex: 10 }}>
+                            <button
+                                onClick={handleShowPending}
+                                style={{
+                                    backgroundColor: '#b91c1c',
+                                    color: 'white',
+                                    padding: '6px 16px',
+                                    borderRadius: '20px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 700,
+                                    border: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                <RefreshCw size={16} />
+                                {pendingUpdates.length} وڌيڪ اپڊيٽس
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Timeline */}
