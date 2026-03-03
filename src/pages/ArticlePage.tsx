@@ -9,6 +9,8 @@ import LinkExtension from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
 import TextAlign from '@tiptap/extension-text-align';
 import SEO from '../components/SEO';
+import LiveUpdateTimeline from '../components/LiveUpdateTimeline';
+import type { LiveUpdate } from '../components/LiveUpdateTimeline';
 
 const CATEGORY_MAP: Record<string, string> = {
     'Politics': 'سياست',
@@ -41,6 +43,7 @@ const ArticlePage: React.FC = () => {
     const [authorName, setAuthorName] = useState<string | null>(null);
     const [authorUsername, setAuthorUsername] = useState<string | null>(null);
     const [categoryName, setCategoryName] = useState('News');
+    const [updates, setUpdates] = useState<LiveUpdate[]>([]);
     const [loading, setLoading] = useState(true);
 
     const editor = useEditor({
@@ -104,6 +107,21 @@ const ArticlePage: React.FC = () => {
                     if (art.categories) {
                         const rawName = art.categories.name;
                         setCategoryName(CATEGORY_MAP[rawName] || rawName);
+                    }
+
+                    // Fetch Updates if any exist for this article
+                    const { data: upds } = await supabase
+                        .from('live_updates')
+                        .select('*')
+                        .eq('article_id', art.id)
+                        .order('published_at', { ascending: false });
+
+                    if (upds) {
+                        const sorted = [...upds].sort((a, b) => {
+                            if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
+                            return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+                        });
+                        setUpdates(sorted);
                     }
 
                     // Fetch Related Articles
@@ -211,6 +229,16 @@ const ArticlePage: React.FC = () => {
             <div className="article-content" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.65', color: '#2c2c2c' }}>
                 <EditorContent editor={editor} />
             </div>
+
+            {/* Render Timeline for archived live blogs */}
+            {updates.length > 0 && (
+                <div style={{ maxWidth: '800px', margin: '4rem auto 2rem' }}>
+                    <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem', fontSize: '1.2rem', fontWeight: 800, color: '#111827' }}>
+                        {updates.length} اپڊيٽس
+                    </div>
+                    <LiveUpdateTimeline updates={updates} isLiveProfile={false} />
+                </div>
+            )}
 
             {/* Related Articles Section */}
             {relatedArticles.length > 0 && (

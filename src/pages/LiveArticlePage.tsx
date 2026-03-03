@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
@@ -117,6 +117,11 @@ const LiveArticlePage: React.FC = () => {
     if (loading) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}><LoadingSpinner /></div>;
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
 
+    // Redirect to normal article page if the live blog has ended
+    if (article.is_live === false) {
+        return <Navigate to={`/article/${slug}`} replace />;
+    }
+
     return (
         <div style={{ backgroundColor: '#f9fafb', minHeight: '100vh', paddingBottom: '4rem' }}>
             <SEO title={`LIVE: ${article.title}`} description={article.subdeck} image={article.featured_image_url} />
@@ -179,7 +184,7 @@ const LiveArticlePage: React.FC = () => {
                 </div>
 
                 {/* Timeline */}
-                <LiveUpdateTimeline updates={updates} />
+                <LiveUpdateTimeline updates={updates} isLiveProfile={true} />
 
             </div>
         </div>

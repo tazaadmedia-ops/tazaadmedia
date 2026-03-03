@@ -37,7 +37,6 @@ const Home: React.FC = () => {
     };
 
     const fetchArticles = async () => {
-        // Fetch more articles to cover sections
         const { data, error } = await supabase
             .from('articles')
             .select(`
@@ -48,6 +47,7 @@ const Home: React.FC = () => {
                 )
             `)
             .eq('status', 'published')
+            .order('is_live', { ascending: false })
             .order('updated_at', { ascending: false })
             .limit(100); // Increased limit due to dynamic sections
 
