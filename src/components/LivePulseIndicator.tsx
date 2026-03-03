@@ -19,9 +19,13 @@ const LivePulseIndicator: React.FC<LivePulseIndicatorProps> = ({ text = 'لائ�
                             opacity: 0;
                         }
                     }
+                    @keyframes blinkText {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                    }
                 `}
             </style>
-            <span>{text}</span>
+            <span style={{ animation: 'blinkText 1.5s ease-in-out infinite' }}>{text}</span>
         </div>
     );
 };

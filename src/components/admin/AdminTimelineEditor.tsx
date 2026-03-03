@@ -20,6 +20,9 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
     const [mediaUrl, setMediaUrl] = useState('');
     const [isPinned, setIsPinned] = useState(false);
 
+    // File upload ref
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
     useEffect(() => {
         if (!articleId || articleId === 'new') {
             setLoading(false);
@@ -53,6 +56,32 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
         setMediaUrl('');
         setIsPinned(false);
         setIsOpen(true);
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsSubmitting(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `article_images/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('articles')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data } = supabase.storage.from('articles').getPublicUrl(filePath);
+            setMediaUrl(data.publicUrl);
+        } catch (error: any) {
+            console.error('Error uploading image:', error);
+            alert('تصوير اپلوڊ ڪرڻ ۾ مسلو: ' + error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleEdit = (update: any) => {
@@ -140,23 +169,40 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
                         <input
                             value={title} onChange={e => setTitle(e.target.value)}
                             placeholder="عنوان (اختياري)"
-                            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', width: '100%', fontSize: '1rem' }}
+                            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', width: '100%', fontSize: '1rem', fontFamily: 'var(--font-main)' }}
                         />
 
                         <textarea
                             value={content} onChange={e => setContent(e.target.value)}
                             placeholder="اپڊيٽ جو تفصيل (HTML سپورٽ ٿيل)..."
                             rows={5}
-                            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', width: '100%', fontSize: '1rem', resize: 'vertical' }}
+                            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', width: '100%', fontSize: '1rem', resize: 'vertical', fontFamily: 'var(--font-main)' }}
                         />
 
-                        <input
-                            value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
-                            placeholder="عڪس/ميڊيا يو آر ايل (اختياري)"
-                            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', width: '100%', fontSize: '0.9rem' }}
-                        />
+                        {/* Media Upload / URL */}
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <input
+                                value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
+                                placeholder="عڪس/ميڊيا يو آر ايل (اختياري)"
+                                style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', flexGrow: 1, fontSize: '0.9rem', fontFamily: 'var(--font-main)' }}
+                            />
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                onChange={handleImageUpload}
+                            />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isSubmitting}
+                                style={{ padding: '0 16px', backgroundColor: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', fontFamily: 'var(--font-main)' }}
+                            >
+                                {isSubmitting ? 'uploading...' : 'تصوير اپلوڊ'}
+                            </button>
+                        </div>
 
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, color: '#374151' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, color: '#374151', fontFamily: 'var(--font-main)' }}>
                             <input
                                 type="checkbox"
                                 checked={isPinned}
