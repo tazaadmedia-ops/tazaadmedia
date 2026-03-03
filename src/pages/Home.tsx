@@ -70,6 +70,22 @@ const Home: React.FC = () => {
         }).slice(0, 4); // Limit to 4 per section
     };
 
+    // Routing helper
+    const getArticleLink = (article: any) => {
+        return article.is_live ? `/article/live/${article.slug}` : `/article/${article.slug}`;
+    };
+
+    // Live Badge Component for Homepage
+    const LiveBadge = () => (
+        <span style={{ color: '#dc2626', fontWeight: 800, display: 'inline-flex', alignItems: 'center' }}>
+            <span className="live-dot-container">
+                <span className="live-dot-ping"></span>
+                <span className="live-dot-core"></span>
+            </span>
+            لائيو
+        </span>
+    );
+
     if (loading) return <LoadingSpinner />;
 
     // Distribute top items
@@ -92,7 +108,7 @@ const Home: React.FC = () => {
                 {/* Hero */}
                 <div>
                     {heroStory ? (
-                        <Link to={`/article/${heroStory.slug}`}>
+                        <Link to={getArticleLink(heroStory)}>
                             <div style={{ position: 'relative' }}>
                                 <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#eee', borderRadius: '0', marginBottom: '0.75rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {heroStory.featured_image_url ? (
@@ -103,8 +119,8 @@ const Home: React.FC = () => {
                                 </div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                                <span style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                                    ● {getCategory(heroStory)}
+                                <span style={{ color: heroStory.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                                    {heroStory.is_live ? <LiveBadge /> : `● ${getCategory(heroStory)}`}
                                 </span>
                                 {getAuthor(heroStory) && (
                                     <span style={{ fontSize: '0.8rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
@@ -128,12 +144,12 @@ const Home: React.FC = () => {
                 <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem', alignContent: 'start' }}>
                     {sideStories.map(story => (
                         <div key={story.id}>
-                            <Link to={`/article/${story.slug}`}>
+                            <Link to={getArticleLink(story)}>
                                 <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.5rem', overflow: 'hidden' }}>
                                     {story.featured_image_url && <img src={story.featured_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
-                                <div style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
-                                    {getCategory(story)}
+                                <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
+                                    {story.is_live ? <LiveBadge /> : getCategory(story)}
                                 </div>
                                 <h3 style={{ fontSize: '0.95rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
                                     {story.title}
@@ -152,7 +168,8 @@ const Home: React.FC = () => {
                             paddingLeft: i < 3 ? '1.5rem' : 0,
                             borderRight: i < 3 ? '1px solid #F0F0F0' : 'none'
                         }}>
-                            <Link to={`/article/${story.slug}`}>
+                            <Link to={getArticleLink(story)}>
+                                {story.is_live && <div style={{ marginBottom: '0.25rem', fontSize: '0.7rem' }}><LiveBadge /></div>}
                                 <h3 style={{ fontSize: '1rem', lineHeight: 1.4, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
                                     {story.title}
                                 </h3>
@@ -188,7 +205,7 @@ const Home: React.FC = () => {
 
                         <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
                             {sectionArticles.map(story => (
-                                <Link key={story.id} to={`/article/${story.slug}`}>
+                                <Link key={story.id} to={getArticleLink(story)}>
                                     <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f9f9f9', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
                                         {story.featured_image_url ? (
                                             <img src={story.featured_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -196,6 +213,7 @@ const Home: React.FC = () => {
                                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ddd', fontSize: '0.8rem' }}>No Image</div>
                                         )}
                                     </div>
+                                    {story.is_live && <div style={{ marginBottom: '0.25rem', fontSize: '0.7rem' }}><LiveBadge /></div>}
                                     <h3 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', color: '#111' }}>
                                         {story.title}
                                     </h3>
