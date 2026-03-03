@@ -128,7 +128,7 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                             {/* Render rich text content safely */}
                             <div
                                 className="article-content timeline-content"
-                                style={{ fontSize: '1.1rem', color: '#374151', margin: 0, paddingBottom: '0.5rem' }}
+                                style={{ fontSize: '1.1rem', color: '#374151', margin: 0, paddingBottom: '0.5rem', whiteSpace: 'pre-wrap' }}
                                 dangerouslySetInnerHTML={{ __html: update.content }}
                             />
 
