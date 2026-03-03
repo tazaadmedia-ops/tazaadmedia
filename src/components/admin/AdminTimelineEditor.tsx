@@ -183,7 +183,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
                         <div style={{ display: 'flex', gap: '8px' }}>
                             <input
                                 value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
-                                placeholder="عڪس/ميڊيا يو آر ايل (اختياري)"
+                                placeholder="تصوير يا ٽوئيٽ لنڪ (Image or Tweet URL)"
                                 style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', flexGrow: 1, fontSize: '0.9rem', fontFamily: 'var(--font-main)' }}
                             />
                             <input

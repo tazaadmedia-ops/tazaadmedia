@@ -1,5 +1,6 @@
 import React from 'react';
 import { Share2 } from 'lucide-react';
+import { TwitterTweetEmbed } from 'react-twitter-embed';
 
 export interface LiveUpdate {
     id: string;
@@ -39,6 +40,11 @@ const formatRelativeTime = (dateString: string) => {
     } else {
         return `${years} سال اڳ ۾`;
     }
+};
+
+const getTweetId = (url: string) => {
+    const match = url.match(/(?:twitter|x)\.com\/.+\/status\/(\d+)/);
+    return match ? match[1] : null;
 };
 
 const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false }) => {
@@ -136,7 +142,13 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
 
                             {update.media_url && (
                                 <div style={{ marginBottom: '1rem', borderRadius: '4px', overflow: 'hidden' }}>
-                                    <img src={update.media_url} alt="Update media" style={{ width: '100%', height: 'auto', objectFit: 'contain', backgroundColor: '#f9fafb' }} />
+                                    {getTweetId(update.media_url) ? (
+                                        <div style={{ direction: 'ltr' }}>
+                                            <TwitterTweetEmbed tweetId={getTweetId(update.media_url)!} options={{ conversation: 'none' }} />
+                                        </div>
+                                    ) : (
+                                        <img src={update.media_url} alt="Update media" style={{ width: '100%', height: 'auto', objectFit: 'contain', backgroundColor: '#f9fafb' }} />
+                                    )}
                                 </div>
                             )}
 
