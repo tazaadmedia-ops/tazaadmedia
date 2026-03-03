@@ -1,5 +1,5 @@
-import React from 'react';
-import { Share2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Share2, Twitter, Facebook, MessageCircle, Copy, X } from 'lucide-react';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 
 export interface LiveUpdate {
@@ -48,29 +48,23 @@ const getTweetId = (url: string) => {
 };
 
 const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false }) => {
-    const handleShare = async (update: LiveUpdate) => {
-        const shareUrl = `${window.location.origin}${window.location.pathname}#update-${update.id}`;
-        const shareTitle = update.title || "Tazaad Live Update";
+    const [openShareMenuId, setOpenShareMenuId] = useState<string | null>(null);
 
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: shareTitle,
-                    url: shareUrl
-                });
-            } catch (err) {
-                console.error("Error sharing:", err);
-            }
-        } else {
-            // Fallback: Copy to clipboard
-            try {
-                await navigator.clipboard.writeText(shareUrl);
-                alert("لنڪ ڪاپي ٿي وئي آهي (Link copied to clipboard)");
-            } catch (err) {
-                console.error("Clipboard error:", err);
-            }
+    const handleShareClick = (e: React.MouseEvent, updateId: string) => {
+        e.stopPropagation();
+        setOpenShareMenuId(openShareMenuId === updateId ? null : updateId);
+    };
+
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            alert("لنڪ ڪاپي ٿي وئي آهي (Link copied to clipboard)");
+            setOpenShareMenuId(null);
+        } catch (err) {
+            console.error("Clipboard error:", err);
         }
     };
+    // handleShare removed as we now use specific social links or copy
 
     if (!updates || updates.length === 0) {
         return <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>ڪا به اپڊيٽ موجود ناهي</div>;
@@ -183,30 +177,105 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                                 </div>
                             )}
 
-                            {/* Share Icon Floating at Bottom Left */}
-                            <div style={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: '20px',
-                                transform: 'translateY(50%)',
-                                backgroundColor: '#fff',
-                                borderRadius: '50%',
-                                width: '32px',
-                                height: '32px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '1px solid #d1d5db',
-                                cursor: 'pointer',
-                                color: '#4b5563',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                            }}
-                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f9fafb' }}
-                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff' }}
-                                onClick={() => handleShare(update)}
-                                title="Share this update"
-                            >
-                                <Share2 size={16} />
+                            {/* Share Button & Menu */}
+                            <div style={{ position: 'absolute', bottom: 0, left: '20px', transform: 'translateY(50%)', zIndex: 10 }}>
+                                <div
+                                    style={{
+                                        backgroundColor: '#fff',
+                                        borderRadius: '50%',
+                                        width: '32px',
+                                        height: '32px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px solid #d1d5db',
+                                        cursor: 'pointer',
+                                        color: openShareMenuId === update.id ? '#dc2626' : '#4b5563',
+                                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    onClick={(e) => handleShareClick(e, update.id)}
+                                    title="Share this update"
+                                >
+                                    {openShareMenuId === update.id ? <X size={16} /> : <Share2 size={16} />}
+                                </div>
+
+                                {openShareMenuId === update.id && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '40px',
+                                        left: 0,
+                                        backgroundColor: '#fff',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                                        border: '1px solid #e5e7eb',
+                                        padding: '8px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '4px',
+                                        minWidth: '150px',
+                                        animation: 'fade-in-up 0.2s ease-out'
+                                    }}>
+                                        {[
+                                            {
+                                                name: 'X (Twitter)',
+                                                icon: <Twitter size={14} />,
+                                                link: `https://twitter.com/intent/tweet?text=${encodeURIComponent(update.title || 'Tazaad Update')}&url=${encodeURIComponent(window.location.origin + window.location.pathname + '#update-' + update.id)}`
+                                            },
+                                            {
+                                                name: 'Facebook',
+                                                icon: <Facebook size={14} />,
+                                                link: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin + window.location.pathname + '#update-' + update.id)}`
+                                            },
+                                            {
+                                                name: 'WhatsApp',
+                                                icon: <MessageCircle size={14} />,
+                                                link: `https://api.whatsapp.com/send?text=${encodeURIComponent((update.title || 'Tazaad Update') + ' ' + window.location.origin + window.location.pathname + '#update-' + update.id)}`
+                                            }
+                                        ].map((platform) => (
+                                            <a
+                                                key={platform.name}
+                                                href={platform.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '10px',
+                                                    padding: '8px 12px',
+                                                    fontSize: '0.85rem',
+                                                    color: '#374151',
+                                                    textDecoration: 'none',
+                                                    borderRadius: '6px',
+                                                    transition: 'background-color 0.2s'
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                                onClick={() => setOpenShareMenuId(null)}
+                                            >
+                                                {platform.icon} {platform.name}
+                                            </a>
+                                        ))}
+                                        <div
+                                            onClick={() => copyToClipboard(window.location.origin + window.location.pathname + '#update-' + update.id)}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '10px',
+                                                padding: '8px 12px',
+                                                fontSize: '0.85rem',
+                                                color: '#374151',
+                                                cursor: 'pointer',
+                                                borderRadius: '6px',
+                                                transition: 'background-color 0.2s'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                        >
+                                            <Copy size={14} /> لنڪ ڪاپي ڪريو
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -223,6 +292,17 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                         50% {
                             opacity: .5;
                             transform: scale(1.1);
+                        }
+                    }
+
+                    @keyframes fade-in-up {
+                        from {
+                            opacity: 0;
+                            transform: translateY(10px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
                         }
                     }
 
