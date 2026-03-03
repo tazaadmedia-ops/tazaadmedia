@@ -153,7 +153,16 @@ const LiveArticlePage: React.FC = () => {
 
     return (
         <div style={{ backgroundColor: '#f9fafb', minHeight: '100vh', paddingBottom: '4rem' }}>
-            <SEO title={`LIVE: ${article.title}`} description={article.subdeck} image={article.featured_image_url} />
+            <SEO
+                title={`لائيو: ${article.title}`}
+                description={article.subdeck || article.title}
+                image={article.featured_image_url}
+                slug={`live/${slug}`}
+                type="article"
+                publishedAt={article.published_at || article.created_at}
+                author={authorName || undefined}
+                schemaType="NewsArticle"
+            />
 
             {/* Featured Media - Full Bleed Top */}
             {article.featured_image_url && (
