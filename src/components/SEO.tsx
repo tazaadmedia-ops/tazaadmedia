@@ -24,7 +24,7 @@ const SEO: React.FC<SEOProps> = ({
     schemaType,
     jsonLd
 }) => {
-    const siteUrl = 'https://tazaad.com.pk'; // Final production domain
+    const siteUrl = 'https://thetazaad.com'; // Final production domain
     const fullUrl = `${siteUrl}${slug ? (slug.startsWith('/') ? slug : `/${slug}`) : ''}`;
 
     // Ensure image is absolute and handles Supabase paths

@@ -22,7 +22,14 @@ export default async function handler(request: any, response: any) {
         if (Array.isArray(slug)) slug = slug[0];
 
         if (typeof slug === 'string') {
-            slug = slug.split('/')[0].split('?')[0].trim();
+            slug = slug.split('?')[0].trim();
+            // Handle live/ prefixed slugs (live articles)
+            if (slug.startsWith('live/')) {
+                slug = slug.replace('live/', '');
+            } else {
+                // For normal articles, we still only want the first segment if there's any nesting
+                slug = slug.split('/')[0];
+            }
         }
 
         // 1. Fetch index.html using FILE SYSTEM (More reliable than fetch)
@@ -110,7 +117,9 @@ export default async function handler(request: any, response: any) {
         }
 
         // 4. Prepare Metadata
-        const title = (article.title ? article.title.replace(/"/g, '&quot;') : 'Tazaad - Sindhi');
+        const isLive = Array.isArray(request.query.slug) ? request.query.slug[0].startsWith('live/') : (typeof request.query.slug === 'string' && request.query.slug.startsWith('live/'));
+        const prefix = isLive ? 'لائيو: ' : '';
+        const title = prefix + (article.title ? article.title.replace(/"/g, '&quot;') : 'Tazaad - Sindhi');
         const description = (article.subdeck ? article.subdeck.replace(/"/g, '&quot;') : 'Leading Sindhi digital media platform.').substring(0, 200);
 
         let imageUrl = article.featured_image_url;
@@ -142,7 +151,7 @@ export default async function handler(request: any, response: any) {
 `;
 
         html = html.replace('<head>', `<head>${metaTags}`);
-        const debugInfo = `<!-- SSR DEBUG: Disk Mode. Slug=${slug}, Found=${!!article} -->`;
+        const debugInfo = `<!-- SSR DEBUG: Disk Mode. Slug=${slug}, Live=${isLive}, Found=${!!article} -->`;
         html = html.replace('</body>', `${debugInfo}</body>`);
 
         response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
