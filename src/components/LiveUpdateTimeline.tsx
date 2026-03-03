@@ -48,6 +48,30 @@ const getTweetId = (url: string) => {
 };
 
 const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false }) => {
+    const handleShare = async (update: LiveUpdate) => {
+        const shareUrl = `${window.location.origin}${window.location.pathname}#update-${update.id}`;
+        const shareTitle = update.title || "Tazaad Live Update";
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: shareTitle,
+                    url: shareUrl
+                });
+            } catch (err) {
+                console.error("Error sharing:", err);
+            }
+        } else {
+            // Fallback: Copy to clipboard
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                alert("لنڪ ڪاپي ٿي وئي آهي (Link copied to clipboard)");
+            } catch (err) {
+                console.error("Clipboard error:", err);
+            }
+        }
+    };
+
     if (!updates || updates.length === 0) {
         return <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>ڪا به اپڊيٽ موجود ناهي</div>;
     }
@@ -70,7 +94,7 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                 const isPinnedCard = update.is_pinned;
 
                 return (
-                    <div key={update.id} style={{ position: 'relative', marginBottom: index === updates.length - 1 ? '2rem' : '2.5rem', zIndex: 1 }}>
+                    <div key={update.id} id={`update-${update.id}`} style={{ position: 'relative', marginBottom: index === updates.length - 1 ? '2rem' : '2.5rem', zIndex: 1 }}>
 
                         {/* Time Header with Dot */}
                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem', position: 'relative' }}>
@@ -179,6 +203,8 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                             }}
                                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f9fafb' }}
                                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff' }}
+                                onClick={() => handleShare(update)}
+                                title="Share this update"
                             >
                                 <Share2 size={16} />
                             </div>
