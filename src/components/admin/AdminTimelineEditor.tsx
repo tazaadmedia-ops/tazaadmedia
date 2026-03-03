@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Trash2, Edit2, Check, X, Loader, Pin } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Loader, Pin, Twitter } from 'lucide-react';
 import { format } from 'date-fns';
+
+const getTweetId = (url: string) => {
+    const match = url.match(/(?:twitter|x)\.com\/.+\/status\/(\d+)/);
+    return match ? match[1] : null;
+};
 
 interface AdminTimelineEditorProps {
     articleId: string;
@@ -214,6 +219,20 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                             />
                             ھن اپڊيٽ کي پِن (Pin) ڪريو
                         </label>
+
+                        {/* Media Preview in Editor */}
+                        {mediaUrl && (
+                            <div style={{ marginTop: '0.5rem', padding: '10px', backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}>
+                                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '8px', fontWeight: 600 }}>ميڊيا پريويو:</div>
+                                {getTweetId(mediaUrl) ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1d9bf0', fontWeight: 600 }}>
+                                        <Twitter size={18} /> Twitter Tweet (ID: {getTweetId(mediaUrl)})
+                                    </div>
+                                ) : (
+                                    <img src={mediaUrl} style={{ maxHeight: '150px', borderRadius: '4px' }} alt="Preview" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
@@ -248,7 +267,17 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                                 </div>
                                 {update.title && <h5 style={{ margin: '0 0 0.5rem 0', fontWeight: 700, fontSize: '1.1rem' }}>{update.title}</h5>}
                                 <div style={{ color: '#374151', fontSize: '0.95rem', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-main)' }} dangerouslySetInnerHTML={{ __html: update.content }} />
-                                {update.media_url && <img src={update.media_url} style={{ maxHeight: '100px', marginTop: '10px', borderRadius: '4px' }} alt="update media" />}
+                                {update.media_url && (
+                                    <div style={{ marginTop: '10px' }}>
+                                        {getTweetId(update.media_url) ? (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1d9bf0', fontSize: '0.85rem', fontWeight: 600, backgroundColor: '#f0f9ff', padding: '4px 8px', borderRadius: '4px', width: 'fit-content' }}>
+                                                <Twitter size={14} /> Twitter Tweet
+                                            </div>
+                                        ) : (
+                                            <img src={update.media_url} style={{ maxHeight: '100px', borderRadius: '4px' }} alt="update media" />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '1rem', borderRight: '1px solid #f3f4f6' }}>
                                 <button onClick={() => handleEdit(update)} title="Edit" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4b5563', padding: '4px' }}><Edit2 size={16} /></button>

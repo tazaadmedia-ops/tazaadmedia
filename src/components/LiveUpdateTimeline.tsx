@@ -164,8 +164,15 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                                 </h3>
                             )}
 
+                            {/* Render rich text content safely */}
+                            <div
+                                className="article-content timeline-content"
+                                style={{ fontSize: '1.1rem', color: '#374151', margin: 0, paddingBottom: '0.5rem', whiteSpace: 'pre-wrap' }}
+                                dangerouslySetInnerHTML={{ __html: update.content }}
+                            />
+
                             {update.media_url && (
-                                <div style={{ marginBottom: '1rem', borderRadius: '4px', overflow: 'hidden' }}>
+                                <div style={{ marginTop: '1rem', marginBottom: '1rem', borderRadius: '4px', overflow: 'hidden' }}>
                                     {getTweetId(update.media_url) ? (
                                         <div style={{ direction: 'ltr' }}>
                                             <TwitterTweetEmbed tweetId={getTweetId(update.media_url)!} options={{ conversation: 'none' }} />
@@ -175,13 +182,6 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                                     )}
                                 </div>
                             )}
-
-                            {/* Render rich text content safely */}
-                            <div
-                                className="article-content timeline-content"
-                                style={{ fontSize: '1.1rem', color: '#374151', margin: 0, paddingBottom: '0.5rem', whiteSpace: 'pre-wrap' }}
-                                dangerouslySetInnerHTML={{ __html: update.content }}
-                            />
 
                             {/* Share Icon Floating at Bottom Left */}
                             <div style={{
