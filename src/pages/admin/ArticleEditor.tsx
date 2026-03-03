@@ -68,6 +68,7 @@ const ArticleEditor: React.FC = () => {
     const [categoryId, setCategoryId] = useState<string | null>(null);
     const [showCategoryMenu, setShowCategoryMenu] = useState(false);
     const [isLive, setIsLive] = useState(false);
+    const [hasUpdates, setHasUpdates] = useState(false);
 
     // Featured Image
     const [featuredImageUrl, setFeaturedImageUrl] = useState('');
@@ -215,6 +216,16 @@ const ArticleEditor: React.FC = () => {
                         }
 
                         editor?.commands.setContent(article.content_json || article.content_text || '');
+
+                        // 3. Check for existing updates
+                        const { count } = await supabase
+                            .from('live_updates')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('article_id', id);
+
+                        if (count && count > 0) {
+                            setHasUpdates(true);
+                        }
                     }
                 }
             } catch (error: any) {
@@ -731,9 +742,9 @@ const ArticleEditor: React.FC = () => {
                     </label>
                 </div>
 
-                {isLive && id && id !== 'new' && (
+                {(isLive || hasUpdates) && id && id !== 'new' && (
                     <div style={{ marginBottom: '3rem' }}>
-                        <AdminTimelineEditor articleId={id} />
+                        <AdminTimelineEditor articleId={id} isLive={isLive} />
                     </div>
                 )}
                 {isLive && (!id || id === 'new') && (

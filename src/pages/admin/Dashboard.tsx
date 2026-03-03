@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { Eye, Trash2, Edit2 } from 'lucide-react';
@@ -7,6 +7,7 @@ import { Eye, Trash2, Edit2 } from 'lucide-react';
 const Dashboard: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchArticles();
@@ -31,6 +32,19 @@ const Dashboard: React.FC = () => {
             alert('Error deleting: ' + error.message);
         } else {
             setArticles(articles.filter(a => a.id !== id));
+        }
+    };
+
+    const handleToggleLive = async (articleId: string, currentStatus: boolean) => {
+        const { error } = await supabase
+            .from('articles')
+            .update({ is_live: !currentStatus })
+            .eq('id', articleId);
+
+        if (error) {
+            alert('Error updating status: ' + error.message);
+        } else {
+            setArticles(articles.map(a => a.id === articleId ? { ...a, is_live: !currentStatus } : a));
         }
     };
 
@@ -79,6 +93,7 @@ const Dashboard: React.FC = () => {
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '40%' }}>Title</th>
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Slug</th>
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Status</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Live</th>
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Action</th>
                             </tr>
                         </thead>
@@ -108,6 +123,31 @@ const Dashboard: React.FC = () => {
                                         </span>
                                     </td>
                                     <td style={{ padding: '1.2rem 1.5rem' }}>
+                                        <div
+                                            onClick={() => handleToggleLive(article.id, article.is_live)}
+                                            style={{
+                                                width: '40px',
+                                                height: '20px',
+                                                backgroundColor: article.is_live ? '#ef4444' : '#e5e7eb',
+                                                borderRadius: '20px',
+                                                position: 'relative',
+                                                cursor: 'pointer',
+                                                transition: 'background-color 0.2s'
+                                            }}
+                                        >
+                                            <div style={{
+                                                width: '16px',
+                                                height: '16px',
+                                                backgroundColor: '#fff',
+                                                borderRadius: '50%',
+                                                position: 'absolute',
+                                                top: '2px',
+                                                left: article.is_live ? '22px' : '2px',
+                                                transition: 'left 0.2s'
+                                            }} />
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '1.2rem 1.5rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <a
                                                 href={`/article/${article.slug}`}
@@ -118,12 +158,23 @@ const Dashboard: React.FC = () => {
                                             >
                                                 <Eye size={18} />
                                             </a>
-                                            <Link
-                                                to={`/admin/edit/${article.id}`}
-                                                style={{ color: 'var(--color-accent)', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                            <button
+                                                onClick={() => navigate(`/admin/edit/${article.id}`)}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    color: 'var(--color-accent)',
+                                                    cursor: 'pointer',
+                                                    padding: 0,
+                                                    fontWeight: 600,
+                                                    fontSize: '0.9rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px'
+                                                }}
                                             >
                                                 <Edit2 size={16} /> Edit
-                                            </Link>
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(article.id, article.title)}
                                                 style={{

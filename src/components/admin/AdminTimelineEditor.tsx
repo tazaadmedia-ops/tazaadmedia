@@ -5,9 +5,10 @@ import { format } from 'date-fns';
 
 interface AdminTimelineEditorProps {
     articleId: string;
+    isLive?: boolean;
 }
 
-const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) => {
+const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, isLive = true }) => {
     const [updates, setUpdates] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -144,9 +145,11 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
     }
 
     return (
-        <div style={{ marginTop: '2rem', borderTop: '1px solid #e5e7eb', paddingTop: '2rem', direction: 'rtl' }}>
+        <div style={{ marginTop: '2rem', borderTop: '2px solid #f3f4f6', paddingTop: '2.5rem', direction: 'rtl' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>ٽائيم لائين اپڊيٽس</h3>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: '#111827' }}>
+                    {isLive ? 'لائيو اپڊيٽس (Live Updates)' : 'لائيو اپڊيٽس جو آرڪائيو (Live Blog Archive)'}
+                </h3>
                 {!isOpen && (
                     <button
                         onClick={handleOpenNew}
