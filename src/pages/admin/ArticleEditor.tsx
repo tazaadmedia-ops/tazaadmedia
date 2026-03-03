@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import FloatingMenuExtension from '@tiptap/extension-floating-menu';
 import AdminLayout from '../../components/admin/AdminLayout';
+import AdminTimelineEditor from '../../components/admin/AdminTimelineEditor';
 import { supabase } from '../../lib/supabase';
 
 // --- Components ---
@@ -66,6 +67,7 @@ const ArticleEditor: React.FC = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [categoryId, setCategoryId] = useState<string | null>(null);
     const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+    const [isLive, setIsLive] = useState(false);
 
     // Featured Image
     const [featuredImageUrl, setFeaturedImageUrl] = useState('');
@@ -205,6 +207,7 @@ const ArticleEditor: React.FC = () => {
                         setSubdeck(article.subdeck || '');
                         setCategoryId(article.primary_category_id);
                         setFeaturedImageUrl(article.featured_image_url || ''); // Assuming we add this column
+                        setIsLive(article.is_live || false);
 
                         if (article.article_authors) {
                             const authors = article.article_authors.map((aa: any) => aa.users).filter(Boolean);
@@ -245,6 +248,7 @@ const ArticleEditor: React.FC = () => {
             content_json: editor.getJSON(),
             content_text: editor.getText(),
             status: 'published',
+            is_live: isLive,
             updated_at: new Date().toISOString()
         };
 
@@ -671,6 +675,48 @@ const ArticleEditor: React.FC = () => {
                         {subdeck.length}/250
                     </div>
                 </div>
+
+                {/* Live Blog Toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '12px', marginBottom: '2.5rem', direction: 'rtl', backgroundColor: isLive ? '#fef2f2' : '#f9fafb', padding: '12px 16px', borderRadius: '8px', border: `1px solid ${isLive ? '#fecaca' : '#e5e7eb'}`, transition: 'all 0.3s ease' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '1.05rem', fontWeight: 700, color: isLive ? '#dc2626' : '#374151' }}>
+                            لائيو اپڊيٽس (Live Updates)
+                        </span>
+                        <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                            هن مضمون کي لائيو بلاگ طور سيٽ ڪريو
+                        </span>
+                    </div>
+
+                    {/* Switch styled checkbox */}
+                    <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', marginRight: 'auto' }}>
+                        <input
+                            type="checkbox"
+                            checked={isLive}
+                            onChange={(e) => setIsLive(e.target.checked)}
+                            style={{ opacity: 0, width: 0, height: 0 }}
+                        />
+                        <span style={{
+                            position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                            backgroundColor: isLive ? '#ef4444' : '#ccc', transition: '.4s', borderRadius: '24px'
+                        }}>
+                            <span style={{
+                                position: 'absolute', height: '18px', width: '18px', left: isLive ? '22px' : '3px', bottom: '3px',
+                                backgroundColor: 'white', transition: '.4s', borderRadius: '50%'
+                            }}></span>
+                        </span>
+                    </label>
+                </div>
+
+                {isLive && id && id !== 'new' && (
+                    <div style={{ marginBottom: '3rem' }}>
+                        <AdminTimelineEditor articleId={id} />
+                    </div>
+                )}
+                {isLive && (!id || id === 'new') && (
+                    <div style={{ padding: '15px', backgroundColor: '#fff3cd', color: '#856404', borderRadius: '8px', marginBottom: '2.5rem', fontSize: '0.9rem', direction: 'rtl' }}>
+                        لائيو اپڊيٽس تبديل يا شامل ڪرڻ لاءِ پھريان مضمون کي محفوظ (Publish/Save) ڪريو.
+                    </div>
+                )}
 
                 {/* Bylines */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2.5rem' }}>
