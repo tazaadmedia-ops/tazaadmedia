@@ -1,4 +1,5 @@
 import React from 'react';
+import { Share2 } from 'lucide-react';
 
 export interface LiveUpdate {
     id: string;
@@ -35,67 +36,79 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
             {/* Timeline Vertical Connector Line */}
             <div style={{
                 position: 'absolute',
-                top: '20px', // Start slightly down so it doesn't overshoot the first dot
+                top: '8px',
                 bottom: 0,
-                right: '111px', // precise alignment for rtl (matches dot center)
+                right: '11px',
                 width: '1px',
-                backgroundColor: '#cbd5e1', // Sleek grey
+                backgroundColor: '#d1d5db',
                 zIndex: 0
             }}></div>
 
             {updates.map((update, index) => {
-                const isFirstActive = isLiveProfile && index === 0 && !update.is_pinned; // Only pulse nearest/latest active if unpinned
+                const isFirstActive = isLiveProfile && index === 0 && !update.is_pinned;
                 const isPinnedCard = update.is_pinned;
-                const dotColor = isFirstActive ? '#f59e0b' : '#f59e0b'; // Amber
-                const ringColor = isPinnedCard ? '#dc2626' : '#fff'; // Red if pinned to stand out, otherwise white
 
                 return (
-                    <div key={update.id} style={{ position: 'relative', marginBottom: index === updates.length - 1 ? '0' : '2.5rem', zIndex: 1, display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+                    <div key={update.id} style={{ position: 'relative', marginBottom: index === updates.length - 1 ? '2rem' : '2.5rem', zIndex: 1 }}>
 
-                        {/* Timeline Node / Time Column */}
-                        <div style={{ width: '90px', flexShrink: 0, display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                            {/* Time text */}
-                            <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#4b5563', whiteSpace: 'nowrap', paddingTop: '2px', width: '60px', textAlign: 'left' }}>
-                                {formatTime(update.published_at)}
-                            </div>
-
-                            {/* Dot */}
-                            <div style={{ position: 'relative', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                        {/* Time Header with Dot */}
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem', position: 'relative' }}>
+                            {/* Dot on the line */}
+                            <div style={{ position: 'absolute', right: '3.5px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {isFirstActive && (
                                     <span style={{
                                         position: 'absolute',
                                         width: '24px',
                                         height: '24px',
-                                        backgroundColor: dotColor,
+                                        backgroundColor: '#f59e0b',
                                         borderRadius: '50%',
                                         opacity: 0.4,
                                         animation: 'pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                                     }}></span>
                                 )}
                                 <div style={{
-                                    width: '14px',
-                                    height: '14px',
+                                    width: '16px',
+                                    height: '16px',
                                     borderRadius: '50%',
-                                    backgroundColor: dotColor,
-                                    border: `3px solid ${ringColor}`,
-                                    boxShadow: '0 0 0 1px #cbd5e1', // subtle outer border to separate from white background
+                                    backgroundColor: '#fff',
+                                    border: `2px solid #f59e0b`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                     position: 'relative',
                                     zIndex: 2
-                                }}></div>
+                                }}>
+                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f59e0b' }}></div>
+                                </div>
+                            </div>
+
+                            {/* Time text */}
+                            <div style={{ marginRight: '30px', fontSize: '0.95rem', fontWeight: 600, color: '#111827', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontWeight: 700 }}>{formatTime(update.published_at)}</span>
                             </div>
                         </div>
 
                         {/* Content Card */}
                         <div style={{
-                            flexGrow: 1,
+                            marginRight: '30px',
                             backgroundColor: '#fff',
                             borderRadius: '8px',
                             padding: '1.5rem',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                            border: update.is_pinned ? '1px solid #fecaca' : '1px solid #f3f4f6'
+                            position: 'relative',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                            border: '1px solid #d1d5db'
                         }}>
-                            {update.is_pinned && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#dc2626', fontWeight: 700, marginBottom: '0.5rem' }}>
+                            {isPinnedCard && (
+                                <div style={{
+                                    display: 'inline-block',
+                                    backgroundColor: '#dc2626',
+                                    color: '#fff',
+                                    padding: '2px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    marginBottom: '1rem'
+                                }}>
                                     📌 پِن ٿيل
                                 </div>
                             )}
@@ -115,9 +128,33 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                             {/* Render rich text content safely */}
                             <div
                                 className="article-content timeline-content"
-                                style={{ fontSize: '1.1rem', color: '#374151', margin: 0 }}
+                                style={{ fontSize: '1.1rem', color: '#374151', margin: 0, paddingBottom: '0.5rem' }}
                                 dangerouslySetInnerHTML={{ __html: update.content }}
                             />
+
+                            {/* Share Icon Floating at Bottom Left */}
+                            <div style={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: '20px',
+                                transform: 'translateY(50%)',
+                                backgroundColor: '#fff',
+                                borderRadius: '50%',
+                                width: '32px',
+                                height: '32px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: '1px solid #d1d5db',
+                                cursor: 'pointer',
+                                color: '#4b5563',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                            }}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f9fafb' }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff' }}
+                            >
+                                <Share2 size={16} />
+                            </div>
                         </div>
                     </div>
                 );

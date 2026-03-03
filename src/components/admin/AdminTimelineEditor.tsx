@@ -66,7 +66,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
         try {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `article_images/${fileName}`;
+            const filePath = `${fileName}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
