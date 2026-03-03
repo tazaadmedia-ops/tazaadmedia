@@ -204,26 +204,27 @@ const LiveArticlePage: React.FC = () => {
                     </div>
 
                     {pendingUpdates.length > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'center', position: 'absolute', bottom: '-20px', left: 0, right: 0, zIndex: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', position: 'sticky', top: '20px', zIndex: 100, marginBottom: '1rem' }}>
                             <button
                                 onClick={handleShowPending}
                                 style={{
                                     backgroundColor: '#b91c1c',
                                     color: 'white',
-                                    padding: '6px 16px',
-                                    borderRadius: '20px',
-                                    fontSize: '0.9rem',
+                                    padding: '8px 24px',
+                                    borderRadius: '30px',
+                                    fontSize: '1rem',
                                     fontWeight: 700,
                                     border: 'none',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '6px',
+                                    gap: '8px',
                                     cursor: 'pointer',
-                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                    boxShadow: '0 4px 12px rgba(185, 28, 28, 0.3)',
+                                    animation: 'slideDown 0.3s ease-out'
                                 }}
                             >
-                                <RefreshCw size={16} />
-                                {pendingUpdates.length} وڌيڪ اپڊيٽس
+                                <RefreshCw size={18} className="animate-spin-slow" />
+                                {pendingUpdates.length} نيون اپڊيٽس ڏسو
                             </button>
                         </div>
                     )}
@@ -231,6 +232,22 @@ const LiveArticlePage: React.FC = () => {
 
                 {/* Timeline */}
                 <LiveUpdateTimeline updates={updates} isLiveProfile={true} />
+
+                <style>
+                    {`
+                        @keyframes slideDown {
+                            from { transform: translateY(-20px); opacity: 0; }
+                            to { transform: translateY(0); opacity: 1; }
+                        }
+                        .animate-spin-slow {
+                            animation: spin 3s linear infinite;
+                        }
+                        @keyframes spin {
+                            from { transform: rotate(0deg); }
+                            to { transform: rotate(360deg); }
+                        }
+                    `}
+                </style>
 
             </div>
         </div>

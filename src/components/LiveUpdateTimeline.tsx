@@ -15,15 +15,30 @@ interface LiveUpdateTimelineProps {
     isLiveProfile?: boolean; // Controls whether the first item gets the pulsing active animation
 }
 
-const formatTime = (dateString: string) => {
-    const d = new Date(dateString);
-    let hours = d.getHours();
-    const minutes = d.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-    return `${hours}:${minutesStr} ${ampm}`;
+const formatRelativeTime = (dateString: string) => {
+    const publishedDate = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - publishedDate.getTime()) / 1000);
+
+    const minutes = Math.floor(diffInSeconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
+
+    if (diffInSeconds < 60) {
+        return 'ڪجهه سيڪنڊ اڳ ۾'; // A few seconds ago
+    } else if (minutes < 60) {
+        return `${minutes} منٽ اڳ ۾`;
+    } else if (hours < 24) {
+        return `${hours} ڪلاڪ اڳ ۾`;
+    } else if (days < 30) {
+        return `${days} ڏينھن اڳ ۾`;
+    } else if (months < 12) {
+        return `${months} مھينا اڳ ۾`;
+    } else {
+        return `${years} سال اڳ ۾`;
+    }
 };
 
 const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false }) => {
@@ -84,7 +99,7 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
 
                             {/* Time text */}
                             <div style={{ marginRight: '30px', fontSize: '0.95rem', fontWeight: 600, color: '#111827', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontWeight: 700 }}>{formatTime(update.published_at)}</span>
+                                <span style={{ fontWeight: 700 }}>{formatRelativeTime(update.published_at)}</span>
                             </div>
                         </div>
 
