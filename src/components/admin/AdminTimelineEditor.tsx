@@ -69,12 +69,12 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
             const filePath = `article_images/${fileName}`;
 
             const { error: uploadError } = await supabase.storage
-                .from('articles')
+                .from('avatars')
                 .upload(filePath, file);
 
             if (uploadError) throw uploadError;
 
-            const { data } = supabase.storage.from('articles').getPublicUrl(filePath);
+            const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
             setMediaUrl(data.publicUrl);
         } catch (error: any) {
             console.error('Error uploading image:', error);
@@ -244,7 +244,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId }) 
                                     {format(new Date(update.published_at), 'MMM dd, yyyy HH:mm')}
                                 </div>
                                 {update.title && <h5 style={{ margin: '0 0 0.5rem 0', fontWeight: 700, fontSize: '1.1rem' }}>{update.title}</h5>}
-                                <div style={{ color: '#374151', fontSize: '0.95rem' }} dangerouslySetInnerHTML={{ __html: update.content }} />
+                                <div style={{ color: '#374151', fontSize: '0.95rem', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-main)' }} dangerouslySetInnerHTML={{ __html: update.content }} />
                                 {update.media_url && <img src={update.media_url} style={{ maxHeight: '100px', marginTop: '10px', borderRadius: '4px' }} alt="update media" />}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '1rem', borderRight: '1px solid #f3f4f6' }}>
