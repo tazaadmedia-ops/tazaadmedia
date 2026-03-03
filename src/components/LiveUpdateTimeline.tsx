@@ -89,7 +89,7 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                         </div>
 
                         {/* Content Card */}
-                        <div style={{
+                        <div className="live-update-card" style={{
                             marginRight: '30px',
                             backgroundColor: '#fff',
                             borderRadius: '8px',
@@ -170,6 +170,13 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                         50% {
                             opacity: .5;
                             transform: scale(1.1);
+                        }
+                    }
+
+                    @media (max-width: 640px) {
+                        .live-update-card {
+                            margin-right: 15px !important;
+                            padding: 1rem !important;
                         }
                     }
                 `}

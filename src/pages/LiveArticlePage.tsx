@@ -6,8 +6,6 @@ import SEO from '../components/SEO';
 import LivePulseIndicator from '../components/LivePulseIndicator';
 import LiveUpdateTimeline from '../components/LiveUpdateTimeline';
 import type { LiveUpdate } from '../components/LiveUpdateTimeline';
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 
 const formatSindhiDate = (dateString: string) => {
     if (!dateString) return '';
@@ -24,13 +22,7 @@ const LiveArticlePage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
 
-    const editor = useEditor({
-        editable: false,
-        extensions: [StarterKit], // Simplified for just summary render
-        editorProps: {
-            attributes: { class: 'prose prose-lg focus:outline-none', style: 'font-family: var(--font-main);' },
-        },
-    });
+
 
     useEffect(() => {
         const fetchLiveArticle = async () => {
@@ -51,7 +43,6 @@ const LiveArticlePage: React.FC = () => {
                     if (art.article_authors?.[0]?.users?.full_name) {
                         setAuthorName(art.article_authors[0].users.full_name);
                     }
-                    if (editor) editor.commands.setContent(art.content_json || art.content_text || '');
 
                     // Fetch Updates (Mocking query if table doesn't exist yet gracefully)
                     const { data: upds, error: updError } = await supabase
@@ -78,7 +69,7 @@ const LiveArticlePage: React.FC = () => {
         };
 
         fetchLiveArticle();
-    }, [slug, editor]);
+    }, [slug]);
 
     // Realtime Subscription
     useEffect(() => {
@@ -159,12 +150,7 @@ const LiveArticlePage: React.FC = () => {
                 </div>
 
 
-                {/* Article Summary (The initial writeup) */}
-                <div style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '3rem' }}>
-                    <div className="article-content" style={{ fontSize: '1.1rem', margin: 0 }}>
-                        <EditorContent editor={editor} />
-                    </div>
-                </div>
+
 
                 {/* Updates Section Header */}
                 <div style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
