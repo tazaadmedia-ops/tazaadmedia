@@ -169,12 +169,22 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                             {update.media_url && (
                                 <div style={{ marginTop: '1rem', marginBottom: '1rem', borderRadius: '4px', overflow: 'hidden' }}>
                                     {getTweetId(update.media_url) ? (
-                                        <div style={{ direction: 'ltr', minHeight: '250px', backgroundColor: '#f9fafb', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <TwitterTweetEmbed
-                                                tweetId={getTweetId(update.media_url)!}
-                                                options={{ conversation: 'none' }}
-                                                placeholder={<div style={{ color: '#666', fontSize: '0.9rem' }}>Twitter لوڊ ٿي رهيو آهي...</div>}
-                                            />
+                                        <div style={{
+                                            direction: 'ltr',
+                                            minHeight: '250px',
+                                            backgroundColor: '#f9fafb',
+                                            borderRadius: '8px',
+                                            display: 'flex',
+                                            justifyContent: 'flex-start',
+                                            padding: '10px'
+                                        }}>
+                                            <div style={{ width: '100%', maxWidth: '650px' }}>
+                                                <TwitterTweetEmbed
+                                                    tweetId={getTweetId(update.media_url)!}
+                                                    options={{ conversation: 'none', width: '100%' }}
+                                                    placeholder={<div style={{ color: '#666', fontSize: '0.9rem', padding: '20px' }}>Twitter لوڊ ٿي رهيو آهي...</div>}
+                                                />
+                                            </div>
                                         </div>
                                     ) : (
                                         <img

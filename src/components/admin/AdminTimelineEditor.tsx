@@ -233,13 +233,23 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                             <div style={{ marginTop: '0.5rem', padding: '10px', backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}>
                                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '8px', fontWeight: 600 }}>ميڊيا پريويو:</div>
                                 {getTweetId(mediaUrl) ? (
-                                    <div style={{ direction: 'ltr', minHeight: '200px', backgroundColor: '#f9fafb', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <TwitterTweetEmbed
-                                            key={getTweetId(mediaUrl)!}
-                                            tweetId={getTweetId(mediaUrl)!}
-                                            options={{ conversation: 'none' }}
-                                            placeholder={<div style={{ color: '#666', fontSize: '0.8rem' }}>Twitter لوڊ ٿي رهيو آهي...</div>}
-                                        />
+                                    <div style={{
+                                        direction: 'ltr',
+                                        minHeight: '200px',
+                                        backgroundColor: '#f9fafb',
+                                        borderRadius: '8px',
+                                        display: 'flex',
+                                        justifyContent: 'flex-start',
+                                        padding: '10px'
+                                    }}>
+                                        <div style={{ width: '100%', maxWidth: '650px' }}>
+                                            <TwitterTweetEmbed
+                                                key={getTweetId(mediaUrl)!}
+                                                tweetId={getTweetId(mediaUrl)!}
+                                                options={{ conversation: 'none', width: '100%' }}
+                                                placeholder={<div style={{ color: '#666', fontSize: '0.8rem', padding: '10px' }}>Twitter لوڊ ٿي رهيو آهي...</div>}
+                                            />
+                                        </div>
                                     </div>
                                 ) : (
                                     <img src={mediaUrl} style={{ maxHeight: '150px', borderRadius: '4px' }} alt="Preview" onError={(e) => (e.currentTarget.style.display = 'none')} />
