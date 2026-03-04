@@ -14,6 +14,15 @@
   <meta property="og:image" content="/default-og.jpg" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
+  <script>
+    // Polyfill for legacy CJS modules
+    window.global = window;
+    window.process = { env: {} };
+    window.require = (name) => {
+      console.warn(`Polyfilled require called for: ${name}`);
+      return {};
+    };
+  </script>
 </head>
 
 <body>

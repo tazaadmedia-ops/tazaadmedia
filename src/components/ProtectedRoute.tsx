@@ -25,7 +25,11 @@ const ProtectedRoute: React.FC = () => {
                 if (user) {
                     setRole(user.role);
                 } else {
-                    console.error("Error fetching user role", error);
+                    console.error("Error fetching user role Profile Fetch Error:", error);
+                    // Check if it's a 406 Not Acceptable
+                    if (error?.message?.includes('406') || error?.code === '406') {
+                        console.warn('406 Not Acceptable detected. This might be a session/WAF issue.');
+                    }
                 }
             }
 

@@ -11,6 +11,9 @@ export default defineConfig({
     include: ['react-twitter-embed'],
   },
   build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {
