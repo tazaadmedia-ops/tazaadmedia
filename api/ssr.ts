@@ -60,8 +60,8 @@ export default async function handler(request: any, response: any) {
 
         // 3. Default Metadata (Home)
         let meta: Metadata = {
-            title: "تضاد - سنڌي (Tazaad - Sindhi)",
-            description: "Leading Sindhi digital media platform offering news, analysis, and special reports.",
+            title: "تضاد - سنڌي",
+            description: "تازيون خبرون، تجزيا ۽ رپورٽون - تضاد سنڌي",
             image: `${baseUrl}/default-og.jpg`,
             url: baseUrl,
             type: "website",
