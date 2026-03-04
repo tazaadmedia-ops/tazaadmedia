@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     'process.env': {},
+    global: 'window',
   },
   optimizeDeps: {
     include: ['react-twitter-embed'],

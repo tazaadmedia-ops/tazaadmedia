@@ -10,16 +10,22 @@ const ProtectedRoute: React.FC = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            // 1. Check Session
-            const { data: { session: currentSession } } = await supabase.auth.getSession();
-            setSession(currentSession);
+            // 1. Check User (more reliable than getSession for server-side validation)
+            const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
 
-            if (currentSession?.user) {
+            if (authError) {
+                console.error("Auth check error:", authError);
+                setLoading(false);
+                return;
+            }
+
+            if (currentUser) {
+                setSession({ user: currentUser });
                 // 2. Check Role
                 const { data: user, error } = await supabase
                     .from('users')
                     .select('role')
-                    .eq('id', currentSession.user.id)
+                    .eq('id', currentUser.id)
                     .single();
 
                 if (user) {
