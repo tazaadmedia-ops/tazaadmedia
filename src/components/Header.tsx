@@ -121,11 +121,11 @@ const Header: React.FC = () => {
                 }}>
                     <nav className="nav-scroll" style={{
                         display: 'flex',
-                        gap: '1.5rem',
+                        gap: '2.5rem',
                         height: '100%',
                         alignItems: 'center',
                         flexGrow: 1,
-                        padding: '0 10px'
+                        padding: '0 20px'
                     }}>
                         {menuItems.map((item) => (
                             <NavMenuItem
@@ -149,7 +149,7 @@ const Header: React.FC = () => {
                             }}
                             style={{
                                 width: '100%',
-                                padding: '8px 35px 8px 12px',
+                                padding: '8px 12px 8px 35px',
                                 borderRadius: '20px',
                                 border: '1px solid #ddd',
                                 outline: 'none',
@@ -165,7 +165,7 @@ const Header: React.FC = () => {
                             onClick={handleSearch}
                             style={{
                                 position: 'absolute',
-                                right: '12px',
+                                left: '12px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
                                 opacity: 0.7,
