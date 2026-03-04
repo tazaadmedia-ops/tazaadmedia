@@ -75,7 +75,8 @@ export default async function handler(request: any, response: any) {
 
         if (type === 'article' || type === 'live') {
             const isLive = type === 'live';
-            const { data: art } = await supabase.from('articles').select('*').eq('slug', detail).single();
+            const { data: artResult } = await supabase.from('articles').select('*').eq('slug', detail).single();
+            const art = artResult as any;
             if (art) {
                 const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
                 meta.title = `${prefixedTitle} | تضاد`;
@@ -96,7 +97,8 @@ export default async function handler(request: any, response: any) {
                 };
             }
         } else if (type === 'category') {
-            const { data: cat } = await supabase.from('categories').select('*').eq('slug', detail).single();
+            const { data: catResult } = await supabase.from('categories').select('*').eq('slug', detail).single();
+            const cat = catResult as any;
             if (cat) {
                 meta.title = `${cat.name} | تضاد`;
                 meta.description = `تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
@@ -109,7 +111,8 @@ export default async function handler(request: any, response: any) {
                 };
             }
         } else if (type === 'author') {
-            const { data: user } = await supabase.from('users').select('*').eq('username', detail).single();
+            const { data: userResult } = await supabase.from('users').select('*').eq('username', detail).single();
+            const user = userResult as any;
             if (user) {
                 meta.title = `${user.full_name} | ليکڪ`;
                 meta.description = user.bio || `${user.full_name} جون لکڻيون تضاد تي.`;
@@ -127,24 +130,42 @@ export default async function handler(request: any, response: any) {
         }
 
         // 5. Inject Content
+        // Aggressively remove existing metadata to avoid conflicts
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
         html = html.replace(/<meta[^>]*?(?:name|property)=["'](?:description|og:|twitter:)[^>]*?>/gi, '');
+        html = html.replace(/<link[^>]*?rel=["']canonical["'][^>]*?>/gi, '');
+
+        const debugInfo = `
+    <!-- 
+      SSR DEBUG:
+      Type: ${type}
+      Detail: ${detail}
+      Title: ${meta.title}
+      Image: ${meta.image}
+      Status: ${detail ? 'Processed' : 'Home'}
+      Timestamp: ${new Date().toISOString()}
+    -->`;
 
         const metaTags = `
+    ${debugInfo}
     <title>${meta.title.replace(/"/g, '&quot;')}</title>
     <meta name="description" content="${meta.description.replace(/"/g, '&quot;')}" />
     <meta property="og:title" content="${meta.title.replace(/"/g, '&quot;')}" />
     <meta property="og:description" content="${meta.description.replace(/"/g, '&quot;')}" />
     <meta property="og:image" content="${meta.image}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="${meta.url}" />
     <meta property="og:type" content="${meta.type}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${meta.title.replace(/"/g, '&quot;')}" />
     <meta name="twitter:description" content="${meta.description.replace(/"/g, '&quot;')}" />
     <meta name="twitter:image" content="${meta.image}" />
+    <link rel="canonical" href="${meta.url}" />
     <script type="application/ld+json">${JSON.stringify(meta.schema)}</script>
 `;
 
+        // Inject right after <head> to be top priority
         html = html.replace('<head>', `<head>${metaTags}`);
 
         response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
