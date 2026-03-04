@@ -4,58 +4,57 @@ import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
 
-const CATEGORY_MAP: Record<string, string> = {
-    'analysis': 'تجزيا',
-    'special-reports': 'خصوصي رپورٽون',
-    'sindh': 'سنڌ',
-    'region': 'خطو',
-    'world': 'دنيا'
-};
-
-const DB_MAPPING: Record<string, string[]> = {
-    'analysis': ['Opinion', 'Analysis', 'تجزيا'],
-    'special-reports': ['Special Reports', 'Special Report', 'خصوصي رپورٽس'],
-    'sindh': ['Sindh', 'سنڌ'],
-    'region': ['Region', 'Nearby', 'خطو'],
-    'world': ['World', 'International', 'دنيا']
-};
-
 const CategoryPage: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [articles, setArticles] = useState<any[]>([]);
+    const [category, setCategory] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    const displayName = slug ? (CATEGORY_MAP[slug] || slug) : 'Category';
+    const displayName = category?.name || slug || 'Category';
 
     useEffect(() => {
-        const fetchArticles = async () => {
+        const fetchCategoryAndArticles = async () => {
             if (!slug) return;
             setLoading(true);
 
-            const dbNames = DB_MAPPING[slug] || [slug];
+            try {
+                // 1. Fetch category details by slug
+                const { data: catData, error: catError } = await supabase
+                    .from('categories')
+                    .select('*')
+                    .eq('slug', slug)
+                    .single();
 
-            const { data, error } = await supabase
-                .from('articles')
-                .select(`
-                    *,
-                    categories!inner( name ),
-                    article_authors (
-                        users ( full_name )
-                    )
-                `)
-                .in('categories.name', dbNames)
-                .eq('status', 'published')
-                .order('updated_at', { ascending: false });
+                if (catError) throw catError;
 
-            if (data) {
-                setArticles(data);
-            } else if (error) {
-                console.error('Error fetching category articles:', error);
+                if (catData) {
+                    setCategory(catData);
+
+                    // 2. Fetch published articles for this category ID
+                    const { data, error } = await supabase
+                        .from('articles')
+                        .select(`
+                            *,
+                            categories ( name ),
+                            article_authors (
+                                users ( full_name )
+                            )
+                        `)
+                        .eq('primary_category_id', catData.id)
+                        .eq('status', 'published')
+                        .order('updated_at', { ascending: false });
+
+                    if (error) throw error;
+                    if (data) setArticles(data);
+                }
+            } catch (error: any) {
+                console.error('Error fetching category data:', error);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
-        fetchArticles();
+        fetchCategoryAndArticles();
         window.scrollTo(0, 0);
     }, [slug]);
 
