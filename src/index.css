@@ -393,43 +393,65 @@ img {
     justify-content: center !important;
   }
 
-  .article-list-item {
-    grid-template-columns: 1fr !important;
-    gap: 1.5rem !important;
-    padding-bottom: 2rem !important;
-  }
+}
 
-  /* Mobile Navbar Utilities */
+/* Navbar Base Styles (Desktop & General) */
+.nav-scroll {
+  display: flex;
+  gap: 2rem;
+  height: 100%;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.nav-link {
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  font-family: var(--font-main);
+  padding: 0 4px;
+  white-space: nowrap;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.nav-link.active {
+  color: var(--color-accent) !important;
+  border-bottom: 3px solid var(--color-accent);
+}
+
+/* Mobile Overrides */
+@media (max-width: 768px) {
   .nav-scroll {
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    white-space: nowrap;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* IE/Edge */
-    padding-left: 20px;
-    padding-right: 20px;
-    /* Symmetrical mask for both sides */
-    mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent);
+    padding: 0 var(--spacing-md);
+    gap: 1.5rem;
   }
 
   .nav-scroll::-webkit-scrollbar {
     display: none;
-    /* Chrome/Safari/Webkit */
   }
 
   .nav-link {
     font-size: 1rem !important;
-    padding: 6px 16px !important;
-    border-radius: 20px;
+    padding: 8px 12px !important;
+    border-radius: 8px;
+    height: auto;
+    border-bottom: none !important;
   }
 
   .nav-link.active {
     background-color: #fceceb !important;
     border-bottom: none !important;
+    color: var(--color-accent) !important;
   }
 
   .hide-mobile {

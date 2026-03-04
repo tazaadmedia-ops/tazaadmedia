@@ -119,14 +119,7 @@ const Header: React.FC = () => {
                     width: '100%',
                     height: '100%'
                 }}>
-                    <nav className="nav-scroll" style={{
-                        display: 'flex',
-                        gap: '2.5rem',
-                        height: '100%',
-                        alignItems: 'center',
-                        flexGrow: 1,
-                        padding: '0 20px'
-                    }}>
+                    <nav className="nav-scroll">
                         {menuItems.map((item) => (
                             <NavMenuItem
                                 key={item.to}
@@ -179,31 +172,13 @@ const Header: React.FC = () => {
     );
 };
 
-const NavMenuItem: React.FC<{ to: string; label: string; active: boolean }> = ({ to, label, active }) => (
+const NavMenuItem: React.FC<{ to: string; label: string; active: boolean }> = ({ to, label }) => (
     <NavLink
         to={to}
         className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
-        style={{
-            ...navLinkStyle,
-            color: active ? '#B70100' : '#1a1a1a',
-            borderBottom: active ? '3px solid #B70100' : '3px solid transparent',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'all 0.2s ease'
-        }}
     >
         {label}
     </NavLink>
 );
-
-const navLinkStyle: React.CSSProperties = {
-    fontWeight: 700,
-    fontSize: '1.1rem',
-    textDecoration: 'none',
-    fontFamily: 'var(--font-main)',
-    padding: '0 4px',
-    whiteSpace: 'nowrap'
-};
 
 export default Header;
