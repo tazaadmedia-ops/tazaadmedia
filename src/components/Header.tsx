@@ -109,7 +109,6 @@ const Header: React.FC = () => {
             <div className="header-white-bar" style={{
                 backgroundColor: '#fff',
                 borderBottom: '1px solid #eee',
-                height: '50px',
                 display: 'flex',
                 alignItems: 'center'
             }}>
@@ -120,7 +119,14 @@ const Header: React.FC = () => {
                     width: '100%',
                     height: '100%'
                 }}>
-                    <nav className="nav-scroll" style={{ display: 'flex', gap: '2rem', height: '100%', alignItems: 'center' }}>
+                    <nav className="nav-scroll" style={{
+                        display: 'flex',
+                        gap: '1.5rem',
+                        height: '100%',
+                        alignItems: 'center',
+                        flexGrow: 1,
+                        padding: '0 10px'
+                    }}>
                         {menuItems.map((item) => (
                             <NavMenuItem
                                 key={item.to}
@@ -132,7 +138,7 @@ const Header: React.FC = () => {
                     </nav>
 
                     {/* Search Input */}
-                    <div className="search-container" style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
+                    <div className="search-container search-container-mobile" style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
                         <input
                             type="text"
                             placeholder="ڳولا ڪريو"
@@ -147,7 +153,7 @@ const Header: React.FC = () => {
                                 borderRadius: '20px',
                                 border: '1px solid #ddd',
                                 outline: 'none',
-                                fontSize: '16px',
+                                fontSize: '15px',
                                 backgroundColor: '#f9f9f9',
                                 color: '#333',
                                 fontFamily: 'var(--font-main)'
