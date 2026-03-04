@@ -14,7 +14,7 @@ import {
     RotateCcw, RotateCw, Bold, Italic, Strikethrough,
     Code, Link as LinkIcon, Video, Quote,
     ListOrdered, ChevronDown, AlignLeft, AlignCenter, AlignRight,
-    Loader, Check
+    Loader, Check, Twitter
 } from 'lucide-react';
 import FloatingMenuExtension from '@tiptap/extension-floating-menu';
 import AdminLayout from '../../components/admin/AdminLayout';
@@ -491,19 +491,23 @@ const ArticleEditor: React.FC = () => {
 
             if (isEmptyParagraph) {
                 const start = editor.view.coordsAtPos($from.pos);
-                // Use viewport coordinates directly for fixed positioning
-                setFloatingMenuPos({
-                    top: start.top - 5, // Center vertically
-                    left: start.left + 15 // Slight right offset (RTL)
-                });
+                const editorElement = editor.view.dom.parentElement;
+                const editorRect = editorElement?.getBoundingClientRect();
+
+                if (editorRect) {
+                    setFloatingMenuPos({
+                        top: start.top - editorRect.top,
+                        left: start.left - editorRect.left + (document.dir === 'rtl' ? -40 : 15)
+                    });
+                }
             } else {
                 setFloatingMenuPos(null);
             }
         };
 
         editor.on('selectionUpdate', updateMenu);
-        editor.on('update', updateMenu); // Also on content change
-        editor.on('blur', () => setFloatingMenuPos(null)); // Hide on blur? Maybe not if clicking the button
+        editor.on('update', updateMenu);
+        // Removed blur listener to prevent vanishing on click
 
         return () => {
             editor.off('selectionUpdate', updateMenu);
@@ -528,81 +532,107 @@ const ArticleEditor: React.FC = () => {
             <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
 
                 {/* Floating "+" Menu */}
-                {floatingMenuPos && (
-                    <div style={{
-                        position: 'fixed',
-                        top: floatingMenuPos.top,
-                        left: floatingMenuPos.left,
-                        transform: 'translate(10px, -5px)',
-                        zIndex: 100,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}>
-                        <button
-                            onClick={() => setIsFloatingMenuOpen(!isFloatingMenuOpen)}
-                            title="Add Section"
-                            style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                width: '32px', height: '32px', borderRadius: '50%',
-                                border: '1px solid #ddd', backgroundColor: '#fff',
-                                cursor: 'pointer', color: isFloatingMenuOpen ? '#B70100' : '#666',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                transition: 'all 0.2s',
-                                transform: isFloatingMenuOpen ? 'rotate(45deg)' : 'none'
-                            }}
-                        >
-                            <Plus size={18} />
-                        </button>
+                <div style={{ position: 'relative' }}>
+                    {floatingMenuPos && (
+                        <div style={{
+                            position: 'absolute',
+                            top: floatingMenuPos.top,
+                            left: floatingMenuPos.left,
+                            zIndex: 100,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            pointerEvents: 'auto'
+                        }}>
+                            <button
+                                onClick={() => setIsFloatingMenuOpen(!isFloatingMenuOpen)}
+                                title="Add Section"
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    width: '32px', height: '32px', borderRadius: '50%',
+                                    border: '1px solid #ddd', backgroundColor: '#fff',
+                                    cursor: 'pointer', color: isFloatingMenuOpen ? '#B70100' : '#666',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                    transition: 'all 0.2s',
+                                    transform: isFloatingMenuOpen ? 'rotate(45deg)' : 'none'
+                                }}
+                            >
+                                <Plus size={18} />
+                            </button>
 
-                        {isFloatingMenuOpen && (
-                            <div style={{
-                                display: 'flex',
-                                gap: '6px',
-                                backgroundColor: '#fff',
-                                padding: '4px',
-                                borderRadius: '24px',
-                                border: '1px solid #eee',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                animation: 'fade-in-right 0.2s ease-out'
-                            }}>
-                                <button
-                                    onClick={() => {
-                                        imageInputRef.current?.click();
-                                        setIsFloatingMenuOpen(false);
-                                    }}
-                                    className="floating-menu-btn"
-                                    title="Add Image"
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
-                                        border: 'none', backgroundColor: 'transparent',
-                                        cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
-                                    }}
-                                >
-                                    <ImageIcon size={16} /> تصوير (Image)
-                                </button>
-                                <div style={{ width: '1px', height: '16px', backgroundColor: '#eee', alignSelf: 'center' }} />
-                                <button
-                                    onClick={() => {
-                                        setIsLinkModalOpen(true);
-                                        setIsFloatingMenuOpen(false);
-                                    }}
-                                    className="floating-menu-btn"
-                                    title="Link Article"
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
-                                        border: 'none', backgroundColor: 'transparent',
-                                        cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
-                                    }}
-                                >
-                                    <LinkIcon size={16} /> مضمون جو لنڪ (Article Link)
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            {isFloatingMenuOpen && (
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '6px',
+                                    backgroundColor: '#fff',
+                                    padding: '4px',
+                                    borderRadius: '24px',
+                                    border: '1px solid #eee',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                    animation: 'fade-in-right 0.2s ease-out'
+                                }}>
+                                    <button
+                                        onClick={() => {
+                                            imageInputRef.current?.click();
+                                            setIsFloatingMenuOpen(false);
+                                        }}
+                                        className="floating-menu-btn"
+                                        title="Add Image"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '8px',
+                                            padding: '6px 14px', borderRadius: '18px',
+                                            border: 'none', backgroundColor: 'transparent',
+                                            cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
+                                        }}
+                                    >
+                                        <ImageIcon size={16} /> تصوير (Image)
+                                    </button>
+                                    <div style={{ width: '1px', height: '16px', backgroundColor: '#eee', alignSelf: 'center' }} />
+                                    <button
+                                        onClick={() => {
+                                            setIsLinkModalOpen(true);
+                                            setIsFloatingMenuOpen(false);
+                                        }}
+                                        className="floating-menu-btn"
+                                        title="Link Article"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '8px',
+                                            padding: '6px 14px', borderRadius: '18px',
+                                            border: 'none', backgroundColor: 'transparent',
+                                            cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
+                                        }}
+                                    >
+                                        <List size={16} /> پراڻا مضمون (Previous Articles)
+                                    </button>
+                                    <div style={{ width: '1px', height: '16px', backgroundColor: '#eee', alignSelf: 'center' }} />
+                                    <button
+                                        onClick={() => {
+                                            const url = window.prompt('پيسٽ ڪريو Twitter/X لنڪ (Paste Tweet Link):');
+                                            if (url) {
+                                                // Using an iframe or a custom node for twitter could be better, 
+                                                // but for now we can use the RelatedArticle format or just paste the link
+                                                // Let's assume the user wants a simple embed or just the link for now.
+                                                // Better: Use a custom Twitter extension if available, otherwise just insert text.
+                                                editor.chain().focus().insertContent(`<p>${url}</p>`).run();
+                                            }
+                                            setIsFloatingMenuOpen(false);
+                                        }}
+                                        className="floating-menu-btn"
+                                        title="Twitter Embed"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '8px',
+                                            padding: '6px 14px', borderRadius: '18px',
+                                            border: 'none', backgroundColor: 'transparent',
+                                            cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
+                                        }}
+                                    >
+                                        <Twitter size={16} /> ٽوئيٽ (Twitter)
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {/* Article Search Modal */}
                 {isLinkModalOpen && (
