@@ -5,6 +5,15 @@ import path from 'path';
 // Lazy init to avoid cold start crashes
 let supabase: ReturnType<typeof createClient> | null = null;
 
+interface Metadata {
+    title: string;
+    description: string;
+    image: string;
+    url: string;
+    type: string;
+    schema?: any;
+}
+
 export default async function handler(request: any, response: any) {
     let html = '';
     const start = Date.now();
@@ -13,18 +22,12 @@ export default async function handler(request: any, response: any) {
     const protocol = request.headers['x-forwarded-proto'] || 'https';
     const host = request.headers['x-forwarded-host'] || request.headers.host;
     const isLocal = host.includes('localhost');
-    const baseUrl = isLocal ? `${protocol}://${host}` : `https://thetazaad.com`; // Hardcode production for safety in SSR context
+    const baseUrl = isLocal ? `${protocol}://${host}` : `https://thetazaad.com`;
 
     try {
         let { slug } = request.query;
-
-        if (!slug) return response.status(400).send('Missing slug');
+        if (!slug) slug = 'home';
         if (Array.isArray(slug)) slug = slug[0];
-
-        // Clean slug
-        slug = slug.split('?')[0].trim();
-        const isLiveRequest = slug.startsWith('live/');
-        const cleanSlug = isLiveRequest ? slug.replace('live/', '') : slug.split('/')[0];
 
         // 1. Fetch index.html using FILE SYSTEM
         try {
@@ -32,7 +35,6 @@ export default async function handler(request: any, response: any) {
                 path.join(process.cwd(), 'dist', 'index.html'),
                 path.join(process.cwd(), 'index.html'),
             ];
-
             for (const p of possiblePaths) {
                 if (fs.existsSync(p)) {
                     html = fs.readFileSync(p, 'utf-8');
@@ -43,128 +45,114 @@ export default async function handler(request: any, response: any) {
             console.error(`[SSR] Exception loading index.html:`, e.message);
         }
 
-        if (!html) {
-            console.error("[SSR] Critical: No HTML template found on disk.");
-            return response.status(500).send('System Error: Template Missing');
-        }
+        if (!html) return response.status(500).send('System Error: Template Missing');
 
         // 2. Env Check & Init
         const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
         const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
-        if (!url || !key) {
-            console.warn("[SSR] Supabase Env Vars missing");
-            return response.send(html);
+        if (!url || !key) return response.send(html);
+        if (!supabase) supabase = createClient(url, key);
+
+        // 3. Default Metadata (Home)
+        let meta: Metadata = {
+            title: "تضاد - سنڌي (Tazaad - Sindhi)",
+            description: "Leading Sindhi digital media platform offering news, analysis, and special reports.",
+            image: `${baseUrl}/default-og.jpg`,
+            url: baseUrl,
+            type: "website",
+            schema: {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Tazaad",
+                "url": baseUrl
+            }
+        };
+
+        // 4. Route Handling
+        const [type, ...parts] = slug.split('/');
+        const detail = parts.join('/');
+
+        if (type === 'article' || type === 'live') {
+            const isLive = type === 'live';
+            const { data: art } = await supabase.from('articles').select('*').eq('slug', detail).single();
+            if (art) {
+                const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
+                meta.title = `${prefixedTitle} | تضاد`;
+                meta.description = art.subdeck || meta.description;
+                meta.url = `${baseUrl}/${type}/${detail}`;
+                meta.type = "article";
+                if (art.featured_image_url) {
+                    meta.image = art.featured_image_url.startsWith('http') ? art.featured_image_url : `${baseUrl}${art.featured_image_url.startsWith('/') ? '' : '/'}${art.featured_image_url}`;
+                }
+                meta.schema = {
+                    "@context": "https://schema.org",
+                    "@type": isLive ? "LiveBlogPosting" : "NewsArticle",
+                    "headline": art.title,
+                    "image": [meta.image],
+                    "datePublished": art.published_at || art.created_at,
+                    "dateModified": art.updated_at || art.published_at,
+                    "author": { "@type": "Person", "name": "Tazaad Staff" }
+                };
+            }
+        } else if (type === 'category') {
+            const { data: cat } = await supabase.from('categories').select('*').eq('slug', detail).single();
+            if (cat) {
+                meta.title = `${cat.name} | تضاد`;
+                meta.description = `تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
+                meta.url = `${baseUrl}/category/${detail}`;
+                meta.schema = {
+                    "@context": "https://schema.org",
+                    "@type": "CollectionPage",
+                    "name": cat.name,
+                    "url": meta.url
+                };
+            }
+        } else if (type === 'author') {
+            const { data: user } = await supabase.from('users').select('*').eq('username', detail).single();
+            if (user) {
+                meta.title = `${user.full_name} | ليکڪ`;
+                meta.description = user.bio || `${user.full_name} جون لکڻيون تضاد تي.`;
+                meta.url = `${baseUrl}/author/${detail}`;
+                if (user.avatar_url) {
+                    meta.image = user.avatar_url.startsWith('http') ? user.avatar_url : `${baseUrl}${user.avatar_url.startsWith('/') ? '' : '/'}${user.avatar_url}`;
+                }
+                meta.schema = {
+                    "@context": "https://schema.org",
+                    "@type": "ProfilePage",
+                    "name": user.full_name,
+                    "url": meta.url
+                };
+            }
         }
 
-        if (!supabase) {
-            supabase = createClient(url, key);
-        }
-
-        // 3. Fetch Article Data
-        const { data: article, error } = await supabase
-            .from('articles')
-            .select('*')
-            .eq('slug', cleanSlug)
-            .single();
-
-        if (error || !article) {
-            console.warn(`[SSR] Article not found: ${cleanSlug}`, error?.message);
-            return response.send(html);
-        }
-
-        const art = article as any;
-
-        // 4. Prepare Metadata
-        const prefix = isLiveRequest ? 'لائيو: ' : '';
-        const title = (prefix + (art.title || 'Tazaad - Sindhi')).replace(/"/g, '&quot;');
-        const description = (art.subdeck || 'Leading Sindhi digital media platform.').replace(/"/g, '&quot;').substring(0, 200);
-
-        let imageUrl = art.featured_image_url;
-        if (imageUrl && !imageUrl.startsWith('http')) {
-            imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-        }
-        const image = imageUrl || `${baseUrl}/default-og.jpg`;
-        const articleUrl = `${baseUrl}/article/${slug}`;
-
-        // 5. Inject Metadata
-
-        // Remove existing title and common meta tags that industrial scrapers might latch onto
+        // 5. Inject Content
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
         html = html.replace(/<meta[^>]*?(?:name|property)=["'](?:description|og:|twitter:)[^>]*?>/gi, '');
 
         const metaTags = `
-    <title>${title}</title>
-    <meta name="description" content="${description}" />
-    <meta property="og:title" content="${title}" />
-    <meta property="og:description" content="${description}" />
-    <meta property="og:image" content="${image}" />
-    <meta property="og:image:secure_url" content="${image}" />
-    <meta property="og:url" content="${articleUrl}" />
-    <meta property="og:type" content="article" />
+    <title>${meta.title.replace(/"/g, '&quot;')}</title>
+    <meta name="description" content="${meta.description.replace(/"/g, '&quot;')}" />
+    <meta property="og:title" content="${meta.title.replace(/"/g, '&quot;')}" />
+    <meta property="og:description" content="${meta.description.replace(/"/g, '&quot;')}" />
+    <meta property="og:image" content="${meta.image}" />
+    <meta property="og:url" content="${meta.url}" />
+    <meta property="og:type" content="${meta.type}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${title}" />
-    <meta name="twitter:description" content="${description}" />
-    <meta name="twitter:image" content="${image}" />
-    <meta name="twitter:site" content="@tazaadmedia" />
+    <meta name="twitter:title" content="${meta.title.replace(/"/g, '&quot;')}" />
+    <meta name="twitter:description" content="${meta.description.replace(/"/g, '&quot;')}" />
+    <meta name="twitter:image" content="${meta.image}" />
+    <script type="application/ld+json">${JSON.stringify(meta.schema)}</script>
 `;
 
-        // 5a. Generate JSON-LD (Schema.org)
-        const schema = {
-            "@context": "https://schema.org",
-            "@type": isLiveRequest ? "LiveBlogPosting" : "NewsArticle",
-            "headline": title.replace('لائيو: ', ''),
-            "description": description,
-            "image": [image],
-            "datePublished": art.published_at || art.created_at,
-            "dateModified": art.updated_at || art.published_at || art.created_at,
-            "author": {
-                "@type": "Person",
-                "name": "Tazaad Staff",
-                "url": baseUrl
-            },
-            "publisher": {
-                "@type": "Organization",
-                "name": "Tazaad",
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": `${baseUrl}/logo.png`
-                }
-            }
-        };
+        html = html.replace('<head>', `<head>${metaTags}`);
 
-        const jsonLd = `
-    <script type="application/ld+json">
-        ${JSON.stringify(schema)}
-    </script>
-`;
-
-        const debugComment = `<!-- 
-            SSR DEBUG REPORT:
-            Timestamp: ${new Date().toISOString()}
-            Process Time: ${Date.now() - start}ms
-            Slug Requested: ${slug}
-            Slug Cleaned: ${cleanSlug}
-            Article Found: ${!!article}
-            Live Mode Detect: ${isLiveRequest}
-            Base URL: ${baseUrl}
-            Env URL Present: ${!!process.env.VITE_SUPABASE_URL || !!process.env.SUPABASE_URL}
-            Env Key Present: ${!!process.env.VITE_SUPABASE_ANON_KEY || !!process.env.SUPABASE_ANON_KEY}
-        -->`;
-
-        html = html.replace('<head>', `<head>${metaTags}${jsonLd}${debugComment}`);
-
-        const duration = Date.now() - start;
-        response.setHeader('X-SSR-Process-Time', `${duration}ms`);
-        response.setHeader('X-SSR-Status', 'Success');
         response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
         response.setHeader('Content-Type', 'text/html; charset=utf-8');
-
         return response.send(html);
 
     } catch (err: any) {
         console.error("[SSR] Crash:", err);
-        if (html) return response.send(html);
-        return response.status(500).send('Internal Server Error');
+        return response.send(html);
     }
 }

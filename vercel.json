@@ -1,8 +1,24 @@
 {
   "rewrites": [
     {
-      "source": "/article/(.*)",
-      "destination": "/api/ssr?slug=$1"
+      "source": "/",
+      "destination": "/api/ssr?slug=home"
+    },
+    {
+      "source": "/category/:slug(.*)",
+      "destination": "/api/ssr?slug=category/$slug"
+    },
+    {
+      "source": "/author/:slug(.*)",
+      "destination": "/api/ssr?slug=author/$slug"
+    },
+    {
+      "source": "/article/live/:slug(.*)",
+      "destination": "/api/ssr?slug=live/$slug"
+    },
+    {
+      "source": "/article/:slug(.*)",
+      "destination": "/api/ssr?slug=article/$slug"
     },
     {
       "source": "/(.*)",
