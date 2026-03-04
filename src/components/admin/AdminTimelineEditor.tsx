@@ -239,7 +239,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                                         backgroundColor: '#f9fafb',
                                         borderRadius: '8px',
                                         display: 'flex',
-                                        justifyContent: 'flex-start',
+                                        justifyContent: 'center',
                                         padding: '10px'
                                     }}>
                                         <div style={{ width: '100%', maxWidth: '650px' }}>
