@@ -151,6 +151,38 @@ const LiveArticlePage: React.FC = () => {
         return <Navigate to={`/article/${slug}`} replace />;
     }
 
+    // Construct LiveBlogPosting Schema
+    const liveBlogSchema = article ? {
+        "@type": "LiveBlogPosting",
+        "headline": article.title,
+        "description": article.subdeck || article.title,
+        "image": article.featured_image_url,
+        "coverageStartTime": article.published_at || article.created_at,
+        "coverageEndTime": article.is_live ? undefined : (updates[0]?.published_at || article.updated_at),
+        "author": {
+            "@type": "Person",
+            "name": authorName || "Tazaad Staff"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Tazaad",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://thetazaad.com/logo.png"
+            }
+        },
+        "liveBlogUpdate": updates.slice(0, 10).map(upd => ({
+            "@type": "BlogPosting",
+            "headline": upd.title || `Update at ${new Date(upd.published_at).toLocaleTimeString()}`,
+            "articleBody": upd.content,
+            "datePublished": upd.published_at,
+            "author": {
+                "@type": "Person",
+                "name": authorName || "Tazaad Staff"
+            }
+        }))
+    } : null;
+
     return (
         <div style={{ backgroundColor: '#f9fafb', minHeight: '100vh', paddingBottom: '4rem' }}>
             <SEO
@@ -161,7 +193,8 @@ const LiveArticlePage: React.FC = () => {
                 type="article"
                 publishedAt={article.published_at || article.created_at}
                 author={authorName || undefined}
-                schemaType="NewsArticle"
+                schemaType="LiveBlogPosting"
+                jsonLd={liveBlogSchema}
             />
 
             {/* Featured Media - Full Bleed Top */}

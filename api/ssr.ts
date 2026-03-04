@@ -64,7 +64,7 @@ export default async function handler(request: any, response: any) {
         // 3. Fetch Article Data
         const { data: article, error } = await supabase
             .from('articles')
-            .select('title, subdeck, featured_image_url')
+            .select('*')
             .eq('slug', cleanSlug)
             .single();
 
@@ -73,12 +73,14 @@ export default async function handler(request: any, response: any) {
             return response.send(html);
         }
 
+        const art = article as any;
+
         // 4. Prepare Metadata
         const prefix = isLiveRequest ? 'لائيو: ' : '';
-        const title = (prefix + (article.title || 'Tazaad - Sindhi')).replace(/"/g, '&quot;');
-        const description = (article.subdeck || 'Leading Sindhi digital media platform.').replace(/"/g, '&quot;').substring(0, 200);
+        const title = (prefix + (art.title || 'Tazaad - Sindhi')).replace(/"/g, '&quot;');
+        const description = (art.subdeck || 'Leading Sindhi digital media platform.').replace(/"/g, '&quot;').substring(0, 200);
 
-        let imageUrl = article.featured_image_url;
+        let imageUrl = art.featured_image_url;
         if (imageUrl && !imageUrl.startsWith('http')) {
             imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         }
@@ -107,6 +109,36 @@ export default async function handler(request: any, response: any) {
     <meta name="twitter:site" content="@tazaadmedia" />
 `;
 
+        // 5a. Generate JSON-LD (Schema.org)
+        const schema = {
+            "@context": "https://schema.org",
+            "@type": isLiveRequest ? "LiveBlogPosting" : "NewsArticle",
+            "headline": title.replace('لائيو: ', ''),
+            "description": description,
+            "image": [image],
+            "datePublished": art.published_at || art.created_at,
+            "dateModified": art.updated_at || art.published_at || art.created_at,
+            "author": {
+                "@type": "Person",
+                "name": "Tazaad Staff",
+                "url": baseUrl
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "Tazaad",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": `${baseUrl}/logo.png`
+                }
+            }
+        };
+
+        const jsonLd = `
+    <script type="application/ld+json">
+        ${JSON.stringify(schema)}
+    </script>
+`;
+
         const debugComment = `<!-- 
             SSR DEBUG REPORT:
             Timestamp: ${new Date().toISOString()}
@@ -120,7 +152,7 @@ export default async function handler(request: any, response: any) {
             Env Key Present: ${!!process.env.VITE_SUPABASE_ANON_KEY || !!process.env.SUPABASE_ANON_KEY}
         -->`;
 
-        html = html.replace('<head>', `<head>${metaTags}${debugComment}`);
+        html = html.replace('<head>', `<head>${metaTags}${jsonLd}${debugComment}`);
 
         const duration = Date.now() - start;
         response.setHeader('X-SSR-Process-Time', `${duration}ms`);

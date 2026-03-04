@@ -9,7 +9,7 @@ interface SEOProps {
     type?: 'website' | 'article';
     publishedAt?: string;
     author?: string;
-    schemaType?: 'NewsArticle' | 'Article' | 'WebSite' | 'CollectionPage' | 'ProfilePage';
+    schemaType?: 'NewsArticle' | 'Article' | 'WebSite' | 'CollectionPage' | 'ProfilePage' | 'LiveBlogPosting';
     jsonLd?: any; // Custom additional JSON-LD
 }
 
@@ -41,7 +41,7 @@ const SEO: React.FC<SEOProps> = ({
     const fullTitle = title === baseTitle ? title : `${title} | ${baseTitle}`;
 
     // Base Schema
-    const baseSchema = {
+    const baseSchema: any = {
         "@context": "https://schema.org",
         "@type": schemaType || (type === 'article' ? 'NewsArticle' : 'WebSite'),
         "headline": title.replace('لائيو: ', ''),
@@ -55,8 +55,11 @@ const SEO: React.FC<SEOProps> = ({
         }]
     };
 
-    // Merge custom JSON-LD if provided
-    const structuredData = jsonLd ? { ...baseSchema, ...jsonLd } : baseSchema;
+    // For LiveBlogPosting, we might want to ensure certain properties exist or are merged correctly
+    // If schemaType is LiveBlogPosting, the jsonLd passed should ideally be the source of truth
+    const structuredData = (schemaType === 'LiveBlogPosting' && jsonLd)
+        ? { ...jsonLd, "@context": "https://schema.org" } // Ensure context is there
+        : (jsonLd ? { ...baseSchema, ...jsonLd } : baseSchema);
 
     return (
         <Helmet>
