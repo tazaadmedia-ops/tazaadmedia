@@ -475,7 +475,6 @@ img {
   .search-container-mobile {
     width: 100% !important;
     max-width: none !important;
-    padding: 0 var(--spacing-md);
   }
 }
 
