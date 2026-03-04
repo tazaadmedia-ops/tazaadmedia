@@ -68,8 +68,9 @@ export default async function handler(request: any, response: any) {
             schema: {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "Tazaad",
-                "url": baseUrl
+                "name": "تضاد",
+                "url": baseUrl,
+                "inLanguage": "sd"
             }
         };
 
@@ -100,7 +101,16 @@ export default async function handler(request: any, response: any) {
                         "image": [meta.image],
                         "datePublished": art.published_at || art.created_at,
                         "dateModified": art.updated_at || art.published_at,
-                        "author": { "@type": "Person", "name": "Tazaad Staff" }
+                        "author": { "@type": "Person", "name": "تضاد اسٽاف" },
+                        "publisher": {
+                            "@type": "Organization",
+                            "name": "تضاد",
+                            "logo": {
+                                "@type": "ImageObject",
+                                "url": `${baseUrl}/default-og.jpg`
+                            }
+                        },
+                        "inLanguage": "sd"
                     };
                 }
             } else if (type === 'category') {
@@ -114,7 +124,8 @@ export default async function handler(request: any, response: any) {
                         "@context": "https://schema.org",
                         "@type": "CollectionPage",
                         "name": cat.name,
-                        "url": meta.url
+                        "url": meta.url,
+                        "inLanguage": "sd"
                     };
                 }
             } else if (type === 'author') {
@@ -131,7 +142,12 @@ export default async function handler(request: any, response: any) {
                         "@context": "https://schema.org",
                         "@type": "ProfilePage",
                         "name": user.full_name,
-                        "url": meta.url
+                        "url": meta.url,
+                        "agent": {
+                            "@type": "Person",
+                            "name": user.full_name
+                        },
+                        "inLanguage": "sd"
                     };
                 }
             }
