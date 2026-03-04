@@ -15,8 +15,8 @@
   /* Softer black for better readability */
   --color-text-light: #5A5A5A;
   /* Balanced gray */
-  --color-text-lighter: #7A7A7A;
-  /* Lighter gray with proper contrast */
+  --color-text-lighter: #666666;
+  /* Darker gray for WCAG AA contrast */
   --color-accent: #C41E3A;
   /* More balanced red, less harsh */
   --color-border: #E8E8E8;

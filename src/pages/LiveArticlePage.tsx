@@ -200,7 +200,7 @@ const LiveArticlePage: React.FC = () => {
             {/* Featured Media - Full Bleed Top */}
             {article.featured_image_url && (
                 <div style={{ width: '100%', marginBottom: '3rem' }}>
-                    <img src={article.featured_image_url} alt={article.title} style={{ width: '100%', maxHeight: '65vh', objectFit: 'cover', objectPosition: 'center' }} />
+                    <img src={article.featured_image_url} alt={article.title} fetchPriority="high" style={{ width: '100%', maxHeight: '65vh', objectFit: 'cover', objectPosition: 'center' }} />
                 </div>
             )}
 

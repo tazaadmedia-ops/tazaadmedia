@@ -90,7 +90,7 @@ const Header: React.FC = () => {
                     width: '100%'
                 }}>
                     {/* Logo on the Right (RTL) */}
-                    <NavLink to="/" style={{ display: 'flex', alignItems: 'center', height: '35px' }}>
+                    <NavLink to="/" aria-label="هوم" style={{ display: 'flex', alignItems: 'center', height: '35px' }}>
                         <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '32px', width: 'auto' }}>
                             <path fill="#fff" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
                             <path fill="#fff" d="M22.3,3.4v21.5h7v-10.2h4.3s.2,2.7.2,2.7c4.4-5.8,14-5.2,16.1,2.3s.1,5.2,1.9,5.2h40.7v-10.2h4.3v14.5h-44.7c-.4,0-2.3-1.5-2.7-1.9-.5.6-2.5,1.9-3.1,1.9h-28.3V3.4h4.3ZM45.7,24.9c2-10.8-11-8.7-12.1,0h12.1Z" />
@@ -134,6 +134,7 @@ const Header: React.FC = () => {
                     <div className="search-container search-container-mobile" style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
                         <input
                             type="text"
+                            aria-label="ڳولا"
                             placeholder="ڳولا ڪريو"
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
@@ -142,7 +143,7 @@ const Header: React.FC = () => {
                             }}
                             style={{
                                 width: '100%',
-                                padding: '8px 35px 8px 12px',
+                                padding: '8px 45px 8px 12px', // Increased right padding for button
                                 borderRadius: '20px',
                                 border: '1px solid #ddd',
                                 outline: 'none',
@@ -152,19 +153,27 @@ const Header: React.FC = () => {
                                 fontFamily: 'var(--font-main)'
                             }}
                         />
-                        <Search
-                            size={16}
-                            color="#666"
+                        <button
                             onClick={handleSearch}
+                            aria-label="ڳوليو"
                             style={{
                                 position: 'absolute',
-                                right: '12px',
+                                right: '4px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
-                                opacity: 0.7,
-                                cursor: 'pointer'
+                                background: 'none',
+                                border: 'none',
+                                padding: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                color: '#666',
+                                borderRadius: '50%'
                             }}
-                        />
+                        >
+                            <Search size={18} style={{ opacity: 0.8 }} />
+                        </button>
                     </div>
                 </div>
             </div>

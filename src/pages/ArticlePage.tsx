@@ -221,7 +221,7 @@ const ArticlePage: React.FC = () => {
             {/* Featured Image */}
             {article.featured_image_url && (
                 <div style={{ marginBottom: '4rem', width: '100%', maxWidth: '1080px', margin: '0 auto 4rem auto' }}>
-                    <img src={article.featured_image_url} alt={article.title} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }} />
+                    <img src={article.featured_image_url} alt={article.title} fetchPriority="high" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }} />
                 </div>
             )}
 
@@ -254,7 +254,7 @@ const ArticlePage: React.FC = () => {
                             <Link key={rel.id} to={`/article/${rel.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <div style={{ aspectRatio: '16/9', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
                                     {rel.featured_image_url ? (
-                                        <img src={rel.featured_image_url} alt={rel.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <img src={rel.featured_image_url} alt={rel.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
                                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' }}>No Image</div>
                                     )}

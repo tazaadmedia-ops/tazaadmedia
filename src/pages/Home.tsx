@@ -102,6 +102,7 @@ const Home: React.FC = () => {
             />
 
             {/* --- TOP LATEST NEWS --- */}
+            <h2 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: '0' }}>تازيون خبرون</h2>
 
             {/* Hero + Side Grid */}
             <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
@@ -112,7 +113,7 @@ const Home: React.FC = () => {
                             <div style={{ position: 'relative' }}>
                                 <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#eee', borderRadius: '0', marginBottom: '0.75rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {heroStory.featured_image_url ? (
-                                        <img src={heroStory.featured_image_url} alt={heroStory.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <img src={heroStory.featured_image_url} alt={heroStory.title} fetchPriority="high" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
                                         <span style={{ color: '#999' }}>No Image</span>
                                     )}
@@ -146,7 +147,7 @@ const Home: React.FC = () => {
                         <div key={story.id}>
                             <Link to={getArticleLink(story)}>
                                 <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.5rem', overflow: 'hidden' }}>
-                                    {story.featured_image_url && <img src={story.featured_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                    {story.featured_image_url && <img src={story.featured_image_url} alt={story.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
                                 <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
                                     {story.is_live ? <LiveBadge /> : getCategory(story)}
@@ -208,7 +209,7 @@ const Home: React.FC = () => {
                                 <Link key={story.id} to={getArticleLink(story)}>
                                     <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f9f9f9', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
                                         {story.featured_image_url ? (
-                                            <img src={story.featured_image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img src={story.featured_image_url} alt={story.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
                                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ddd', fontSize: '0.8rem' }}>No Image</div>
                                         )}
