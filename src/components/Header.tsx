@@ -142,7 +142,7 @@ const Header: React.FC = () => {
                             }}
                             style={{
                                 width: '100%',
-                                padding: '8px 12px 8px 35px',
+                                padding: '8px 35px 8px 12px',
                                 borderRadius: '20px',
                                 border: '1px solid #ddd',
                                 outline: 'none',
@@ -158,7 +158,7 @@ const Header: React.FC = () => {
                             onClick={handleSearch}
                             style={{
                                 position: 'absolute',
-                                left: '12px',
+                                right: '12px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
                                 opacity: 0.7,

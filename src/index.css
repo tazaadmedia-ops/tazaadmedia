@@ -433,7 +433,7 @@ img {
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding: 0 var(--spacing-md);
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
   .nav-scroll::-webkit-scrollbar {
@@ -442,15 +442,15 @@ img {
 
   .nav-link {
     font-size: 1rem !important;
-    padding: 8px 12px !important;
-    border-radius: 8px;
-    height: auto;
-    border-bottom: none !important;
+    padding: 8px 4px !important;
+    border-radius: 0;
+    height: 100%;
+    border-bottom: 3px solid transparent !important;
   }
 
   .nav-link.active {
-    background-color: #fceceb !important;
-    border-bottom: none !important;
+    background-color: transparent !important;
+    border-bottom: 3px solid var(--color-accent) !important;
     color: var(--color-accent) !important;
   }
 
