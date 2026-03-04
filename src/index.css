@@ -420,9 +420,11 @@ img {
 }
 
 @keyframes live-ping {
-  75%, 100% {
-      transform: scale(2);
-      opacity: 0;
+
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 
@@ -467,4 +469,16 @@ img {
 /* Navigation Hover Effects */
 .nav-link:hover {
   color: var(--color-accent) !important;
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

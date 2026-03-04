@@ -84,6 +84,11 @@ const ArticleEditor: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [showStyleMenu, setShowStyleMenu] = useState(false);
+    const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+    const [isFloatingMenuOpen, setIsFloatingMenuOpen] = useState(false);
+    const [articleSearchQuery, setArticleSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [isSearchingArticles, setIsSearchingArticles] = useState(false);
 
     // File Input Refs
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -431,6 +436,44 @@ const ArticleEditor: React.FC = () => {
         }
     };
 
+    const searchArticles = async (query: string) => {
+        if (!query.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
+        setIsSearchingArticles(true);
+        try {
+            const { data, error } = await supabase
+                .from('articles')
+                .select('id, title, featured_image_url, slug')
+                .ilike('title', `%${query}%`)
+                .neq('id', id || '') // Don't link to self
+                .limit(5);
+
+            if (error) throw error;
+            setSearchResults(data || []);
+        } catch (error) {
+            console.error('Error searching articles:', error);
+        } finally {
+            setIsSearchingArticles(false);
+        }
+    };
+
+    const handleSelectRelatedArticle = (article: any) => {
+        if (editor) {
+            editor.commands.setRelatedArticle({
+                id: article.id,
+                title: article.title,
+                image: article.featured_image_url || undefined,
+                url: `/article/${article.slug}`
+            });
+            setIsLinkModalOpen(false);
+            setArticleSearchQuery('');
+            setSearchResults([]);
+        }
+    };
+
 
     const [floatingMenuPos, setFloatingMenuPos] = useState<{ top: number, left: number } | null>(null);
 
@@ -480,34 +523,145 @@ const ArticleEditor: React.FC = () => {
 
             <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
 
-                {/* Floating Plus Button */}
+                {/* Floating "+" Menu */}
                 {floatingMenuPos && (
                     <div style={{
                         position: 'fixed',
                         top: floatingMenuPos.top,
                         left: floatingMenuPos.left,
-                        transform: 'translate(10px, -5px)', // Move to right (RTL gutter) and center vertically
+                        transform: 'translate(10px, -5px)',
                         zIndex: 100,
-                        pointerEvents: 'auto'
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
                     }}>
                         <button
-                            onMouseDown={(e) => {
-                                e.preventDefault(); // Prevent focus loss
-                                imageInputRef.current?.click();
-                            }}
-                            title="Add Image"
+                            onClick={() => setIsFloatingMenuOpen(!isFloatingMenuOpen)}
+                            title="Add Section"
                             style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                width: '30px', height: '30px', borderRadius: '50%',
+                                width: '32px', height: '32px', borderRadius: '50%',
                                 border: '1px solid #ddd', backgroundColor: '#fff',
-                                cursor: 'pointer', color: '#666', boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                transition: 'all 0.2s'
+                                cursor: 'pointer', color: isFloatingMenuOpen ? '#B70100' : '#666',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                transition: 'all 0.2s',
+                                transform: isFloatingMenuOpen ? 'rotate(45deg)' : 'none'
                             }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = '#B70100'; e.currentTarget.style.borderColor = '#B70100'; e.currentTarget.style.transform = 'scale(1.1)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = '#666'; e.currentTarget.style.borderColor = '#ddd'; e.currentTarget.style.transform = 'scale(1)'; }}
                         >
-                            <Plus size={16} />
+                            <Plus size={18} />
                         </button>
+
+                        {isFloatingMenuOpen && (
+                            <div style={{
+                                display: 'flex',
+                                gap: '6px',
+                                backgroundColor: '#fff',
+                                padding: '4px',
+                                borderRadius: '24px',
+                                border: '1px solid #eee',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                animation: 'fade-in-right 0.2s ease-out'
+                            }}>
+                                <button
+                                    onClick={() => {
+                                        imageInputRef.current?.click();
+                                        setIsFloatingMenuOpen(false);
+                                    }}
+                                    className="floating-menu-btn"
+                                    title="Add Image"
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '8px',
+                                        padding: '6px 14px', borderRadius: '18px',
+                                        border: 'none', backgroundColor: 'transparent',
+                                        cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
+                                    }}
+                                >
+                                    <ImageIcon size={16} /> تصوير (Image)
+                                </button>
+                                <div style={{ width: '1px', height: '16px', backgroundColor: '#eee', alignSelf: 'center' }} />
+                                <button
+                                    onClick={() => {
+                                        setIsLinkModalOpen(true);
+                                        setIsFloatingMenuOpen(false);
+                                    }}
+                                    className="floating-menu-btn"
+                                    title="Link Article"
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '8px',
+                                        padding: '6px 14px', borderRadius: '18px',
+                                        border: 'none', backgroundColor: 'transparent',
+                                        cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
+                                    }}
+                                >
+                                    <LinkIcon size={16} /> مضمون جو لنڪ (Article Link)
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Article Search Modal */}
+                {isLinkModalOpen && (
+                    <div style={{
+                        position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+                        backdropFilter: 'blur(2px)'
+                    }}>
+                        <div style={{
+                            backgroundColor: '#fff', borderRadius: '12px', width: '90%', maxWidth: '500px',
+                            boxShadow: '0 20px 50px rgba(0,0,0,0.2)', overflow: 'hidden', direction: 'rtl'
+                        }}>
+                            <div style={{ padding: '1.25rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>مضمون کي لنڪ ڪريو (Link Article)</h3>
+                                <button onClick={() => setIsLinkModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999' }}><X size={20} /></button>
+                            </div>
+                            <div style={{ padding: '1.25rem' }}>
+                                <div style={{ position: 'relative', marginBottom: '1rem' }}>
+                                    <input
+                                        type="text"
+                                        placeholder="مضمون جو عنوان ڳولھيو..."
+                                        value={articleSearchQuery}
+                                        onChange={(e) => {
+                                            setArticleSearchQuery(e.target.value);
+                                            searchArticles(e.target.value);
+                                        }}
+                                        autoFocus
+                                        style={{
+                                            width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid #ddd',
+                                            fontSize: '1rem', outline: 'none', fontFamily: 'var(--font-main)'
+                                        }}
+                                    />
+                                    {isSearchingArticles && <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}><Loader size={16} className="animate-spin text-gray-400" /></div>}
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {searchResults.length > 0 ? (
+                                        searchResults.map(art => (
+                                            <div
+                                                key={art.id}
+                                                onClick={() => handleSelectRelatedArticle(art)}
+                                                style={{
+                                                    padding: '10px', borderRadius: '8px', border: '1px solid #eee',
+                                                    cursor: 'pointer', display: 'flex', gap: '12px', alignItems: 'center',
+                                                    transition: 'all 0.2s', backgroundColor: '#f9fafb'
+                                                }}
+                                                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#B70100'; e.currentTarget.style.backgroundColor = '#fff'; }}
+                                                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#eee'; e.currentTarget.style.backgroundColor = '#f9fafb'; }}
+                                            >
+                                                {art.featured_image_url ? (
+                                                    <img src={art.featured_image_url} style={{ width: '50px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                                                ) : (
+                                                    <div style={{ width: '50px', height: '40px', backgroundColor: '#eee', borderRadius: '4px' }} />
+                                                )}
+                                                <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#111', flexGrow: 1 }}>{art.title}</div>
+                                            </div>
+                                        ))
+                                    ) : articleSearchQuery.length > 2 ? (
+                                        <div style={{ textAlign: 'center', padding: '1rem', color: '#999' }}>ڪو به مضمون نه مليو.</div>
+                                    ) : null}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
