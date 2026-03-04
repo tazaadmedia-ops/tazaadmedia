@@ -49,9 +49,18 @@ export default async function handler(request: any, response: any) {
 
         if (!html) return response.status(500).send('System Error: Template Missing');
 
+        // 2. Env Check & Init
+        const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+        const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+        const hasEnv = !!(url && key);
+
+        if (hasEnv) {
+            if (!supabase) supabase = createClient(url!, key!);
+        }
+
         // 3. Default Metadata (Home)
         let meta: Metadata = {
-            title: `تضاد - سنڌي (Type: ${type}, Slug: ${slug || 'none'})`,
+            title: `تضاد - سنڌي (Type: ${type}, Slug: ${slug || 'none'}, Env: ${hasEnv})`,
             description: "Leading Sindhi digital media platform offering news, analysis, and special reports.",
             image: `${baseUrl}/default-og.jpg`,
             url: baseUrl,
@@ -64,19 +73,16 @@ export default async function handler(request: any, response: any) {
             }
         };
 
-        // 2. Env Check & Init
-        const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-        const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-
-        if (url && key) {
-            if (!supabase) supabase = createClient(url, key);
-        }
-
         // 4. Route Handling
         if (supabase && slug) {
             if (type === 'article' || type === 'live') {
                 const isLive = type === 'live';
-                const { data: artResult } = await supabase.from('articles').select('*').eq('slug', slug).single();
+                const { data: artResult, error: artError } = await supabase.from('articles').select('*').eq('slug', slug).single();
+
+                if (artError) {
+                    meta.title = `تضاد (DB Error: ${artError.message})`;
+                }
+
                 const art = artResult as any;
                 if (art) {
                     const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
