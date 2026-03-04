@@ -104,9 +104,23 @@ export default async function handler(request: any, response: any) {
     <meta name="twitter:title" content="${title}" />
     <meta name="twitter:description" content="${description}" />
     <meta name="twitter:image" content="${image}" />
+    <meta name="twitter:site" content="@tazaadmedia" />
 `;
 
-        html = html.replace('<head>', `<head>${metaTags}`);
+        const debugComment = `<!-- 
+            SSR DEBUG REPORT:
+            Timestamp: ${new Date().toISOString()}
+            Process Time: ${Date.now() - start}ms
+            Slug Requested: ${slug}
+            Slug Cleaned: ${cleanSlug}
+            Article Found: ${!!article}
+            Live Mode Detect: ${isLiveRequest}
+            Base URL: ${baseUrl}
+            Env URL Present: ${!!process.env.VITE_SUPABASE_URL || !!process.env.SUPABASE_URL}
+            Env Key Present: ${!!process.env.VITE_SUPABASE_ANON_KEY || !!process.env.SUPABASE_ANON_KEY}
+        -->`;
+
+        html = html.replace('<head>', `<head>${metaTags}${debugComment}`);
 
         const duration = Date.now() - start;
         response.setHeader('X-SSR-Process-Time', `${duration}ms`);
