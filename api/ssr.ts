@@ -25,12 +25,11 @@ export default async function handler(request: any, response: any) {
     const baseUrl = isLocal ? `${protocol}://${host}` : `https://thetazaad.com`;
 
     try {
-        let { slug } = request.query;
-        if (!slug) slug = 'home';
+        // Robust parameter extraction
+        let { type, slug } = request.query;
+        if (!type || type === 'home') type = 'home';
+        if (Array.isArray(type)) type = type[0];
         if (Array.isArray(slug)) slug = slug[0];
-
-        // Ensure we handle leading slashes or weirdness from Vercel
-        if (slug.startsWith('/')) slug = slug.substring(1);
 
         // 1. Fetch index.html using FILE SYSTEM
         try {
@@ -52,7 +51,7 @@ export default async function handler(request: any, response: any) {
 
         // 3. Default Metadata (Home)
         let meta: Metadata = {
-            title: `تضاد - سنڌي (${slug || 'home'})`,
+            title: `تضاد - سنڌي (Type: ${type}, Slug: ${slug || 'none'})`,
             description: "Leading Sindhi digital media platform offering news, analysis, and special reports.",
             image: `${baseUrl}/default-og.jpg`,
             url: baseUrl,
@@ -74,19 +73,16 @@ export default async function handler(request: any, response: any) {
         }
 
         // 4. Route Handling
-        const [type, ...parts] = slug.split('/');
-        const detail = parts.join('/');
-
-        if (supabase && detail) {
+        if (supabase && slug) {
             if (type === 'article' || type === 'live') {
                 const isLive = type === 'live';
-                const { data: artResult } = await supabase.from('articles').select('*').eq('slug', detail).single();
+                const { data: artResult } = await supabase.from('articles').select('*').eq('slug', slug).single();
                 const art = artResult as any;
                 if (art) {
                     const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
-                    meta.title = `${prefixedTitle} | تضاد`;
+                    meta.title = prefixedTitle;
                     meta.description = art.subdeck || meta.description;
-                    meta.url = `${baseUrl}/${type}/${detail}`;
+                    meta.url = `${baseUrl}/${type === 'live' ? 'article/live' : 'article'}/${slug}`;
                     meta.type = "article";
                     if (art.featured_image_url) {
                         meta.image = art.featured_image_url.startsWith('http') ? art.featured_image_url : `${baseUrl}${art.featured_image_url.startsWith('/') ? '' : '/'}${art.featured_image_url}`;
@@ -102,12 +98,12 @@ export default async function handler(request: any, response: any) {
                     };
                 }
             } else if (type === 'category') {
-                const { data: catResult } = await supabase.from('categories').select('*').eq('slug', detail).single();
+                const { data: catResult } = await supabase.from('categories').select('*').eq('slug', slug).single();
                 const cat = catResult as any;
                 if (cat) {
                     meta.title = `${cat.name} | تضاد`;
                     meta.description = `تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
-                    meta.url = `${baseUrl}/category/${detail}`;
+                    meta.url = `${baseUrl}/category/${slug}`;
                     meta.schema = {
                         "@context": "https://schema.org",
                         "@type": "CollectionPage",
@@ -116,12 +112,12 @@ export default async function handler(request: any, response: any) {
                     };
                 }
             } else if (type === 'author') {
-                const { data: userResult } = await supabase.from('users').select('*').eq('username', detail).single();
+                const { data: userResult } = await supabase.from('users').select('*').eq('username', slug).single();
                 const user = userResult as any;
                 if (user) {
                     meta.title = `${user.full_name} | ليکڪ`;
                     meta.description = user.bio || `${user.full_name} جون لکڻيون تضاد تي.`;
-                    meta.url = `${baseUrl}/author/${detail}`;
+                    meta.url = `${baseUrl}/author/${slug}`;
                     if (user.avatar_url) {
                         meta.image = user.avatar_url.startsWith('http') ? user.avatar_url : `${baseUrl}${user.avatar_url.startsWith('/') ? '' : '/'}${user.avatar_url}`;
                     }
@@ -135,24 +131,13 @@ export default async function handler(request: any, response: any) {
             }
         }
 
-        // 5. Inject Content (Always happens, even for Home)
+        // 5. Inject Content
+        // Aggressively remove existing metadata to avoid conflicts
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
         html = html.replace(/<meta[^>]*?(?:name|property)=["'](?:description|og:|twitter:)[^>]*?>/gi, '');
         html = html.replace(/<link[^>]*?rel=["']canonical["'][^>]*?>/gi, '');
 
-        const debugInfo = `
-    <!-- 
-      SSR DEBUG:
-      Type: ${type}
-      Detail: ${detail}
-      Title: ${meta.title}
-      Image: ${meta.image}
-      Status: ${detail ? 'Processed' : 'Home'}
-      Timestamp: ${new Date().toISOString()}
-    -->`;
-
         const metaTags = `
-    ${debugInfo}
     <title>${meta.title.replace(/"/g, '&quot;')}</title>
     <meta name="description" content="${meta.description.replace(/"/g, '&quot;')}" />
     <meta property="og:title" content="${meta.title.replace(/"/g, '&quot;')}" />

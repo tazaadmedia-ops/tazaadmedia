@@ -2,23 +2,23 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/api/ssr?slug=home"
+      "destination": "/api/ssr?type=home"
     },
     {
-      "source": "/category/(.*)",
-      "destination": "/api/ssr?slug=category/$1"
+      "source": "/article/live/:slug",
+      "destination": "/api/ssr?type=live&slug=:slug"
     },
     {
-      "source": "/author/(.*)",
-      "destination": "/api/ssr?slug=author/$1"
+      "source": "/article/:slug",
+      "destination": "/api/ssr?type=article&slug=:slug"
     },
     {
-      "source": "/article/live/(.*)",
-      "destination": "/api/ssr?slug=live/$1"
+      "source": "/category/:slug",
+      "destination": "/api/ssr?type=category&slug=:slug"
     },
     {
-      "source": "/article/(.*)",
-      "destination": "/api/ssr?slug=article/$1"
+      "source": "/author/:slug",
+      "destination": "/api/ssr?type=author&slug=:slug"
     },
     {
       "source": "/((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/).*)",
