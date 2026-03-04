@@ -6,22 +6,22 @@
     },
     {
       "source": "/category/:slug",
-      "destination": "/api/ssr?slug=category/:slug"
+      "destination": "/api/ssr?slug=category/$slug"
     },
     {
       "source": "/author/:slug",
-      "destination": "/api/ssr?slug=author/:slug"
+      "destination": "/api/ssr?slug=author/$slug"
     },
     {
       "source": "/article/live/:slug",
-      "destination": "/api/ssr?slug=live/:slug"
+      "destination": "/api/ssr?slug=live/$slug"
     },
     {
       "source": "/article/:slug",
-      "destination": "/api/ssr?slug=article/:slug"
+      "destination": "/api/ssr?slug=article/$slug"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/).*)",
       "destination": "/index.html"
     }
   ]

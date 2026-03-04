@@ -29,6 +29,9 @@ export default async function handler(request: any, response: any) {
         if (!slug) slug = 'home';
         if (Array.isArray(slug)) slug = slug[0];
 
+        // Ensure we handle leading slashes or weirdness from Vercel
+        if (slug.startsWith('/')) slug = slug.substring(1);
+
         // 1. Fetch index.html using FILE SYSTEM
         try {
             const possiblePaths = [
