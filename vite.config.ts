@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'process.env': {},
+  },
+  optimizeDeps: {
+    include: ['react-twitter-embed'],
+  },
   build: {
     rollupOptions: {
       output: {
@@ -20,6 +26,9 @@ export default defineConfig({
             }
             if (id.includes('supabase')) {
               return 'vendor-supabase';
+            }
+            if (id.includes('react-twitter-embed')) {
+              return 'vendor-twitter';
             }
             return 'vendor'; // all other dependencies
           }

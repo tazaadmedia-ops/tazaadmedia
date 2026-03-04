@@ -96,7 +96,11 @@ const ArticleEditor: React.FC = () => {
 
     const editor = useEditor({
         extensions: [
-            StarterKit,
+            StarterKit.configure({
+                // Disable link if it's included in this version's StarterKit
+                // @ts-ignore - version specific
+                link: false,
+            }),
             Figure,
             RelatedArticle,
             Youtube.configure({ controls: true }),
