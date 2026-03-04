@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Plus, Trash2, Edit2, Check, X, Loader, Pin, Twitter } from 'lucide-react';
 import { format } from 'date-fns';
+import { TwitterTweetEmbed } from 'react-twitter-embed';
 
 const getTweetId = (url: string) => {
-    const match = url.match(/(?:twitter|x)\.com\/.+\/status\/(\d+)/);
+    const match = url.match(/(?:\/|status\/)(\d+)(?:\/|\?|$)/);
     return match ? match[1] : null;
 };
 
@@ -112,6 +113,13 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
 
     const handleSave = async () => {
         if (!content.trim()) return alert('Content is required');
+
+        // Validation for Twitter links
+        if (mediaUrl && (mediaUrl.includes('twitter.com') || mediaUrl.includes('x.com')) && !getTweetId(mediaUrl)) {
+            if (!confirm('هي ٽوئيٽ لنڪ ڪجھ غلط لڳي رھي آھي. ڇا توھان اڃا به محفوظ ڪرڻ چاھيو ٿا؟ (This tweet link looks invalid. Save anyway?)')) {
+                return;
+            }
+        }
 
         setIsSubmitting(true);
 
@@ -225,8 +233,13 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                             <div style={{ marginTop: '0.5rem', padding: '10px', backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px' }}>
                                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '8px', fontWeight: 600 }}>ميڊيا پريويو:</div>
                                 {getTweetId(mediaUrl) ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1d9bf0', fontWeight: 600 }}>
-                                        <Twitter size={18} /> Twitter Tweet (ID: {getTweetId(mediaUrl)})
+                                    <div style={{ direction: 'ltr', minHeight: '200px', backgroundColor: '#f9fafb', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <TwitterTweetEmbed
+                                            key={getTweetId(mediaUrl)!}
+                                            tweetId={getTweetId(mediaUrl)!}
+                                            options={{ conversation: 'none' }}
+                                            placeholder={<div style={{ color: '#666', fontSize: '0.8rem' }}>Twitter لوڊ ٿي رهيو آهي...</div>}
+                                        />
                                     </div>
                                 ) : (
                                     <img src={mediaUrl} style={{ maxHeight: '150px', borderRadius: '4px' }} alt="Preview" onError={(e) => (e.currentTarget.style.display = 'none')} />

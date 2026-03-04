@@ -43,7 +43,8 @@ const formatRelativeTime = (dateString: string) => {
 };
 
 const getTweetId = (url: string) => {
-    const match = url.match(/(?:twitter|x)\.com\/.+\/status\/(\d+)/);
+    // Robust regex to handle x.com, twitter.com, mobile.twitter.com and various share parameters
+    const match = url.match(/(?:\/|status\/)(\d+)(?:\/|\?|$)/);
     return match ? match[1] : null;
 };
 
@@ -168,11 +169,20 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                             {update.media_url && (
                                 <div style={{ marginTop: '1rem', marginBottom: '1rem', borderRadius: '4px', overflow: 'hidden' }}>
                                     {getTweetId(update.media_url) ? (
-                                        <div style={{ direction: 'ltr' }}>
-                                            <TwitterTweetEmbed tweetId={getTweetId(update.media_url)!} options={{ conversation: 'none' }} />
+                                        <div style={{ direction: 'ltr', minHeight: '250px', backgroundColor: '#f9fafb', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <TwitterTweetEmbed
+                                                tweetId={getTweetId(update.media_url)!}
+                                                options={{ conversation: 'none' }}
+                                                placeholder={<div style={{ color: '#666', fontSize: '0.9rem' }}>Twitter لوڊ ٿي رهيو آهي...</div>}
+                                            />
                                         </div>
                                     ) : (
-                                        <img src={update.media_url} alt="Update media" style={{ width: '100%', height: 'auto', objectFit: 'contain', backgroundColor: '#f9fafb' }} />
+                                        <img
+                                            src={update.media_url}
+                                            alt="Update media"
+                                            style={{ width: '100%', height: 'auto', objectFit: 'contain', backgroundColor: '#f9fafb' }}
+                                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                                        />
                                     )}
                                 </div>
                             )}
