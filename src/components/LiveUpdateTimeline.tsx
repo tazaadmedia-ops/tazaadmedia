@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Twitter, Facebook, MessageCircle, Copy, X } from 'lucide-react';
+import { Share2, Twitter, Facebook, MessageCircle, Copy, X, Pin } from 'lucide-react';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 
 export interface LiveUpdate {
@@ -141,16 +141,19 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                         }}>
                             {isPinnedCard && (
                                 <div style={{
-                                    display: 'inline-block',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
                                     backgroundColor: '#dc2626',
                                     color: '#fff',
-                                    padding: '2px 8px',
-                                    borderRadius: '12px',
+                                    padding: '4px 10px',
+                                    borderRadius: '50px',
                                     fontSize: '0.75rem',
                                     fontWeight: 700,
-                                    marginBottom: '1rem'
+                                    marginBottom: '1rem',
+                                    boxShadow: '0 2px 4px rgba(220, 38, 38, 0.2)'
                                 }}>
-                                    📌 پِن ٿيل
+                                    <Pin size={12} strokeWidth={3} /> پِن ٿيل
                                 </div>
                             )}
 
