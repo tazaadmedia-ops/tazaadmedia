@@ -468,13 +468,22 @@ img {
     color: var(--color-accent) !important;
   }
 
-  .hide-mobile {
+  .hide-desktop {
     display: none !important;
   }
 
   .show-mobile {
-    display: block !important;
+    display: none !important;
   }
+
+  .mobile-menu-overlay {
+    display: none !important;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+
 
   .header-white-bar {
     height: auto !important;
@@ -668,6 +677,111 @@ img {
 /* Navigation Hover Effects */
 .nav-link:hover {
   color: var(--color-accent) !important;
+}
+
+/* Mobile Drawer Menu */
+@media (max-width: 768px) {
+  .show-mobile {
+    display: flex !important;
+  }
+
+  .mobile-menu-overlay {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-menu-content {
+    position: absolute;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: white;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    direction: rtl;
+  }
+
+  .mobile-menu-overlay.open .mobile-menu-content {
+    right: 0;
+  }
+
+  .mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .mobile-menu-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #111;
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-menu-nav {
+    flex: 1;
+    padding: 1rem 0;
+    overflow-y: auto;
+  }
+
+  .mobile-nav-link {
+    display: block;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #111;
+    text-decoration: none;
+    border-right: 4px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .mobile-nav-link.active {
+    color: var(--color-accent);
+    background-color: #fcebeb;
+    border-right-color: var(--color-accent);
+  }
+
+  .mobile-menu-socials {
+    padding: 2rem 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+
+  .mobile-menu-socials a {
+    color: #111;
+    transition: color 0.2s;
+  }
+
+  .mobile-menu-socials a:hover {
+    color: var(--color-accent);
+  }
+
+  .logo-svg {
+    height: 30px !important;
+  }
 }
 
 @keyframes fade-in-right {
