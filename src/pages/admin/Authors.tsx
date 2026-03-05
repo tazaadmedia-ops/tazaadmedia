@@ -11,6 +11,7 @@ interface Author {
     bio: string;
     avatar_url: string;
     role: string;
+    is_hidden?: boolean;
     social_links: {
         twitter?: string;
         facebook?: string;
@@ -70,6 +71,18 @@ const Authors: React.FC = () => {
         setShowModal(false);
         setFormData({ role: 'author' });
         fetchAuthors();
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`ڇا توھان پڪ سان ھن ليکڪ کي ختم ڪرڻ چاھيو ٿا؟\n"${name}"\n(Are you sure you want to delete this author?)`)) return;
+
+        const { error } = await supabase.from('users').delete().eq('id', id);
+        if (error) {
+            alert('Error deleting: ' + error.message);
+        } else {
+            fetchAuthors();
+            setShowModal(false);
+        }
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,7 +180,12 @@ const Authors: React.FC = () => {
                                     {!author.avatar_url && <UserIcon size={32} color="#ccc" />}
                                 </div>
                                 <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#222', marginBottom: '4px' }}>{author.full_name || 'Unnamed'}</h3>
-                                <p style={{ fontSize: '0.9rem', color: '#888', marginBottom: '12px' }}>{author.role}</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                                    <p style={{ fontSize: '0.85rem', color: '#888' }}>{author.role}</p>
+                                    {author.is_hidden && (
+                                        <span style={{ backgroundColor: '#fee2e2', color: '#ef4444', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>Hidden</span>
+                                    )}
+                                </div>
                                 <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: '1.5', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                     {author.bio || 'No bio available.'}
                                 </p>
@@ -303,21 +321,48 @@ const Authors: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <button
-                                    onClick={handleSave}
-                                    disabled={isSaving || isUploading}
-                                    style={{
-                                        marginTop: '1rem', padding: '14px', borderRadius: '8px',
-                                        backgroundColor: '#000', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer',
-                                        opacity: (isSaving || isUploading) ? 0.7 : 1
-                                    }}>
-                                    {isSaving ? 'Saving...' : 'Save Author'}
-                                </button>
+                                {/* Visibility Toggle */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        id="is_hidden"
+                                        checked={formData.is_hidden || false}
+                                        onChange={e => setFormData({ ...formData, is_hidden: e.target.checked })}
+                                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                    />
+                                    <label htmlFor="is_hidden" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#555', cursor: 'pointer' }}>
+                                        Hide this author from public site
+                                    </label>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={isSaving || isUploading}
+                                        style={{
+                                            flex: 1, padding: '14px', borderRadius: '8px',
+                                            backgroundColor: '#000', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer',
+                                            opacity: (isSaving || isUploading) ? 0.7 : 1
+                                        }}>
+                                        {isSaving ? 'Saving...' : 'Save Author'}
+                                    </button>
+
+                                    {formData.id && (
+                                        <button
+                                            onClick={() => handleDelete(formData.id!, formData.full_name!)}
+                                            style={{
+                                                padding: '14px', borderRadius: '8px',
+                                                backgroundColor: '#fff', color: '#ef4444', fontWeight: 600,
+                                                border: '1px solid #fee2e2', cursor: 'pointer'
+                                            }}>
+                                            Delete
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
-
             </div>
         </AdminLayout>
     );

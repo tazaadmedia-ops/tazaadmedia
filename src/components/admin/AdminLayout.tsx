@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Users, FolderOpen, LogOut, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, FolderOpen, LogOut, ExternalLink, MessageSquare } from 'lucide-react';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -112,6 +112,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         icon={FolderOpen}
                         label="Categories"
                         isActive={isActive('/admin/categories')}
+                    />
+                    <SidebarItem
+                        to="/admin/reports"
+                        icon={MessageSquare}
+                        label="Reports"
+                        isActive={isActive('/admin/reports')}
                     />
                 </nav>
 

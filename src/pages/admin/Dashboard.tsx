@@ -6,6 +6,7 @@ import { Eye, Trash2, Edit2 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -48,6 +49,11 @@ const Dashboard: React.FC = () => {
         }
     };
 
+    const filteredArticles = articles.filter(article =>
+        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        article.slug.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <AdminLayout>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
@@ -85,7 +91,28 @@ const Dashboard: React.FC = () => {
 
             {/* Articles Table */}
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #f0f0f0', fontWeight: 700 }}>Recent Articles</div>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontWeight: 700 }}>Recent Articles</div>
+                    <div style={{ position: 'relative', width: '300px' }}>
+                        <input
+                            type="text"
+                            placeholder="Search articles..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '0.6rem 1rem',
+                                borderRadius: '8px',
+                                border: '1px solid #e5e7eb',
+                                fontSize: '0.85rem',
+                                outline: 'none',
+                                transition: 'border-color 0.2s'
+                            }}
+                            onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-accent)'}
+                            onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
+                        />
+                    </div>
+                </div>
                 {loading ? <p style={{ padding: '2rem' }}>Loading...</p> : (
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead>
@@ -98,7 +125,7 @@ const Dashboard: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {articles.map((article) => (
+                            {filteredArticles.map((article) => (
                                 <tr key={article.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                                     <td style={{ padding: '1.2rem 1.5rem' }}>
                                         <div style={{ fontWeight: 600, fontSize: '0.95rem', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
