@@ -39,16 +39,17 @@ const LiveArticlePage: React.FC = () => {
                 // Fetch Article
                 const { data: art, error: artError } = await supabase
                     .from('articles')
-                    .select('*, article_authors(users(full_name))')
+                    .select('id, title, subdeck, slug, featured_image_url, published_at, created_at, is_live, article_authors(users(full_name))')
                     .eq('slug', slug)
                     // .eq('is_live', true) // Ideally uncomment when DB is fully populated
                     .single();
 
                 if (artError) throw artError;
                 if (art) {
+                    const articleWithAuthors = art as any;
                     setArticle(art);
-                    if (art.article_authors?.[0]?.users?.full_name) {
-                        setAuthorName(art.article_authors[0].users.full_name);
+                    if (articleWithAuthors.article_authors?.[0]?.users?.full_name) {
+                        setAuthorName(articleWithAuthors.article_authors[0].users.full_name);
                     }
 
                     // Fetch Updates (Mocking query if table doesn't exist yet gracefully)

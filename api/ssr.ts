@@ -76,80 +76,100 @@ export default async function handler(request: any, response: any) {
 
         // 4. Route Handling
         if (supabase && slug) {
+            // Helper for query timeout
+            const withTimeout = (promise: Promise<any>, timeoutMs: number) =>
+                Promise.race([
+                    promise,
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeoutMs))
+                ]);
+
             if (type === 'article' || type === 'live') {
                 const isLive = type === 'live';
-                const { data: artResult, error: artError } = await supabase.from('articles').select('*').eq('slug', slug).single();
+                try {
+                    // OPTIMIZED: Only select columns needed for SEO/Meta
+                    const query = supabase
+                        .from('articles')
+                        .select('title, subdeck, slug, featured_image_url, published_at, created_at, updated_at')
+                        .eq('slug', slug)
+                        .single();
 
-                if (artError) {
-                    meta.title = `تضاد (DB Error: ${artError.message})`;
-                }
+                    const { data: artResult, error: artError } = await withTimeout(query, 8000) as any;
 
-                const art = artResult as any;
-                if (art) {
-                    const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
-                    meta.title = prefixedTitle;
-                    meta.description = art.subdeck || meta.description;
-                    meta.url = `${baseUrl}/${type === 'live' ? 'article/live' : 'article'}/${slug}`;
-                    meta.type = "article";
-                    if (art.featured_image_url) {
-                        meta.image = art.featured_image_url.startsWith('http') ? art.featured_image_url : `${baseUrl}${art.featured_image_url.startsWith('/') ? '' : '/'}${art.featured_image_url}`;
+                    if (artResult && !artError) {
+                        const art = artResult;
+                        const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
+                        meta.title = prefixedTitle;
+                        meta.description = art.subdeck || meta.description;
+                        meta.url = `${baseUrl}/${type === 'live' ? 'article/live' : 'article'}/${slug}`;
+                        meta.type = "article";
+                        if (art.featured_image_url) {
+                            meta.image = art.featured_image_url.startsWith('http') ? art.featured_image_url : `${baseUrl}${art.featured_image_url.startsWith('/') ? '' : '/'}${art.featured_image_url}`;
+                        }
+                        meta.schema = {
+                            "@context": "https://schema.org",
+                            "@type": isLive ? "LiveBlogPosting" : "NewsArticle",
+                            "headline": art.title,
+                            "image": [meta.image],
+                            "datePublished": art.published_at || art.created_at,
+                            "dateModified": art.updated_at || art.published_at,
+                            "author": { "@type": "Person", "name": "تضاد اسٽاف" },
+                            "publisher": {
+                                "@type": "Organization",
+                                "name": "تضاد",
+                                "logo": {
+                                    "@type": "ImageObject",
+                                    "url": `${baseUrl}/default-og.jpg`
+                                }
+                            },
+                            "inLanguage": "sd"
+                        };
                     }
-                    meta.schema = {
-                        "@context": "https://schema.org",
-                        "@type": isLive ? "LiveBlogPosting" : "NewsArticle",
-                        "headline": art.title,
-                        "image": [meta.image],
-                        "datePublished": art.published_at || art.created_at,
-                        "dateModified": art.updated_at || art.published_at,
-                        "author": { "@type": "Person", "name": "تضاد اسٽاف" },
-                        "publisher": {
-                            "@type": "Organization",
-                            "name": "تضاد",
-                            "logo": {
-                                "@type": "ImageObject",
-                                "url": `${baseUrl}/default-og.jpg`
-                            }
-                        },
-                        "inLanguage": "sd"
-                    };
+                } catch (e) {
+                    console.error(`[SSR] Article Fetch Failed/Timed out:`, e);
                 }
             } else if (type === 'category') {
-                const { data: catResult } = await supabase.from('categories').select('*').eq('slug', slug).single();
-                const cat = catResult as any;
-                if (cat) {
-                    meta.title = `${cat.name} | تضاد`;
-                    meta.description = `تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
-                    meta.url = `${baseUrl}/category/${slug}`;
-                    meta.schema = {
-                        "@context": "https://schema.org",
-                        "@type": "CollectionPage",
-                        "name": cat.name,
-                        "url": meta.url,
-                        "inLanguage": "sd"
-                    };
-                }
-            } else if (type === 'author') {
-                const { data: userResult } = await supabase.from('users').select('*').eq('username', slug).single();
-                const user = userResult as any;
-                if (user) {
-                    meta.title = `${user.full_name} | ليکڪ`;
-                    meta.description = user.bio || `${user.full_name} جون لکڻيون تضاد تي.`;
-                    meta.url = `${baseUrl}/author/${slug}`;
-                    if (user.avatar_url) {
-                        meta.image = user.avatar_url.startsWith('http') ? user.avatar_url : `${baseUrl}${user.avatar_url.startsWith('/') ? '' : '/'}${user.avatar_url}`;
+                try {
+                    const query = supabase.from('categories').select('name, slug').eq('slug', slug).single();
+                    const { data: catResult } = await withTimeout(query, 5000) as any;
+                    if (catResult) {
+                        const cat = catResult;
+                        meta.title = `${cat.name} | تضاد`;
+                        meta.description = `تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
+                        meta.url = `${baseUrl}/category/${slug}`;
+                        meta.schema = {
+                            "@context": "https://schema.org",
+                            "@type": "CollectionPage",
+                            "name": cat.name,
+                            "url": meta.url,
+                            "inLanguage": "sd"
+                        };
                     }
-                    meta.schema = {
-                        "@context": "https://schema.org",
-                        "@type": "ProfilePage",
-                        "name": user.full_name,
-                        "url": meta.url,
-                        "agent": {
-                            "@type": "Person",
-                            "name": user.full_name
-                        },
-                        "inLanguage": "sd"
-                    };
-                }
+                } catch (e) { console.error(`[SSR] Category Fetch Failed:`, e); }
+            } else if (type === 'author') {
+                try {
+                    const query = supabase.from('users').select('full_name, username, bio, avatar_url').eq('username', slug).single();
+                    const { data: userResult } = await withTimeout(query, 5000) as any;
+                    if (userResult) {
+                        const user = userResult;
+                        meta.title = `${user.full_name} | ليکڪ`;
+                        meta.description = user.bio || `${user.full_name} جون لکڻيون تضاد تي.`;
+                        meta.url = `${baseUrl}/author/${slug}`;
+                        if (user.avatar_url) {
+                            meta.image = user.avatar_url.startsWith('http') ? user.avatar_url : `${baseUrl}${user.avatar_url.startsWith('/') ? '' : '/'}${user.avatar_url}`;
+                        }
+                        meta.schema = {
+                            "@context": "https://schema.org",
+                            "@type": "ProfilePage",
+                            "name": user.full_name,
+                            "url": meta.url,
+                            "agent": {
+                                "@type": "Person",
+                                "name": user.full_name
+                            },
+                            "inLanguage": "sd"
+                        };
+                    }
+                } catch (e) { console.error(`[SSR] Author Fetch Failed:`, e); }
             }
         }
 
