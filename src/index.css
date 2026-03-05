@@ -190,6 +190,11 @@ img {
   display: flex;
 }
 
+.flex-center {
+  display: flex;
+  align-items: center;
+}
+
 .justify-between {
   justify-content: space-between;
 }
@@ -482,10 +487,46 @@ img {
     gap: 12px;
   }
 
-  .search-container-mobile {
-    width: 100% !important;
-    max-width: none !important;
+  .search-container-header {
+    max-width: 120px !important;
+    margin-right: 0.5rem !important;
   }
+
+  .header-socials {
+    gap: 0.5rem !important;
+    margin-left: 0.5rem !important;
+  }
+}
+
+.header-socials {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1.5rem;
+}
+
+.social-link {
+  color: #666;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.social-link:hover {
+  color: var(--color-accent);
+}
+
+.social-username {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #333;
+  margin-right: 0.5rem;
+}
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 /* Author Page Styles */

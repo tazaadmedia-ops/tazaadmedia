@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Search } from 'lucide-react';
+import { Search, Facebook, Instagram, Twitter } from 'lucide-react';
 
 
 
@@ -18,9 +18,6 @@ const Header: React.FC = () => {
     }, []);
 
     const fetchCategories = async () => {
-        // Fetch categories that have at least one published article.
-        // We do this by querying articles that are published and selecting their category relation.
-        // This avoids complex !inner join syntax issues if the relationship name is ambiguous.
         const { data: articles } = await supabase
             .from('articles')
             .select(`
@@ -34,7 +31,6 @@ const Header: React.FC = () => {
             .eq('status', 'published');
 
         if (articles) {
-            // Deduplicate categories from the articles
             const uniqueCategoriesMap = new Map();
 
             articles.forEach((article: any) => {
@@ -45,8 +41,6 @@ const Header: React.FC = () => {
             });
 
             const uniqueCategories = Array.from(uniqueCategoriesMap.values());
-
-            // Sort by name
             uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
 
             const dynItems = uniqueCategories.map(cat => ({
@@ -74,52 +68,33 @@ const Header: React.FC = () => {
             position: 'sticky',
             top: 0,
             zIndex: 1000,
-            direction: 'rtl'
+            direction: 'rtl',
+            borderBottom: '1px solid #eee'
         }}>
-            {/* Top Bar - Deep Red Branding */}
-            <div style={{
-                backgroundColor: '#B70100',
-                height: '60px',
+            <div className="container" style={{
                 display: 'flex',
-                alignItems: 'center'
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: '70px',
+                width: '100%'
             }}>
-                <div className="container" style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%'
-                }}>
-                    {/* Logo on the Right (RTL) */}
-                    <NavLink to="/" aria-label="هوم" style={{ display: 'flex', alignItems: 'center', height: '35px' }}>
-                        <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '32px', width: 'auto' }}>
-                            <path fill="#fff" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
-                            <path fill="#fff" d="M22.3,3.4v21.5h7v-10.2h4.3s.2,2.7.2,2.7c4.4-5.8,14-5.2,16.1,2.3s.1,5.2,1.9,5.2h40.7v-10.2h4.3v14.5h-44.7c-.4,0-2.3-1.5-2.7-1.9-.5.6-2.5,1.9-3.1,1.9h-28.3V3.4h4.3ZM45.7,24.9c2-10.8-11-8.7-12.1,0h12.1Z" />
-                            <path fill="#fff" d="M111.3,33.1c0,0,.5.6,0,.2-5.8-7.7,5-13.7,5.4-21.3l1,2.1c1.7,5.4-2.9,9.2-5.2,13.5s-1.2,2.6-1.2,3.0c0,.8,0,1.7,0,2.5Z" />
-                            <path fill="#fff" d="M113.9,35.1c-.4,0-.2,0-.3-.2-2.3-5.0,6.3-11.1,5.8-16.9,0-.4-.3-.8-.2-1.2.8,1.0,1.6,2.3,1.9,3.6,1.4,6.0-6.0,9.4-7.2,14.7Z" />
-                            <path fill="#fff" d="M0,29.2v-4.3h9.8c0.6-6.8-1.2-8.1-7.8-7.4v-3.9h7.2c0.4,0,2.2,1,2.6,1.3,3.4,3,1.3,9.5,2.2,13.5l-.5,0.8H0Z" />
-                            <path fill="#fff" d="M91.3,7c3.2-.5,3.6,5.4-.4,4.2s-1.7-3.8.4-4.2Z" />
-                            <path fill="#fff" d="M97.1,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
-                            <path fill="#fff" d="M41.7,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
+                {/* Logo Section */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                    <NavLink to="/" aria-label="هوم" style={{ display: 'flex', alignItems: 'center' }}>
+                        <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '36px', width: 'auto' }}>
+                            <path fill="#B70100" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
+                            <path fill="#B70100" d="M22.3,3.4v21.5h7v-10.2h4.3s.2,2.7.2,2.7c4.4-5.8,14-5.2,16.1,2.3s.1,5.2,1.9,5.2h40.7v-10.2h4.3v14.5h-44.7c-.4,0-2.3-1.5-2.7-1.9-.5.6-2.5,1.9-3.1,1.9h-28.3V3.4h4.3ZM45.7,24.9c2-10.8-11-8.7-12.1,0h12.1Z" />
+                            <path fill="#B70100" d="M111.3,33.1c0,0,.5.6,0,.2-5.8-7.7,5-13.7,5.4-21.3l1,2.1c1.7,5.4-2.9,9.2-5.2,13.5s-1.2,2.6-1.2,3.0c0,.8,0,1.7,0,2.5Z" />
+                            <path fill="#B70100" d="M113.9,35.1c-.4,0-.2,0-.3-.2-2.3-5.0,6.3-11.1,5.8-16.9,0-.4-.3-.8-.2-1.2.8,1.0,1.6,2.3,1.9,3.6,1.4,6.0-6.0,9.4-7.2,14.7Z" />
+                            <path fill="#B70100" d="M0,29.2v-4.3h9.8c0.6-6.8-1.2-8.1-7.8-7.4v-3.9h7.2c0.4,0,2.2,1,2.6,1.3,3.4,3,1.3,9.5,2.2,13.5l-.5,0.8H0Z" />
+                            <path fill="#B70100" d="M91.3,7c3.2-.5,3.6,5.4-.4,4.2s-1.7-3.8.4-4.2Z" />
+                            <path fill="#B70100" d="M97.1,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
+                            <path fill="#B70100" d="M41.7,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
                         </svg>
                     </NavLink>
-                </div>
-            </div>
 
-            {/* Bottom Bar - White Navigation */}
-            <div className="header-white-bar" style={{
-                backgroundColor: '#fff',
-                borderBottom: '1px solid #eee',
-                display: 'flex',
-                alignItems: 'center'
-            }}>
-                <div className="container header-container" style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    height: '100%'
-                }}>
-                    <nav className="nav-scroll">
+                    {/* Desktop Navigation */}
+                    <nav className="nav-scroll hide-mobile" style={{ marginRight: '1.5rem' }}>
                         {menuItems.map((item) => (
                             <NavMenuItem
                                 key={item.to}
@@ -129,13 +104,28 @@ const Header: React.FC = () => {
                             />
                         ))}
                     </nav>
+                </div>
 
-                    {/* Search Input */}
-                    <div className="search-container search-container-mobile" style={{ position: 'relative', maxWidth: '300px', width: '100%' }}>
+                {/* Search and Social Section */}
+                <div className="flex-center">
+                    <div className="header-socials">
+                        <span className="social-username hide-mobile">@thetazaad</span>
+                        <a href="https://facebook.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Facebook">
+                            <Facebook size={18} />
+                        </a>
+                        <a href="https://instagram.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Instagram">
+                            <Instagram size={18} />
+                        </a>
+                        <a href="https://twitter.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
+                            <Twitter size={18} />
+                        </a>
+                    </div>
+
+                    <div className="search-container search-container-header" style={{ position: 'relative', maxWidth: '200px', width: '100%', marginRight: '1rem' }}>
                         <input
                             type="text"
                             aria-label="ڳولا"
-                            placeholder="ڳولا ڪريو"
+                            placeholder="ڳولا..."
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
                             onKeyDown={(e) => {
@@ -143,12 +133,12 @@ const Header: React.FC = () => {
                             }}
                             style={{
                                 width: '100%',
-                                padding: '8px 45px 8px 12px', // Increased right padding for button
-                                borderRadius: '20px',
-                                border: '1px solid #ddd',
+                                padding: '6px 35px 6px 10px',
+                                borderRadius: '4px',
+                                border: '1px solid #eee',
                                 outline: 'none',
-                                fontSize: '15px',
-                                backgroundColor: '#f9f9f9',
+                                fontSize: '14px',
+                                backgroundColor: '#f5f5f5',
                                 color: '#333',
                                 fontFamily: 'var(--font-main)'
                             }}
@@ -163,19 +153,32 @@ const Header: React.FC = () => {
                                 transform: 'translateY(-50%)',
                                 background: 'none',
                                 border: 'none',
-                                padding: '8px',
+                                padding: '6px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
-                                color: '#666',
-                                borderRadius: '50%'
+                                color: '#666'
                             }}
                         >
-                            <Search size={18} style={{ opacity: 0.8 }} />
+                            <Search size={16} />
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* Mobile Navigation (Scrollable Bar) */}
+            <div className="show-mobile" style={{ borderTop: '1px solid #f9f9f9', padding: '5px 0' }}>
+                <nav className="nav-scroll">
+                    {menuItems.map((item) => (
+                        <NavMenuItem
+                            key={item.to}
+                            to={item.to}
+                            label={item.label}
+                            active={location.pathname === item.to || location.pathname.startsWith(item.to + '/')}
+                        />
+                    ))}
+                </nav>
             </div>
         </header>
     );
