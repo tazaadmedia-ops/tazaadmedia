@@ -14,6 +14,7 @@ export interface LiveUpdate {
 interface LiveUpdateTimelineProps {
     updates: LiveUpdate[];
     isLiveProfile?: boolean; // Controls whether the first item gets the pulsing active animation
+    newlyAddedIds?: Set<string>;
 }
 
 const formatRelativeTime = (dateString: string) => {
@@ -48,7 +49,7 @@ const getTweetId = (url: string) => {
     return match ? match[1] : null;
 };
 
-const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false }) => {
+const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false, newlyAddedIds = new Set() }) => {
     const [openShareMenuId, setOpenShareMenuId] = useState<string | null>(null);
 
     const handleShareClick = (e: React.MouseEvent, updateId: string) => {
@@ -129,7 +130,7 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                         </div>
 
                         {/* Content Card */}
-                        <div className="live-update-card" style={{
+                        <div className={`live-update-card ${newlyAddedIds.has(update.id) ? 'animate-new-item' : ''}`} style={{
                             marginRight: '30px',
                             backgroundColor: '#fff',
                             borderRadius: '8px',
@@ -319,6 +320,21 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                         from {
                             opacity: 0;
                             transform: translateY(10px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    .animate-new-item {
+                        animation: slide-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                    }
+
+                    @keyframes slide-fade-in {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-20px);
                         }
                         to {
                             opacity: 1;

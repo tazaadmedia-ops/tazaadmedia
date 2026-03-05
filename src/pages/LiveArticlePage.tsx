@@ -23,6 +23,7 @@ const LiveArticlePage: React.FC = () => {
     const [authorName, setAuthorName] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
+    const [newlyAddedIds, setNewlyAddedIds] = useState<Set<string>>(new Set());
     const updatesRef = useRef<LiveUpdate[]>([]);
 
     useEffect(() => {
@@ -134,6 +135,9 @@ const LiveArticlePage: React.FC = () => {
     const handleShowPending = useCallback(() => {
         if (pendingUpdates.length === 0) return;
 
+        const newIds = new Set(pendingUpdates.map(u => u.id));
+        setNewlyAddedIds(newIds);
+
         setUpdates(prev => {
             const merged = [...pendingUpdates, ...prev];
             return merged.sort((a, b) => {
@@ -142,6 +146,11 @@ const LiveArticlePage: React.FC = () => {
             });
         });
         setPendingUpdates([]);
+
+        // Clear animation state after 3 seconds
+        setTimeout(() => {
+            setNewlyAddedIds(new Set());
+        }, 3000);
     }, [pendingUpdates]);
 
     if (loading) return <div className="container page-top-margin" style={{ textAlign: 'center' }}><LoadingSpinner /></div>;
@@ -287,7 +296,7 @@ const LiveArticlePage: React.FC = () => {
                 </div>
 
                 {/* Timeline */}
-                <LiveUpdateTimeline updates={updates} isLiveProfile={true} />
+                <LiveUpdateTimeline updates={updates} isLiveProfile={true} newlyAddedIds={newlyAddedIds} />
 
                 <style>
                     {`
