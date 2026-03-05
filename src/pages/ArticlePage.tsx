@@ -220,8 +220,13 @@ const ArticlePage: React.FC = () => {
 
             {/* Featured Image */}
             {article.featured_image_url && (
-                <div style={{ marginBottom: '4rem', width: '100%', maxWidth: '1080px', margin: '0 auto 4rem auto' }}>
+                <div style={{ marginBottom: '2rem', width: '100%', maxWidth: '1080px', margin: '0 auto 2rem auto' }}>
                     <img src={article.featured_image_url} alt={article.title} fetchPriority="high" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }} />
+                    {article.featured_image_caption && (
+                        <figcaption className="featured-image-caption">
+                            {article.featured_image_caption}
+                        </figcaption>
+                    )}
                 </div>
             )}
 

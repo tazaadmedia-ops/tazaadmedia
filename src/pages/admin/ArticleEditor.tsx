@@ -72,6 +72,7 @@ const ArticleEditor: React.FC = () => {
 
     // Featured Image
     const [featuredImageUrl, setFeaturedImageUrl] = useState('');
+    const [featuredImageCaption, setFeaturedImageCaption] = useState('');
     const [isUploadingFeatured, setIsUploadingFeatured] = useState(false);
 
     // Authors Data
@@ -217,6 +218,7 @@ const ArticleEditor: React.FC = () => {
                         setSubdeck(article.subdeck || '');
                         setCategoryId(article.primary_category_id);
                         setFeaturedImageUrl(article.featured_image_url || ''); // Assuming we add this column
+                        setFeaturedImageCaption(article.featured_image_caption || '');
                         setIsLive(article.is_live || false);
 
                         if (article.article_authors) {
@@ -265,6 +267,7 @@ const ArticleEditor: React.FC = () => {
             subdeck,
             primary_category_id: categoryId,
             featured_image_url: featuredImageUrl,
+            featured_image_caption: featuredImageCaption,
             content_json: editor.getJSON(),
             content_text: editor.getText(),
             status: 'published',
@@ -798,7 +801,8 @@ const ArticleEditor: React.FC = () => {
 
                     {!featuredImageUrl && !isUploadingFeatured && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#999', fontSize: '0.9rem' }}>
-                            <ImageIcon size={18} /> Add Cover Image
+                            <ImageIcon size={20} />
+                            <span>Add Featured Image</span>
                         </div>
                     )}
                     {featuredImageUrl && !isUploadingFeatured && (
