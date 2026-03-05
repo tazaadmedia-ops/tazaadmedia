@@ -148,7 +148,8 @@ const LiveArticlePage: React.FC = () => {
     if (!article) return <div className="container page-top-margin" style={{ textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
 
     // Redirect to normal article page if the live blog has ended
-    if (article.is_live === false) {
+    // Only redirect if explicitly ended (is_live === false) and loading is finished
+    if (article && article.is_live === false) {
         return <Navigate to={`/article/${slug}`} replace />;
     }
 
