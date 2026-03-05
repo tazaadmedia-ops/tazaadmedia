@@ -237,7 +237,7 @@ const ArticlePage: React.FC = () => {
 
             {/* Render Timeline for archived live blogs */}
             {updates.length > 0 && (
-                <div style={{ maxWidth: '800px', margin: '4rem auto 2rem', padding: '2rem', backgroundColor: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+                <div style={{ maxWidth: '800px', margin: '1rem auto 2rem', padding: '2rem', backgroundColor: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem' }}>
                         <div style={{ backgroundColor: '#6b7280', color: '#fff', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800 }}>آرڪائيو</div>
                         <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827' }}>
