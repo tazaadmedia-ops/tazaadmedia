@@ -13,6 +13,12 @@ const Header: React.FC = () => {
     const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    // Search Popup State
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+
     useEffect(() => {
         fetchCategories();
         fetchTickerArticles();
@@ -27,10 +33,43 @@ const Header: React.FC = () => {
         }
     }, [tickerArticles]);
 
-    // Close menu on route change
+    // Close menu/search on route change
     useEffect(() => {
         setIsMenuOpen(false);
+        setIsSearchOpen(false);
     }, [location]);
+
+    // Instant Search Logic
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery.trim().length > 1) {
+                performSearch(searchQuery);
+            } else {
+                setSearchResults([]);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const performSearch = async (query: string) => {
+        setIsSearching(true);
+        try {
+            const { data, error } = await supabase
+                .from('articles')
+                .select('id, title, slug, featured_image_url, primary_category_id, categories(name)')
+                .or(`title.ilike.%${query}%,subdeck.ilike.%${query}%`)
+                .eq('status', 'published')
+                .limit(6);
+
+            if (error) throw error;
+            setSearchResults(data || []);
+        } catch (err) {
+            console.error('Search error:', err);
+        } finally {
+            setIsSearching(false);
+        }
+    };
 
     const fetchCategories = async () => {
         const { data: articles } = await supabase
@@ -157,7 +196,7 @@ const Header: React.FC = () => {
                     </div>
 
                     <button
-                        onClick={() => navigate('/search')}
+                        onClick={() => setIsSearchOpen(true)}
                         aria-label="ڳوليو"
                         style={{
                             background: 'none',
@@ -233,6 +272,62 @@ const Header: React.FC = () => {
                         <a href="https://x.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                             <Twitter size={24} fill="currentColor" strokeWidth={0} />
                         </a>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- SEARCH OVERLAY --- */}
+            <div className={`search-overlay ${isSearchOpen ? 'open' : ''}`} onClick={() => setIsSearchOpen(false)}>
+                <div className="search-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="search-header">
+                        <div style={{ position: 'relative', flexGrow: 1 }}>
+                            <input
+                                type="text"
+                                placeholder="ڳوليو..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                autoFocus={isSearchOpen}
+                                className="search-input-large"
+                            />
+                            {isSearching && <div className="search-loader-inline" />}
+                        </div>
+                        <button onClick={() => setIsSearchOpen(false)} className="search-close-btn">
+                            <X size={32} />
+                        </button>
+                    </div>
+
+                    <div className="search-results-container">
+                        {searchResults.length > 0 ? (
+                            <div className="search-results-grid">
+                                {searchResults.map((art) => (
+                                    <Link key={art.id} to={`/article/${art.slug}`} className="search-result-item" onClick={() => setIsSearchOpen(false)}>
+                                        {art.featured_image_url && (
+                                            <div className="search-result-img" style={{ backgroundImage: `url(${art.featured_image_url})` }} />
+                                        )}
+                                        <div className="search-result-info">
+                                            <div className="search-result-cat">{art.categories?.name}</div>
+                                            <div className="search-result-title">{art.title}</div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : searchQuery.length > 2 && !isSearching ? (
+                            <div className="search-no-results">ڪو به مضمون نه مليو.</div>
+                        ) : searchQuery.length === 0 ? (
+                            <div className="search-prompt">مضمون ڳولڻ لاءِ لکو...</div>
+                        ) : null}
+
+                        {searchResults.length > 0 && (
+                            <button
+                                onClick={() => {
+                                    setIsSearchOpen(false);
+                                    navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                                }}
+                                className="search-view-all-btn"
+                            >
+                                سڀ نتيجا ڏسو
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
