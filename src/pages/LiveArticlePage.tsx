@@ -135,6 +135,9 @@ const LiveArticlePage: React.FC = () => {
     const handleShowPending = useCallback(() => {
         if (pendingUpdates.length === 0) return;
 
+        // Capture the newest update ID to scroll to it
+        const newestId = pendingUpdates[0].id;
+
         const newIds = new Set(pendingUpdates.map(u => u.id));
         setNewlyAddedIds(newIds);
 
@@ -146,6 +149,15 @@ const LiveArticlePage: React.FC = () => {
             });
         });
         setPendingUpdates([]);
+
+        // Scroll to the newest update
+        setTimeout(() => {
+            const element = document.getElementById(`update-${newestId}`);
+            if (element) {
+                // Scroll with offset to avoid header if necessary, or just center
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
 
         // Clear animation state after 3 seconds
         setTimeout(() => {
