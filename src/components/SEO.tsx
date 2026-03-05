@@ -83,7 +83,7 @@ const SEO: React.FC<SEOProps> = ({
             <meta name="twitter:title" content={fullTitle} />
             <meta name="twitter:description" content={description} />
             <meta name="twitter:image" content={fullImage} />
-            <meta name="twitter:site" content="@tazaadmedia" />
+            <meta name="twitter:site" content="@thetazaad" />
 
             {/* Structured Data (JSON-LD) */}
             <script type="application/ld+json">

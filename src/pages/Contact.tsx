@@ -13,17 +13,17 @@ const Contact: React.FC = () => {
 
                     <div style={{ marginBottom: '2rem' }}>
                         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.5rem' }}>جنرل انڪوائري</h3>
-                        <a href="mailto:info@tazaad.com" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>info@tazaad.com</a>
+                        <a href="mailto:tazaadmedia@gmail.com" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>tazaadmedia@gmail.com</a>
                     </div>
 
                     <div style={{ marginBottom: '2rem' }}>
                         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.5rem' }}>ايڊيٽوريل ٽيم</h3>
-                        <a href="mailto:editor@tazaad.com" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>editor@tazaad.com</a>
+                        <a href="mailto:tazaadmedia@gmail.com" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>tazaadmedia@gmail.com</a>
                     </div>
 
                     <div>
                         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.5rem' }}>اشتهارن لاءِ</h3>
-                        <a href="mailto:ads@tazaad.com" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>ads@tazaad.com</a>
+                        <a href="mailto:tazaadmedia@gmail.com" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>tazaadmedia@gmail.com</a>
                     </div>
                 </div>
 

@@ -27,7 +27,7 @@ const Submit: React.FC = () => {
                         پنهنجي تحرير هيٺ ڏنل اي ميل تي موڪليو. اسان جي ايڊيٽوريل ٽيم توهان جي مواد جو جائزو وٺندي ۽ جيڪڏهن اهو معيار تي پورو لٿو، ته اسان توهان سان رابطو ڪنداسين.
                     </p>
                     <div style={{ padding: '1.5rem', backgroundColor: '#f5f5f5', borderRadius: '8px', textAlign: 'center' }}>
-                        <p style={{ fontWeight: 700, fontSize: '1.2rem', margin: 0 }}>editor@tazaad.com</p>
+                        <p style={{ fontWeight: 700, fontSize: '1.2rem', margin: 0 }}>tazaadmedia@gmail.com</p>
                     </div>
                     <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>
                         مهرباني ڪري اي ميل، سبجيڪٽ ۾ "Submission: [Topic Name]" لکو.
