@@ -76,7 +76,7 @@ const Header: React.FC = () => {
             .select('title, slug, id, is_live')
             .eq('status', 'published')
             .order('published_at', { ascending: false })
-            .limit(10); // Increase limit for variety
+            .limit(5); // Limit to 5 as requested
 
         if (data) setTickerArticles(data);
     };
