@@ -152,25 +152,27 @@ const Header: React.FC = () => {
             </div>
 
             {/* --- BOTTOM BAR (RED NEWS SLIDER) --- */}
-            <div className="container" style={{ padding: '0 20px' }}>
-                <div className="news-ticker-bar">
-                    <div className="news-ticker-label">
-                        تازيون خبرون <span className="news-ticker-separator">|</span>
-                    </div>
-                    <div className="news-ticker-container">
-                        <div
-                            className="news-ticker-list"
-                            style={{ transform: `translateY(-${currentNewsIndex * 100}%)` }}
-                        >
-                            {tickerArticles.map((art) => (
-                                <Link
-                                    key={art.id}
-                                    to={art.is_live ? `/article/live/${art.slug}` : `/article/${art.slug}`}
-                                    className="news-ticker-item"
-                                >
-                                    {art.title}
-                                </Link>
-                            ))}
+            <div style={{ backgroundColor: 'var(--color-accent)', width: '100%' }}>
+                <div className="container">
+                    <div className="news-ticker-bar">
+                        <div className="news-ticker-label">
+                            تازيون خبرون <span className="news-ticker-separator">|</span>
+                        </div>
+                        <div className="news-ticker-container">
+                            <div
+                                className="news-ticker-list"
+                                style={{ transform: `translateY(-${currentNewsIndex * 100}%)` }}
+                            >
+                                {tickerArticles.map((art) => (
+                                    <Link
+                                        key={art.id}
+                                        to={art.is_live ? `/article/live/${art.slug}` : `/article/${art.slug}`}
+                                        className="news-ticker-item"
+                                    >
+                                        {art.title}
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

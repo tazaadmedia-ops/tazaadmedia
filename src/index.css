@@ -538,8 +538,6 @@ img {
   overflow: hidden;
   font-size: 0.95rem;
   font-weight: 700;
-  border-radius: 2px;
-  margin-bottom: 2px;
 }
 
 .news-ticker-label {
@@ -554,8 +552,8 @@ img {
 }
 
 .news-ticker-separator {
-  margin: 0 0.5rem;
-  opacity: 0.8;
+  margin: 0 0.4rem;
+  opacity: 0.6;
   font-weight: normal;
 }
 
