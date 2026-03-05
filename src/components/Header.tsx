@@ -3,8 +3,6 @@ import { NavLink, useLocation, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Search, Facebook, Instagram, Twitter } from 'lucide-react';
 
-
-
 const Header: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -12,11 +10,21 @@ const Header: React.FC = () => {
         { to: "/", label: "هوم", alwaysShow: true }
     ]);
     const [tickerArticles, setTickerArticles] = useState<any[]>([]);
+    const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
 
     useEffect(() => {
         fetchCategories();
         fetchTickerArticles();
     }, []);
+
+    useEffect(() => {
+        if (tickerArticles.length > 0) {
+            const timer = setInterval(() => {
+                setCurrentNewsIndex((prev) => (prev + 1) % tickerArticles.length);
+            }, 5000);
+            return () => clearInterval(timer);
+        }
+    }, [tickerArticles]);
 
     const fetchCategories = async () => {
         const { data: articles } = await supabase
@@ -33,7 +41,6 @@ const Header: React.FC = () => {
 
         if (articles) {
             const uniqueCategoriesMap = new Map();
-
             articles.forEach((article: any) => {
                 const cat = article.categories;
                 if (cat && cat.id) {
@@ -63,7 +70,7 @@ const Header: React.FC = () => {
             .select('title, slug, id, is_live')
             .eq('status', 'published')
             .order('published_at', { ascending: false })
-            .limit(5);
+            .limit(10); // Increase limit for variety
 
         if (data) setTickerArticles(data);
     };
@@ -144,27 +151,32 @@ const Header: React.FC = () => {
                 </div>
             </div>
 
-            {/* --- BOTTOM BAR (RED NEWS TICKER) --- */}
-            <div className="news-ticker-bar">
-                <div className="news-ticker-label">تازيون خبرون</div>
-                <div className="news-ticker-container">
-                    <div className="news-ticker-content">
-                        {tickerArticles.map((art, idx) => (
-                            <Link
-                                key={art.id}
-                                to={art.is_live ? `/article/live/${art.slug}` : `/article/${art.slug}`}
-                                className="news-ticker-item"
-                            >
-                                {art.title}
-                                {idx < tickerArticles.length - 1 && <span style={{ margin: '0 1rem', opacity: 0.5 }}>|</span>}
-                            </Link>
-                        ))}
-                        {/* Duplicate content for seamless loop if needed, but flex wrap/ticker works better with offset */}
+            {/* --- BOTTOM BAR (RED NEWS SLIDER) --- */}
+            <div className="container" style={{ padding: '0 20px' }}>
+                <div className="news-ticker-bar">
+                    <div className="news-ticker-label">
+                        تازيون خبرون <span className="news-ticker-separator">|</span>
+                    </div>
+                    <div className="news-ticker-container">
+                        <div
+                            className="news-ticker-list"
+                            style={{ transform: `translateY(-${currentNewsIndex * 100}%)` }}
+                        >
+                            {tickerArticles.map((art) => (
+                                <Link
+                                    key={art.id}
+                                    to={art.is_live ? `/article/live/${art.slug}` : `/article/${art.slug}`}
+                                    className="news-ticker-item"
+                                >
+                                    {art.title}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Mobile Scrollable Nav (optional secondary bar) */}
+            {/* Mobile Scrollable Nav */}
             <div className="show-mobile" style={{ borderTop: '1px solid #f0f0f0', backgroundColor: '#fff', padding: '5px 0' }}>
                 <nav className="nav-scroll">
                     {menuItems.map((item) => (
