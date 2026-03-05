@@ -259,24 +259,28 @@ const LiveArticlePage: React.FC = () => {
                                 style={{
                                     backgroundColor: '#b91c1c',
                                     color: 'white',
-                                    padding: '8px 24px',
-                                    borderRadius: '30px',
-                                    fontSize: '1rem',
-                                    fontWeight: 700,
+                                    padding: '10px 24px',
+                                    borderRadius: '100px',
+                                    fontSize: '0.95rem',
+                                    fontWeight: 600,
                                     border: 'none',
-                                    display: 'flex',
+                                    display: 'inline-flex',
+                                    flexDirection: 'row-reverse',
                                     alignItems: 'center',
-                                    gap: '8px',
+                                    gap: '12px',
                                     cursor: 'pointer',
-                                    boxShadow: '0 4px 12px rgba(185, 28, 28, 0.3)',
-                                    animation: 'slideDown 0.3s ease-out'
+                                    animation: 'slideDown 0.3s ease-out',
+                                    direction: 'rtl',
+                                    fontFamily: "'SF Arabic', 'Inter', system-ui, sans-serif"
                                 }}
                             >
-                                <RefreshCw size={18} className="animate-spin-slow" />
-                                {pendingUpdates.length === 1
-                                    ? `[${pendingUpdates.length}] نئين اپڊيٽ ڏسو`
-                                    : `[${pendingUpdates.length}] نيون اپڊيٽس ڏسو`
-                                }
+                                <RefreshCw size={16} className="animate-spin-slow" />
+                                <span>
+                                    {pendingUpdates.length === 1
+                                        ? `[${pendingUpdates.length}] نئين اپڊيٽ ڏسو`
+                                        : `[${pendingUpdates.length}] نيون اپڊيٽس ڏسو`
+                                    }
+                                </span>
                             </button>
                         </div>
                     )}
