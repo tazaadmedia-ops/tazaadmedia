@@ -151,7 +151,7 @@ const Header: React.FC = () => {
                         <a href="https://instagram.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Instagram">
                             <Instagram size={19} strokeWidth={2.5} />
                         </a>
-                        <a href="https://twitter.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
+                        <a href="https://x.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
                             <Twitter size={19} fill="currentColor" strokeWidth={0} />
                         </a>
                     </div>
@@ -179,7 +179,7 @@ const Header: React.FC = () => {
                 <div className="container">
                     <div className="news-ticker-bar">
                         <div className="news-ticker-label">
-                            تازيون خبرون <span className="news-ticker-separator">|</span>
+                            تازيون رپورٽون <span className="news-ticker-separator">|</span>
                         </div>
                         <div className="news-ticker-container">
                             <div
@@ -225,13 +225,13 @@ const Header: React.FC = () => {
 
                     <div className="mobile-menu-socials">
                         <a href="https://facebook.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                            <Facebook fill="currentColor" strokeWidth={0} />
+                            <Facebook size={24} fill="currentColor" strokeWidth={0} />
                         </a>
                         <a href="https://instagram.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                            <Instagram />
+                            <Instagram size={24} strokeWidth={2} />
                         </a>
-                        <a href="https://twitter.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                            <Twitter fill="currentColor" strokeWidth={0} />
+                        <a href="https://x.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                            <Twitter size={24} fill="currentColor" strokeWidth={0} />
                         </a>
                     </div>
                 </div>
