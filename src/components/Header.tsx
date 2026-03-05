@@ -12,6 +12,7 @@ const Header: React.FC = () => {
     const [tickerArticles, setTickerArticles] = useState<any[]>([]);
     const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isTickerTransitioning, setIsTickerTransitioning] = useState(true);
 
     // Search Popup State
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -25,13 +26,23 @@ const Header: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (tickerArticles.length > 0) {
+        if (tickerArticles.length > 1) {
             const timer = setInterval(() => {
-                setCurrentNewsIndex((prev) => (prev + 1) % tickerArticles.length);
+                const nextIndex = currentNewsIndex + 1;
+                setIsTickerTransitioning(true);
+                setCurrentNewsIndex(nextIndex);
+
+                // If we've reached the clone (last item), jump back to the start
+                if (nextIndex === tickerArticles.length - 1) {
+                    setTimeout(() => {
+                        setIsTickerTransitioning(false);
+                        setCurrentNewsIndex(0);
+                    }, 800); // Wait for animation to finish (matches css transition)
+                }
             }, 5000);
             return () => clearInterval(timer);
         }
-    }, [tickerArticles]);
+    }, [tickerArticles, currentNewsIndex]);
 
     // Close menu/search on route change
     useEffect(() => {
@@ -42,12 +53,13 @@ const Header: React.FC = () => {
     // Instant Search Logic
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchQuery.trim().length > 1) {
-                performSearch(searchQuery);
+            const trimmed = searchQuery.trim();
+            if (trimmed.length > 1) {
+                performSearch(trimmed);
             } else {
                 setSearchResults([]);
             }
-        }, 300);
+        }, 400);
 
         return () => clearTimeout(timer);
     }, [searchQuery]);
@@ -55,17 +67,23 @@ const Header: React.FC = () => {
     const performSearch = async (query: string) => {
         setIsSearching(true);
         try {
+            // Sanitize query for .or() syntax which uses commas as separators
+            const safeQuery = query.replace(/[,()]/g, ' ');
+
             const { data, error } = await supabase
                 .from('articles')
                 .select('id, title, slug, featured_image_url, primary_category_id, categories(name)')
-                .or(`title.ilike.%${query}%,subdeck.ilike.%${query}%`)
+                .or(`title.ilike.%${safeQuery}%,subdeck.ilike.%${safeQuery}%`)
                 .eq('status', 'published')
                 .limit(6);
 
-            if (error) throw error;
+            if (error) {
+                console.error('Search query error:', error);
+                throw error;
+            }
             setSearchResults(data || []);
-        } catch (err) {
-            console.error('Search error:', err);
+        } catch (err: any) {
+            console.error('Search failure:', err.message || err);
         } finally {
             setIsSearching(false);
         }
@@ -115,9 +133,12 @@ const Header: React.FC = () => {
             .select('title, slug, id, is_live')
             .eq('status', 'published')
             .order('published_at', { ascending: false })
-            .limit(5); // Limit to 5 as requested
+            .limit(4); // Limited to 4 articles as requested
 
-        if (data) setTickerArticles(data);
+        if (data && data.length > 0) {
+            // Add a clone of the first item at the end for seamless looping
+            setTickerArticles([...data, data[0]]);
+        }
     };
 
     return (
@@ -223,11 +244,14 @@ const Header: React.FC = () => {
                         <div className="news-ticker-container">
                             <div
                                 className="news-ticker-list"
-                                style={{ transform: `translateY(-${currentNewsIndex * 100}%)` }}
+                                style={{
+                                    transform: `translateY(-${currentNewsIndex * 100}%)`,
+                                    transition: isTickerTransitioning ? 'transform 0.8s cubic-bezier(0.76, 0, 0.24, 1)' : 'none'
+                                }}
                             >
-                                {tickerArticles.map((art) => (
+                                {tickerArticles.map((art, i) => (
                                     <Link
-                                        key={art.id}
+                                        key={`${art.id}-${i}`}
                                         to={art.is_live ? `/article/live/${art.slug}` : `/article/${art.slug}`}
                                         className="news-ticker-item"
                                     >
