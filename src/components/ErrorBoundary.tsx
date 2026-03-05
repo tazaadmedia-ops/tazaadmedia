@@ -26,19 +26,24 @@ class ErrorBoundary extends Component<Props, State> {
         const errorMessage = error.toString().toLowerCase();
         if (
             errorMessage.includes('failed to fetch dynamically imported module') ||
-            errorMessage.includes('chunkloaderror')
+            errorMessage.includes('chunkloaderror') ||
+            errorMessage.includes('loading chunk') ||
+            errorMessage.includes('failed to load')
         ) {
-            console.warn('Dynamic import failure detected. Reloading page...');
-            window.location.reload();
+            console.warn('Dynamic import failure detected. Attempting to force reload...');
+            // Optional: Use a short timeout to prevent infinite rapid reloads
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         }
     }
 
     public render() {
         if (this.state.hasError) {
             return (
-                <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif' }}>
-                    <h1>Something went wrong.</h1>
-                    <p style={{ color: 'red', backgroundColor: '#fee', padding: '1rem', borderRadius: '4px', maxWidth: '800px', margin: '1rem auto' }}>
+                <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif', direction: 'ltr' }}>
+                    <h1 style={{ marginBottom: '1.5rem' }}>Something went wrong.</h1>
+                    <p style={{ color: 'red', backgroundColor: '#fee', padding: '1rem', borderRadius: '4px', maxWidth: '800px', margin: '1rem auto', fontSize: '0.9rem', wordBreak: 'break-all' }}>
                         {this.state.error?.toString()}
                     </p>
                     <button
