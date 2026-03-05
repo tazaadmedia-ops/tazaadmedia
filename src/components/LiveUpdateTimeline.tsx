@@ -7,6 +7,7 @@ export interface LiveUpdate {
     title: string | null;
     content: string; // HTML from rich text
     media_url: string | null;
+    video_url: string | null;
     published_at: string;
     is_pinned: boolean;
 }
@@ -48,6 +49,27 @@ const getTweetId = (url: string) => {
     const match = url.match(/(?:\/|status\/)(\d+)(?:\/|\?|$)/);
     return match ? match[1] : null;
 };
+
+const getVideoData = (url: string) => {
+    if (!url) return null;
+
+    // YouTube
+    const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    if (ytMatch) return { type: 'youtube', id: ytMatch[1] };
+
+    // Vimeo
+    const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/);
+    if (vimeoMatch) return { type: 'vimeo', id: vimeoMatch[1] };
+
+    // Facebook Video
+    if (url.includes('facebook.com') && url.includes('videos')) return { type: 'facebook', url };
+
+    // Direct Video (mp4, webm, mov)
+    if (url.match(/\.(mp4|webm|mov|ogg)($|\?)/i)) return { type: 'direct', url };
+
+    return null;
+};
+village
 
 const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false, newlyAddedIds = new Set() }) => {
     const [openShareMenuId, setOpenShareMenuId] = useState<string | null>(null);
@@ -161,6 +183,59 @@ const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLive
                                 <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#111827', marginBottom: '1rem', lineHeight: 1.4 }}>
                                     {update.title}
                                 </h3>
+                            )}
+
+                            {/* Video Player - Shown after title */}
+                            {update.video_url && (
+                                <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#000' }}>
+                                    {(() => {
+                                        const video = getVideoData(update.video_url || '');
+                                        if (!video) return null;
+
+                                        if (video.type === 'youtube') {
+                                            return (
+                                                <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+                                                    <iframe
+                                                        src={`https://www.youtube.com/embed/${video.id}`}
+                                                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                                                        frameBorder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                        allowFullScreen
+                                                        title="YouTube video"
+                                                    ></iframe>
+                                                </div>
+                                            );
+                                        }
+
+                                        if (video.type === 'vimeo') {
+                                            return (
+                                                <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+                                                    <iframe
+                                                        src={`https://player.vimeo.com/video/${video.id}`}
+                                                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                                                        frameBorder="0"
+                                                        allow="autoplay; fullscreen; picture-in-picture"
+                                                        allowFullScreen
+                                                        title="Vimeo video"
+                                                    ></iframe>
+                                                </div>
+                                            );
+                                        }
+
+                                        if (video.type === 'direct') {
+                                            return (
+                                                <video
+                                                    src={video.url}
+                                                    controls
+                                                    playsInline
+                                                    style={{ width: '100%', display: 'block' }}
+                                                />
+                                            );
+                                        }
+
+                                        return null;
+                                    })()}
+                                </div>
                             )}
 
                             {/* Render rich text content safely */}

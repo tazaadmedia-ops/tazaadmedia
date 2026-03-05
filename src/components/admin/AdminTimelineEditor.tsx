@@ -25,6 +25,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [mediaUrl, setMediaUrl] = useState('');
+    const [videoUrl, setVideoUrl] = useState('');
     const [isPinned, setIsPinned] = useState(false);
 
     // File upload ref
@@ -61,6 +62,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
         setTitle('');
         setContent('');
         setMediaUrl('');
+        setVideoUrl('');
         setIsPinned(false);
         setIsOpen(true);
     };
@@ -96,6 +98,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
         setTitle(update.title || '');
         setContent(update.content || '');
         setMediaUrl(update.media_url || '');
+        setVideoUrl(update.video_url || '');
         setIsPinned(update.is_pinned || false);
         setIsOpen(true);
     };
@@ -128,6 +131,7 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
             title,
             content,
             media_url: mediaUrl,
+            video_url: videoUrl,
             is_pinned: isPinned,
         };
 
@@ -209,14 +213,15 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                                 style={{ display: 'none' }}
                                 onChange={handleImageUpload}
                             />
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                disabled={isSubmitting}
-                                style={{ padding: '0 16px', backgroundColor: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', fontFamily: 'var(--font-main)' }}
-                            >
-                                {isSubmitting ? 'uploading...' : 'تصوير اپلوڊ'}
                             </button>
                         </div>
+
+                        {/* Video URL */}
+                        <input
+                            value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
+                            placeholder="وڊيو لنڪ (YouTube يا Direct Video URL)"
+                            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', width: '100%', fontSize: '0.9rem', fontFamily: 'var(--font-main)' }}
+                        />
 
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, color: '#374151', fontFamily: 'var(--font-main)' }}>
                             <input
@@ -270,47 +275,50 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                         </button>
                     </div>
                 </div>
-            )}
+    )
+}
 
-            {/* List of Updates */}
-            {loading ? (
-                <div style={{ textAlign: 'center', padding: '2rem' }}><Loader className="animate-spin text-gray-400" /></div>
-            ) : updates.length === 0 && !isOpen ? (
-                <div style={{ textAlign: 'center', padding: '2rem', backgroundColor: '#f9fafb', borderRadius: '8px', color: '#6b7280' }}>
-                    ڪا به اپڊيٽ موجود ناهي. پھريون شامل ڪريو.
-                </div>
-            ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {updates.map(update => (
-                        <div key={update.id} style={{ display: 'flex', gap: '1rem', padding: '1.25rem', backgroundColor: 'white', border: `1px solid ${update.is_pinned ? '#fecaca' : '#e5e7eb'}`, borderRadius: '8px', position: 'relative' }}>
-                            {update.is_pinned && <Pin size={16} color="#dc2626" style={{ position: 'absolute', top: '10px', left: '10px' }} />}
-                            <div style={{ flexGrow: 1 }}>
-                                <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.5rem' }}>
-                                    {format(new Date(update.published_at), 'MMM dd, yyyy HH:mm')}
-                                </div>
-                                {update.title && <h5 style={{ margin: '0 0 0.5rem 0', fontWeight: 700, fontSize: '1.1rem' }}>{update.title}</h5>}
-                                <div style={{ color: '#374151', fontSize: '0.95rem', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-main)' }} dangerouslySetInnerHTML={{ __html: update.content }} />
-                                {update.media_url && (
-                                    <div style={{ marginTop: '10px' }}>
-                                        {getTweetId(update.media_url) ? (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1d9bf0', fontSize: '0.85rem', fontWeight: 600, backgroundColor: '#f0f9ff', padding: '4px 8px', borderRadius: '4px', width: 'fit-content' }}>
-                                                <Twitter size={14} /> Twitter Tweet
-                                            </div>
-                                        ) : (
-                                            <img src={update.media_url} style={{ maxHeight: '100px', borderRadius: '4px' }} alt="update media" />
-                                        )}
+{/* List of Updates */ }
+{
+    loading ? (
+        <div style={{ textAlign: 'center', padding: '2rem' }}><Loader className="animate-spin text-gray-400" /></div>
+    ) : updates.length === 0 && !isOpen ? (
+        <div style={{ textAlign: 'center', padding: '2rem', backgroundColor: '#f9fafb', borderRadius: '8px', color: '#6b7280' }}>
+            ڪا به اپڊيٽ موجود ناهي. پھريون شامل ڪريو.
+        </div>
+    ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {updates.map(update => (
+                <div key={update.id} style={{ display: 'flex', gap: '1rem', padding: '1.25rem', backgroundColor: 'white', border: `1px solid ${update.is_pinned ? '#fecaca' : '#e5e7eb'}`, borderRadius: '8px', position: 'relative' }}>
+                    {update.is_pinned && <Pin size={16} color="#dc2626" style={{ position: 'absolute', top: '10px', left: '10px' }} />}
+                    <div style={{ flexGrow: 1 }}>
+                        <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.5rem' }}>
+                            {format(new Date(update.published_at), 'MMM dd, yyyy HH:mm')}
+                        </div>
+                        {update.title && <h5 style={{ margin: '0 0 0.5rem 0', fontWeight: 700, fontSize: '1.1rem' }}>{update.title}</h5>}
+                        <div style={{ color: '#374151', fontSize: '0.95rem', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-main)' }} dangerouslySetInnerHTML={{ __html: update.content }} />
+                        {update.media_url && (
+                            <div style={{ marginTop: '10px' }}>
+                                {getTweetId(update.media_url) ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1d9bf0', fontSize: '0.85rem', fontWeight: 600, backgroundColor: '#f0f9ff', padding: '4px 8px', borderRadius: '4px', width: 'fit-content' }}>
+                                        <Twitter size={14} /> Twitter Tweet
                                     </div>
+                                ) : (
+                                    <img src={update.media_url} style={{ maxHeight: '100px', borderRadius: '4px' }} alt="update media" />
                                 )}
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '1rem', borderRight: '1px solid #f3f4f6' }}>
-                                <button onClick={() => handleEdit(update)} title="Edit" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4b5563', padding: '4px' }}><Edit2 size={16} /></button>
-                                <button onClick={() => handleDelete(update.id)} title="Delete" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', padding: '4px' }}><Trash2 size={16} /></button>
-                            </div>
-                        </div>
-                    ))}
+                        )}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '1rem', borderRight: '1px solid #f3f4f6' }}>
+                        <button onClick={() => handleEdit(update)} title="Edit" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4b5563', padding: '4px' }}><Edit2 size={16} /></button>
+                        <button onClick={() => handleDelete(update.id)} title="Delete" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', padding: '4px' }}><Trash2 size={16} /></button>
+                    </div>
                 </div>
-            )}
+            ))}
         </div>
+    )
+}
+        </div >
     );
 };
 
