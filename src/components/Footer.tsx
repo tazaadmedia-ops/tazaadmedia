@@ -57,17 +57,15 @@ const Footer: React.FC = () => {
 
                     <div style={{ flex: 1 }}>
                         {/* Legal Links Row */}
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', color: '#888', fontSize: '0.8rem', fontWeight: 600 }}>
+                        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', color: '#888', fontSize: '0.8rem', fontWeight: 600 }}>
                             <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>پرائيويسي پاليسي</Link>
-                            <span>|</span>
                             <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>شرط ۽ ضابطا</Link>
-                            <span>|</span>
                             <Link to="/sitemap" style={{ color: 'inherit', textDecoration: 'none' }}>سائيٽ ميپ</Link>
                         </div>
 
                         {/* Copyright */}
                         <p style={{ color: '#666', fontSize: '0.8rem', marginBottom: '0.5rem', fontWeight: 500 }}>
-                            Tazaad.com © 2026. All Rights Reserved.
+                            تضاد © 2026. سڀ حق محفوظ آهن.
                         </p>
                         <p style={{ color: '#555', fontSize: '0.75rem', maxWidth: '500px', lineHeight: 1.4 }}>
                             هي سائيٽ محفوظ آهي ۽ پرائيويسي پاليسي ۽ شرطن جي تحت ڪم ڪري رهي آهي.
@@ -76,8 +74,10 @@ const Footer: React.FC = () => {
 
                     {/* Footer Logo */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-                        <SafeImage src={wordmark} alt="Tazaad Wordmark" style={{ height: '30px', filter: 'brightness(0) invert(1)' }} />
-                        <span style={{ color: '#444', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em' }}>SINDHI EDITORIAL</span>
+                        <div style={{ height: '30px', display: 'flex', alignItems: 'center' }}>
+                            <SafeImage src={wordmark} alt="تضاد" style={{ height: '30px', filter: 'brightness(0) invert(1)' }} />
+                        </div>
+                        <span style={{ color: '#444', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em' }}>سنڌي ايڊيٽوريل</span>
                     </div>
 
                 </div>

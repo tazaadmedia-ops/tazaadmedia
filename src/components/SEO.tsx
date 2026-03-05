@@ -37,8 +37,8 @@ const SEO: React.FC<SEOProps> = ({
         }
     }
 
-    const baseTitle = "Tazaad - Sindhi";
-    const fullTitle = title === baseTitle ? title : `${title} | ${baseTitle}`;
+    const baseTitle = "تضاد - سنڌي";
+    const fullTitle = title === "هوم" || title === "Home" || title === baseTitle ? baseTitle : `${title} - ${baseTitle}`;
 
     // Base Schema
     const baseSchema: any = {
