@@ -143,8 +143,8 @@ const LiveArticlePage: React.FC = () => {
         setPendingUpdates([]);
     }, [pendingUpdates]);
 
-    if (loading) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}><LoadingSpinner /></div>;
-    if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
+    if (loading) return <div className="container page-top-margin" style={{ textAlign: 'center' }}><LoadingSpinner /></div>;
+    if (!article) return <div className="container page-top-margin" style={{ textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
 
     // Redirect to normal article page if the live blog has ended
     if (article.is_live === false) {
@@ -204,7 +204,7 @@ const LiveArticlePage: React.FC = () => {
                 </div>
             )}
 
-            <div className="container" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: '1fr', gap: '3rem', paddingTop: article.featured_image_url ? '0' : '4rem' }}>
+            <div className="container page-top-margin" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: '1fr', gap: '3rem', paddingTop: article.featured_image_url ? '0' : undefined }}>
                 <div>
                     {/* Header Content Below Image */}
                     <div style={{ marginBottom: '2.5rem', textAlign: 'right', direction: 'rtl' }}>

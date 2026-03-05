@@ -45,7 +45,7 @@ const SearchPage: React.FC = () => {
     }, [query]);
 
     return (
-        <div className="container" style={{ marginTop: '2rem', fontFamily: 'var(--font-main)', direction: 'rtl' }}>
+        <div className="container page-top-margin" style={{ fontFamily: 'var(--font-main)', direction: 'rtl' }}>
             <header style={{ borderBottom: '1px solid #eee', paddingBottom: '1rem', marginBottom: '3rem' }}>
                 <h1 style={{ fontSize: '2rem', fontWeight: 900 }}>ڳولا جا نتيجا: "{query}"</h1>
                 <p style={{ color: '#666' }}>{articles.length} مضمون مليل</p>

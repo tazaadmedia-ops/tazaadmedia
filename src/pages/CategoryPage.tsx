@@ -61,7 +61,7 @@ const CategoryPage: React.FC = () => {
     if (loading) return <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}><LoadingSpinner /></div>;
 
     return (
-        <div className="container" style={{ marginTop: '2rem', fontFamily: 'var(--font-main)', direction: 'rtl' }}>
+        <div className="container page-top-margin" style={{ fontFamily: 'var(--font-main)', direction: 'rtl' }}>
             <SEO
                 title={`${displayName} | News`}
                 description={`Latest articles in ${displayName}`}

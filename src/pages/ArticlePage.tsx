@@ -173,7 +173,7 @@ const ArticlePage: React.FC = () => {
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>مضمون نہ مليو</div>;
 
     return (
-        <article className="container article-page-container" style={{ marginTop: '2.5rem', fontFamily: 'var(--font-main)' }}>
+        <article className="container article-page-container page-top-margin" style={{ fontFamily: 'var(--font-main)' }}>
             <SEO
                 title={article.title}
                 description={article.subdeck || article.title}
