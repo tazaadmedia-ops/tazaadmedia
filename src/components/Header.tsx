@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Search, Facebook, Instagram, Twitter } from 'lucide-react';
 
@@ -11,10 +11,11 @@ const Header: React.FC = () => {
     const [menuItems, setMenuItems] = useState<any[]>([
         { to: "/", label: "هوم", alwaysShow: true }
     ]);
-    const [searchText, setSearchText] = useState('');
+    const [tickerArticles, setTickerArticles] = useState<any[]>([]);
 
     useEffect(() => {
         fetchCategories();
+        fetchTickerArticles();
     }, []);
 
     const fetchCategories = async () => {
@@ -56,10 +57,15 @@ const Header: React.FC = () => {
         }
     };
 
-    const handleSearch = () => {
-        if (searchText.trim()) {
-            navigate(`/search?q=${encodeURIComponent(searchText)}`);
-        }
+    const fetchTickerArticles = async () => {
+        const { data } = await supabase
+            .from('articles')
+            .select('title, slug, id, is_live')
+            .eq('status', 'published')
+            .order('published_at', { ascending: false })
+            .limit(5);
+
+        if (data) setTickerArticles(data);
     };
 
     return (
@@ -68,20 +74,20 @@ const Header: React.FC = () => {
             position: 'sticky',
             top: 0,
             zIndex: 1000,
-            direction: 'rtl',
-            borderBottom: '1px solid #eee'
+            direction: 'rtl'
         }}>
+            {/* --- TOP BAR (WHITE) --- */}
             <div className="container" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                height: '70px',
+                height: '65px',
                 width: '100%'
             }}>
-                {/* Logo Section */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                {/* Right Area: Logo + Nav */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                     <NavLink to="/" aria-label="هوم" style={{ display: 'flex', alignItems: 'center' }}>
-                        <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '36px', width: 'auto' }}>
+                        <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '34px', width: 'auto' }}>
                             <path fill="#B70100" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
                             <path fill="#B70100" d="M22.3,3.4v21.5h7v-10.2h4.3s.2,2.7.2,2.7c4.4-5.8,14-5.2,16.1,2.3s.1,5.2,1.9,5.2h40.7v-10.2h4.3v14.5h-44.7c-.4,0-2.3-1.5-2.7-1.9-.5.6-2.5,1.9-3.1,1.9h-28.3V3.4h4.3ZM45.7,24.9c2-10.8-11-8.7-12.1,0h12.1Z" />
                             <path fill="#B70100" d="M111.3,33.1c0,0,.5.6,0,.2-5.8-7.7,5-13.7,5.4-21.3l1,2.1c1.7,5.4-2.9,9.2-5.2,13.5s-1.2,2.6-1.2,3.0c0,.8,0,1.7,0,2.5Z" />
@@ -93,89 +99,80 @@ const Header: React.FC = () => {
                         </svg>
                     </NavLink>
 
-                    {/* Desktop Navigation */}
-                    <nav className="nav-scroll hide-mobile" style={{ marginRight: '1.5rem' }}>
+                    {/* Navigation - Compressed */}
+                    <nav className="nav-scroll hide-mobile" style={{ marginRight: '1rem' }}>
                         {menuItems.map((item) => (
                             <NavMenuItem
                                 key={item.to}
                                 to={item.to}
                                 label={item.label}
-                                active={location.pathname === item.to || location.pathname.startsWith(item.to + '/')}
+                                active={location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))}
                             />
                         ))}
                     </nav>
                 </div>
 
-                {/* Search and Social Section */}
-                <div className="flex-center">
+                {/* Left Area: Socials + Search Icon */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div className="header-socials">
-                        <span className="social-username hide-mobile">@thetazaad</span>
                         <a href="https://facebook.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Facebook">
-                            <Facebook size={18} />
+                            <Facebook size={19} fill="currentColor" strokeWidth={0} />
                         </a>
                         <a href="https://instagram.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Instagram">
-                            <Instagram size={18} />
+                            <Instagram size={19} strokeWidth={2.5} />
                         </a>
                         <a href="https://twitter.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
-                            <Twitter size={18} />
+                            <Twitter size={19} fill="currentColor" strokeWidth={0} />
                         </a>
                     </div>
 
-                    <div className="search-container search-container-header" style={{ position: 'relative', maxWidth: '200px', width: '100%', marginRight: '1rem' }}>
-                        <input
-                            type="text"
-                            aria-label="ڳولا"
-                            placeholder="ڳولا..."
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSearch();
-                            }}
-                            style={{
-                                width: '100%',
-                                padding: '6px 35px 6px 10px',
-                                borderRadius: '4px',
-                                border: '1px solid #eee',
-                                outline: 'none',
-                                fontSize: '14px',
-                                backgroundColor: '#f5f5f5',
-                                color: '#333',
-                                fontFamily: 'var(--font-main)'
-                            }}
-                        />
-                        <button
-                            onClick={handleSearch}
-                            aria-label="ڳوليو"
-                            style={{
-                                position: 'absolute',
-                                right: '4px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                background: 'none',
-                                border: 'none',
-                                padding: '6px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                color: '#666'
-                            }}
-                        >
-                            <Search size={16} />
-                        </button>
+                    <button
+                        onClick={() => navigate('/search')}
+                        aria-label="ڳوليو"
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            color: '#333'
+                        }}
+                    >
+                        <Search size={22} strokeWidth={2.5} />
+                    </button>
+                </div>
+            </div>
+
+            {/* --- BOTTOM BAR (RED NEWS TICKER) --- */}
+            <div className="news-ticker-bar">
+                <div className="news-ticker-label">تازيون خبرون</div>
+                <div className="news-ticker-container">
+                    <div className="news-ticker-content">
+                        {tickerArticles.map((art, idx) => (
+                            <Link
+                                key={art.id}
+                                to={art.is_live ? `/article/live/${art.slug}` : `/article/${art.slug}`}
+                                className="news-ticker-item"
+                            >
+                                {art.title}
+                                {idx < tickerArticles.length - 1 && <span style={{ margin: '0 1rem', opacity: 0.5 }}>|</span>}
+                            </Link>
+                        ))}
+                        {/* Duplicate content for seamless loop if needed, but flex wrap/ticker works better with offset */}
                     </div>
                 </div>
             </div>
 
-            {/* Mobile Navigation (Scrollable Bar) */}
-            <div className="show-mobile" style={{ borderTop: '1px solid #f9f9f9', padding: '5px 0' }}>
+            {/* Mobile Scrollable Nav (optional secondary bar) */}
+            <div className="show-mobile" style={{ borderTop: '1px solid #f0f0f0', backgroundColor: '#fff', padding: '5px 0' }}>
                 <nav className="nav-scroll">
                     {menuItems.map((item) => (
                         <NavMenuItem
                             key={item.to}
                             to={item.to}
                             label={item.label}
-                            active={location.pathname === item.to || location.pathname.startsWith(item.to + '/')}
+                            active={location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))}
                         />
                     ))}
                 </nav>
@@ -184,10 +181,11 @@ const Header: React.FC = () => {
     );
 };
 
-const NavMenuItem: React.FC<{ to: string; label: string; active: boolean }> = ({ to, label }) => (
+const NavMenuItem: React.FC<{ to: string; label: string; active: boolean }> = ({ to, label, active }) => (
     <NavLink
         to={to}
-        className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+        className={active ? "nav-link active" : "nav-link"}
+        style={{ fontWeight: 800, color: active ? 'var(--color-accent)' : '#111' }}
     >
         {label}
     </NavLink>
