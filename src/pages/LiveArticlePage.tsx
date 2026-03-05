@@ -272,7 +272,10 @@ const LiveArticlePage: React.FC = () => {
                                 }}
                             >
                                 <RefreshCw size={18} className="animate-spin-slow" />
-                                {pendingUpdates.length} نيون اپڊيٽس ڏسو
+                                {pendingUpdates.length === 1
+                                    ? `[${pendingUpdates.length}] نئين اپڊيٽ ڏسو`
+                                    : `[${pendingUpdates.length}] نيون اپڊيٽس ڏسو`
+                                }
                             </button>
                         </div>
                     )}
