@@ -437,6 +437,14 @@ img {
   border-bottom: 3px solid var(--color-accent);
 }
 
+.show-mobile {
+  display: none !important;
+}
+
+.mobile-menu-overlay {
+  display: none !important;
+}
+
 /* Mobile Overrides */
 @media (max-width: 768px) {
   .nav-scroll {
@@ -469,14 +477,6 @@ img {
   }
 
   .hide-desktop {
-    display: none !important;
-  }
-
-  .show-mobile {
-    display: none !important;
-  }
-
-  .mobile-menu-overlay {
     display: none !important;
   }
 
