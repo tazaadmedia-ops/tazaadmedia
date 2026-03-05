@@ -262,7 +262,7 @@ const LiveArticlePage: React.FC = () => {
                     </div>
 
                     {pendingUpdates.length > 0 && (
-                        <div style={{ display: 'flex', justifyContent: 'center', position: 'sticky', top: '20px', zIndex: 100, marginBottom: '1rem' }}>
+                        <div style={{ position: 'fixed', top: '100px', left: '50%', transform: 'translateX(-50%)', zIndex: 2000 }}>
                             <button
                                 onClick={handleShowPending}
                                 style={{
