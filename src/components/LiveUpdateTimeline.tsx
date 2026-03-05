@@ -69,7 +69,6 @@ const getVideoData = (url: string) => {
 
     return null;
 };
-village
 
 const LiveUpdateTimeline: React.FC<LiveUpdateTimelineProps> = ({ updates, isLiveProfile = false, newlyAddedIds = new Set() }) => {
     const [openShareMenuId, setOpenShareMenuId] = useState<string | null>(null);
