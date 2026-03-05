@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Search, Facebook, Instagram, Twitter } from 'lucide-react';
+import { Search, Facebook, Instagram, Twitter, Menu, X } from 'lucide-react';
 
 const Header: React.FC = () => {
     const location = useLocation();
@@ -11,6 +11,7 @@ const Header: React.FC = () => {
     ]);
     const [tickerArticles, setTickerArticles] = useState<any[]>([]);
     const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         fetchCategories();
@@ -25,6 +26,11 @@ const Header: React.FC = () => {
             return () => clearInterval(timer);
         }
     }, [tickerArticles]);
+
+    // Close menu on route change
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [location]);
 
     const fetchCategories = async () => {
         const { data: articles } = await supabase
@@ -91,8 +97,25 @@ const Header: React.FC = () => {
                 height: '65px',
                 width: '100%'
             }}>
-                {/* Right Area: Logo + Nav */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                {/* Right Area: Menu Button (Mobile) + Logo + Nav (Desktop) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <button
+                        className="show-mobile"
+                        onClick={() => setIsMenuOpen(true)}
+                        aria-label="مينيو"
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: '8px',
+                            cursor: 'pointer',
+                            color: '#111',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Menu size={24} strokeWidth={2.5} />
+                    </button>
+
                     <NavLink to="/" aria-label="هوم" style={{ display: 'flex', alignItems: 'center' }}>
                         <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '34px', width: 'auto' }}>
                             <path fill="#B70100" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
@@ -106,7 +129,7 @@ const Header: React.FC = () => {
                         </svg>
                     </NavLink>
 
-                    {/* Navigation - Compressed */}
+                    {/* Navigation - Compressed (Desktop) */}
                     <nav className="nav-scroll hide-mobile" style={{ marginRight: '1rem' }}>
                         {menuItems.map((item) => (
                             <NavMenuItem
@@ -121,7 +144,7 @@ const Header: React.FC = () => {
 
                 {/* Left Area: Socials + Search Icon */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div className="header-socials">
+                    <div className="header-socials hide-mobile">
                         <a href="https://facebook.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Facebook">
                             <Facebook size={19} fill="currentColor" strokeWidth={0} />
                         </a>
@@ -178,18 +201,40 @@ const Header: React.FC = () => {
                 </div>
             </div>
 
-            {/* Mobile Scrollable Nav */}
-            <div className="show-mobile" style={{ borderTop: '1px solid #f0f0f0', backgroundColor: '#fff', padding: '5px 0' }}>
-                <nav className="nav-scroll">
-                    {menuItems.map((item) => (
-                        <NavMenuItem
-                            key={item.to}
-                            to={item.to}
-                            label={item.label}
-                            active={location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))}
-                        />
-                    ))}
-                </nav>
+            {/* --- MOBILE DRAWER MENU --- */}
+            <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}>
+                <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="mobile-menu-header">
+                        <span style={{ fontWeight: 800, fontSize: '1.2rem' }}>مينيو</span>
+                        <button onClick={() => setIsMenuOpen(false)} aria-label="بند ڪريو">
+                            <X size={28} />
+                        </button>
+                    </div>
+
+                    <nav className="mobile-menu-nav">
+                        {menuItems.map((item) => (
+                            <NavLink
+                                key={item.to}
+                                to={item.to}
+                                className={({ isActive }) => isActive ? "mobile-nav-link active" : "mobile-nav-link"}
+                            >
+                                {item.label}
+                            </NavLink>
+                        ))}
+                    </nav>
+
+                    <div className="mobile-menu-socials">
+                        <a href="https://facebook.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <Facebook fill="currentColor" strokeWidth={0} />
+                        </a>
+                        <a href="https://instagram.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <Instagram />
+                        </a>
+                        <a href="https://twitter.com/thetazaad" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                            <Twitter fill="currentColor" strokeWidth={0} />
+                        </a>
+                    </div>
+                </div>
             </div>
         </header>
     );
