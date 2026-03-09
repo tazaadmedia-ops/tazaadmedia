@@ -284,7 +284,7 @@ const Header: React.FC = () => {
                         bottom: 0,
                         right: 0,
                         height: '3px',
-                        backgroundColor: '#fff',
+                        backgroundColor: '#ffd140',
                         width: `${scrollProgress}%`,
                         transition: 'width 0.1s ease-out',
                         opacity: scrollProgress > 0 ? 1 : 0,
