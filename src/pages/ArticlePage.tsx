@@ -11,6 +11,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import { RelatedArticle } from '../extensions/RelatedArticle';
 import { Twitter } from '../extensions/Twitter';
 import SEO from '../components/SEO';
+import SafeImage from '../components/SafeImage';
 import LiveUpdateTimeline from '../components/LiveUpdateTimeline';
 import type { LiveUpdate } from '../components/LiveUpdateTimeline';
 
@@ -244,7 +245,14 @@ const ArticlePage: React.FC = () => {
             {/* Featured Image */}
             {article.featured_image_url && (
                 <div style={{ marginBottom: '1rem', width: '100%', maxWidth: '1080px', margin: '0 auto 1rem auto' }}>
-                    <img src={article.featured_image_url} alt={article.title} fetchPriority="high" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }} />
+                    <SafeImage
+                        src={article.featured_image_url}
+                        alt={article.title}
+                        fetchPriority="high"
+                        width="1200"
+                        height="675"
+                        style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }}
+                    />
                     {article.featured_image_caption && (
                         <figcaption className="featured-image-caption">
                             {article.featured_image_caption}
@@ -276,22 +284,25 @@ const ArticlePage: React.FC = () => {
             {/* Related Articles Section */}
             {relatedArticles.length > 0 && (
                 <div style={{ maxWidth: '800px', margin: '4rem auto 2rem' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
                         وڌيڪ پڙهو {categoryName}
-                    </h3>
+                    </h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '2rem' }}>
                         {relatedArticles.map((rel) => (
                             <Link key={rel.id} to={`/article/${rel.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <div style={{ aspectRatio: '16/9', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
-                                    {rel.featured_image_url ? (
-                                        <img src={rel.featured_image_url} alt={rel.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' }}>No Image</div>
-                                    )}
+                                    <SafeImage
+                                        src={rel.featured_image_url}
+                                        alt={rel.title}
+                                        width="600"
+                                        height="338"
+                                        loading="lazy"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
                                 </div>
-                                <h4 style={{ fontSize: '1rem', fontWeight: 700, lineHeight: 1.3, color: '#111' }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 700, lineHeight: 1.3, color: '#111' }}>
                                     {rel.title}
-                                </h4>
+                                </h3>
                             </Link>
                         ))}
                     </div>

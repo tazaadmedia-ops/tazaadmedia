@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 
 interface SafeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     fallbackText?: string;
+    width?: string | number;
+    height?: string | number;
 }
 
-const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, ...props }) => {
+const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, width, height, ...props }) => {
     const [error, setError] = useState(false);
 
     if (error || !src) {
@@ -41,17 +43,26 @@ const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, ..
         );
     }
 
+    // Optimize Supabase images if width is provided
+    let optimizedSrc = src;
+    if (optimizedSrc && optimizedSrc.includes('supabase.co') && !optimizedSrc.includes('?') && width) {
+        optimizedSrc = `${optimizedSrc}?width=${width}&quality=80`;
+    }
+
     return (
         <img
-            src={src}
+            src={optimizedSrc}
             alt={alt}
+            width={width}
+            height={height}
             style={{
                 ...style,
                 borderRadius: '0',
                 display: 'block',
                 userSelect: 'none',
                 WebkitUserSelect: 'none',
-                pointerEvents: 'auto'
+                pointerEvents: 'auto',
+                aspectRatio: (width && height) ? `${width}/${height}` : undefined
             } as any}
             onError={() => setError(true)}
             {...props}

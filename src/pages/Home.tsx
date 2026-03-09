@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
+import SafeImage from '../components/SafeImage';
 
 
 
@@ -115,7 +116,14 @@ const Home: React.FC = () => {
                             <div style={{ position: 'relative' }}>
                                 <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#eee', borderRadius: '0', marginBottom: '0.75rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {heroStory.featured_image_url ? (
-                                        <img src={heroStory.featured_image_url} alt={heroStory.title} fetchPriority="high" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <SafeImage
+                                            src={heroStory.featured_image_url}
+                                            alt={heroStory.title}
+                                            fetchPriority="high"
+                                            width="1200"
+                                            height="675"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
                                     ) : (
                                         <span style={{ color: '#999' }}>No Image</span>
                                     )}
@@ -149,7 +157,7 @@ const Home: React.FC = () => {
                         <div key={story.id}>
                             <Link to={getArticleLink(story)}>
                                 <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.5rem', overflow: 'hidden' }}>
-                                    {story.featured_image_url && <img src={story.featured_image_url} alt={story.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                    <SafeImage src={story.featured_image_url} alt={story.title} width="600" height="375" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                                 <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
                                     {story.is_live ? <LiveBadge /> : getCategory(story)}
@@ -210,11 +218,14 @@ const Home: React.FC = () => {
                             {sectionArticles.map(story => (
                                 <Link key={story.id} to={getArticleLink(story)}>
                                     <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f9f9f9', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
-                                        {story.featured_image_url ? (
-                                            <img src={story.featured_image_url} alt={story.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ddd', fontSize: '0.8rem' }}>No Image</div>
-                                        )}
+                                        <SafeImage
+                                            src={story.featured_image_url}
+                                            alt={story.title}
+                                            width="600"
+                                            height="375"
+                                            loading="lazy"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
                                     </div>
                                     {story.is_live && <div style={{ marginBottom: '0.25rem', fontSize: '0.7rem' }}><LiveBadge /></div>}
                                     <h3 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', color: '#111' }}>
