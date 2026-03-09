@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NavLink, useLocation, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Search, Facebook, Instagram, Twitter, Menu, X } from 'lucide-react';
@@ -26,6 +26,7 @@ const Header: React.FC = () => {
 
     const [scrollProgress, setScrollProgress] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);
+    const lastScrollY = useRef(0);
 
 
     useEffect(() => {
@@ -36,7 +37,18 @@ const Header: React.FC = () => {
     useEffect(() => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
-            setIsScrolled(currentScrollY > 100);
+
+            if (currentScrollY <= 100) {
+                setIsScrolled(false);
+            } else if (currentScrollY > lastScrollY.current) {
+                // Scrolling down
+                setIsScrolled(true);
+            } else {
+                // Scrolling up
+                setIsScrolled(false);
+            }
+
+            lastScrollY.current = currentScrollY <= 0 ? 0 : currentScrollY;
 
             // Note: The second check is for the "short slug" URLs like /slug-name
             if (isArticlePage) {
@@ -55,6 +67,7 @@ const Header: React.FC = () => {
         handleScroll();
         return () => window.removeEventListener('scroll', handleScroll);
     }, [location.pathname, isArticlePage]);
+
 
 
     useEffect(() => {
