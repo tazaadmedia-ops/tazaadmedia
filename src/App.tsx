@@ -14,6 +14,7 @@ const ArticleEditor = lazy(() => import('./pages/admin/ArticleEditor'));
 const Authors = lazy(() => import('./pages/admin/Authors'));
 const Categories = lazy(() => import('./pages/admin/Categories'));
 const Reports = lazy(() => import('./pages/admin/Reports'));
+const SiteSettings = lazy(() => import('./pages/admin/SiteSettings'));
 const About = lazy(() => import('./pages/About'));
 const Submit = lazy(() => import('./pages/Submit'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -37,6 +38,7 @@ function App() {
             <Route path="/admin/authors" element={<Authors />} />
             <Route path="/admin/categories" element={<Categories />} />
             <Route path="/admin/reports" element={<Reports />} />
+            <Route path="/admin/settings" element={<SiteSettings />} />
             <Route path="/admin/edit/:id" element={<ArticleEditor />} />
             <Route path="/admin/new" element={<ArticleEditor />} />
           </Route>

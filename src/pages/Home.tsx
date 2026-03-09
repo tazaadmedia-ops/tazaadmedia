@@ -25,7 +25,8 @@ const Home: React.FC = () => {
         const { data: categories } = await supabase
             .from('categories')
             .select('id, name, slug')
-            .order('name');
+            .eq('is_visible_on_home', true)
+            .order('created_at', { ascending: true }); // Chronological order
 
         if (categories) {
             setSections(categories.map(c => ({

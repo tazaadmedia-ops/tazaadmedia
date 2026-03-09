@@ -21,7 +21,7 @@ const Header: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
-        fetchCategories();
+        fetchNavbarData();
         fetchTickerArticles();
     }, []);
 
@@ -89,48 +89,40 @@ const Header: React.FC = () => {
         }
     };
 
-    const fetchCategories = async () => {
-        const { data: articles } = await supabase
-            .from('articles')
-            .select(`
-                primary_category_id,
-                categories (
-                    id,
-                    name,
-                    slug,
-                    created_at
-                )
-            `)
-            .eq('status', 'published');
+    const fetchNavbarData = async () => {
+        // Fetch Settings
+        const { data: settingsData } = await supabase
+            .from('site_settings')
+            .select('key, value');
 
-        if (articles) {
-            const uniqueCategoriesMap = new Map();
-            articles.forEach((article: any) => {
-                const cat = article.categories;
-                if (cat && cat.id) {
-                    uniqueCategoriesMap.set(cat.id, cat);
-                }
+        const showAbout = settingsData?.find(s => s.key === 'show_about_in_navbar')?.value ?? true;
+
+        // Fetch Categories
+        const { data: categories } = await supabase
+            .from('categories')
+            .select('id, name, slug, display_order')
+            .eq('is_visible_on_navbar', true)
+            .order('display_order', { ascending: true });
+
+        const items = [
+            { to: "/", label: "هوم", id: 'home' }
+        ];
+
+        if (categories) {
+            categories.forEach(cat => {
+                items.push({
+                    to: `/topic/${cat.slug}`,
+                    label: cat.name,
+                    id: cat.id
+                });
             });
-
-            const uniqueCategories = Array.from(uniqueCategoriesMap.values());
-            // Sort chronologically by created_at
-            uniqueCategories.sort((a, b) => {
-                const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-                const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-                return dateA - dateB;
-            });
-
-            const dynItems = uniqueCategories.map(cat => ({
-                to: `/topic/${cat.slug}`,
-                label: cat.name,
-                id: cat.id
-            }));
-
-            setMenuItems([
-                { to: "/", label: "هوم", id: 'home' },
-                ...dynItems
-            ]);
         }
+
+        if (showAbout) {
+            items.push({ to: "/about", label: "اسان بابت", id: 'about' });
+        }
+
+        setMenuItems(items);
     };
 
     const fetchTickerArticles = async () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Users, FolderOpen, LogOut, ExternalLink, MessageSquare, Menu, X } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, FolderOpen, LogOut, ExternalLink, MessageSquare, Menu, X, Settings as SettingsIcon } from 'lucide-react';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -142,6 +142,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                             icon={MessageSquare}
                             label="Reports"
                             isActive={isActive('/admin/reports')}
+                            onClick={() => isMobile && setIsSidebarOpen(false)}
+                        />
+                        <SidebarItem
+                            to="/admin/settings"
+                            icon={SettingsIcon}
+                            label="Site Settings"
+                            isActive={isActive('/admin/settings')}
                             onClick={() => isMobile && setIsSidebarOpen(false)}
                         />
                     </nav>
