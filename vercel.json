@@ -5,6 +5,18 @@
       "destination": "/api/sitemap"
     },
     {
+      "source": "/sitemap-news.xml",
+      "destination": "/api/sitemap-news"
+    },
+    {
+      "source": "/feed.xml",
+      "destination": "/api/feed"
+    },
+    {
+      "source": "/amp/:slug",
+      "destination": "/api/amp?slug=:slug"
+    },
+    {
       "source": "/",
       "destination": "/api/ssr?type=home"
     },
@@ -21,11 +33,11 @@
       "destination": "/api/ssr?type=author&slug=:slug"
     },
     {
-      "source": "/:slug((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/|live/|topic/|author/|admin/|login|search|about|submit|contact|privacy|terms|sitemap).*)",
+      "source": "/:slug((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/|live/|topic/|author/|admin/|login|search|about|submit|contact|privacy|terms|sitemap|feed|amp|sitemap-news).*)",
       "destination": "/api/ssr?type=article&slug=:slug"
     },
     {
-      "source": "/((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/).*)",
+      "source": "/((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/|feed.xml|sitemap-news.xml|amp/).*)",
       "destination": "/index.html"
     }
   ],
