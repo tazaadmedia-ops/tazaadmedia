@@ -26,7 +26,9 @@ const Header: React.FC = () => {
 
     const [scrollProgress, setScrollProgress] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const lastScrollY = useRef(0);
+
 
 
     useEffect(() => {
@@ -178,7 +180,16 @@ const Header: React.FC = () => {
 
 
 
-    const hideOnScroll = isArticlePage && isScrolled;
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const hideOnScroll = isArticlePage && isScrolled && isMobile;
+
 
     return (
         <>
