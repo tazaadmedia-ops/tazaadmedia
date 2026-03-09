@@ -212,7 +212,7 @@ const LiveArticlePage: React.FC = () => {
                 title={`لائيو: ${article.title}`}
                 description={article.subdeck || article.title}
                 image={article.featured_image_url}
-                slug={`live/${slug}`}
+                slug={`article/live/${slug}`}
                 type="article"
                 publishedAt={article.published_at || article.created_at}
                 author={authorName || undefined}

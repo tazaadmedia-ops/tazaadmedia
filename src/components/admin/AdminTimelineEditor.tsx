@@ -203,9 +203,32 @@ const AdminTimelineEditor: React.FC<AdminTimelineEditorProps> = ({ articleId, is
                         <div style={{ display: 'flex', gap: '8px' }}>
                             <input
                                 value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
-                                placeholder="تصوير يا ٽوئيٽ لنڪ (Image or Tweet URL)"
                                 style={{ padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', flexGrow: 1, fontSize: '0.9rem', fontFamily: 'var(--font-main)' }}
                             />
+
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        fileInputRef.current?.click();
+                                    }}
+                                    title="Add Image"
+                                    style={{ padding: '8px', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#666' }}
+                                >
+                                    <Plus size={18} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        const url = prompt('Enter Twitter/X Link:');
+                                        if (url) setMediaUrl(url);
+                                    }}
+                                    title="Add Tweet"
+                                    style={{ padding: '8px', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#1d9bf0' }}
+                                >
+                                    <Twitter size={18} />
+                                </button>
+                            </div>
                             <input
                                 type="file"
                                 accept="image/*"

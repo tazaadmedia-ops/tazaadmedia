@@ -257,6 +257,7 @@ const ArticleEditor: React.FC = () => {
         setIsSaving(true);
 
         let currentSlug = slug.trim();
+        // Only generate a new slug if it's completely empty
         if (!currentSlug) {
             currentSlug = generateRandomSlug();
             setSlug(currentSlug);
@@ -299,9 +300,12 @@ const ArticleEditor: React.FC = () => {
             if (errorSg) {
                 // Check for unique constraint violation (Postgres code 23505) or explicit slug message
                 if ((errorSg.code === '23505' || errorSg.message.includes('slug') || errorSg.message.includes('unique')) && retries < 3) {
-                    const newSlug = `${slugToTry}-${Math.floor(Math.random() * 10000)}`;
-                    console.warn(`Slug collision for ${slugToTry}, retrying with ${newSlug}`);
-                    return saveToDb(newSlug, retries + 1);
+                    // Only retry with a new slug if it's a NEW article to avoid changing stable URLs
+                    if (!id || id === 'new') {
+                        const newSlug = `${slugToTry}-${Math.floor(Math.random() * 10000)}`;
+                        console.warn(`Slug collision for ${slugToTry}, retrying with ${newSlug}`);
+                        return saveToDb(newSlug, retries + 1);
+                    }
                 }
                 throw errorSg;
             }
@@ -498,9 +502,11 @@ const ArticleEditor: React.FC = () => {
                 const editorRect = editorElement?.getBoundingClientRect();
 
                 if (editorRect) {
+                    // Adjust horizontal position for RTL
+                    const isRtl = document.dir === 'rtl' || getComputedStyle(editor.view.dom).direction === 'rtl';
                     setFloatingMenuPos({
                         top: start.top - editorRect.top,
-                        left: start.left - editorRect.left + (document.dir === 'rtl' ? -40 : 15)
+                        left: start.left - editorRect.left + (isRtl ? -45 : 15)
                     });
                 }
             } else {

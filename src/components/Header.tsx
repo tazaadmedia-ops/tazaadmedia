@@ -133,7 +133,7 @@ const Header: React.FC = () => {
             .select('title, slug, id, is_live')
             .eq('status', 'published')
             .order('published_at', { ascending: false })
-            .limit(4); // Limited to 4 articles as requested
+            .limit(5); // Limited to 5 articles as requested
 
         if (data && data.length > 0) {
             // Add a clone of the first item at the end for seamless looping
