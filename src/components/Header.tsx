@@ -161,8 +161,9 @@ const Header: React.FC = () => {
                 backgroundColor: '#fff',
                 position: 'sticky',
                 top: 0,
-                zIndex: 1000,
-                direction: 'rtl'
+                zIndex: 2000,
+                direction: 'rtl',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
             }}>
                 {/* --- TOP BAR (WHITE) --- */}
                 <div className="container" style={{
@@ -247,10 +248,11 @@ const Header: React.FC = () => {
                             <Search size={22} strokeWidth={2.5} />
                         </button>
                     </div>
+
                 </div>
 
                 {/* --- BOTTOM BAR (RED NEWS SLIDER) --- */}
-                <div style={{ backgroundColor: 'var(--color-accent)', width: '100%', position: 'relative' }}>
+                <div style={{ backgroundColor: 'var(--color-accent)', width: '100%' }}>
                     <div className="container">
                         <div className="news-ticker-bar">
                             <div className="news-ticker-label">
@@ -277,21 +279,30 @@ const Header: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Reading Progress Bar */}
+                {/* Reading Progress Bar (Now below the ticker) */}
+                <div style={{
+                    height: '3px',
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
                     <div style={{
                         position: 'absolute',
-                        bottom: 0,
+                        top: 0,
                         right: 0,
-                        height: '3px',
+                        height: '100%',
                         backgroundColor: '#ffd140',
                         width: `${scrollProgress}%`,
-                        transition: 'width 0.1s ease-out',
+                        transition: 'width 0.3s cubic-bezier(0.1, 0, 0, 1)',
                         opacity: scrollProgress > 0 ? 1 : 0,
                         zIndex: 10
                     }} />
                 </div>
             </header>
+
 
 
             {/* --- MOBILE DRAWER MENU --- */}
