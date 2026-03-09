@@ -54,6 +54,8 @@ export default async function handler(request: any, response: any) {
         const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwcGRzemVqemlpemliamxncGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxNDg0NTksImV4cCI6MjA4NDcyNDQ1OX0.O_xMpyfCJpjX2sjDZk0rs_x2youjwOVlobNdDL2Ulao';
         const hasEnv = !!(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL);
 
+        const fbAppId = process.env.VITE_FACEBOOK_APP_ID || process.env.FACEBOOK_APP_ID || '';
+
         if (url && key) {
             if (!supabase) supabase = createClient(url, key);
         }
@@ -197,6 +199,7 @@ export default async function handler(request: any, response: any) {
     <meta property="og:image:height" content="630" />
     <meta property="og:url" content="${escapeAttr(meta.url)}" />
     <meta property="og:type" content="${meta.type}" />
+    ${fbAppId ? `<meta property="fb:app_id" content="${escapeAttr(fbAppId)}" />` : ''}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeAttr(meta.title)}" />
     <meta name="twitter:description" content="${escapeAttr(meta.description)}" />

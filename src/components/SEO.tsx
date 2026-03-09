@@ -77,6 +77,7 @@ const SEO: React.FC<SEOProps> = ({
             <meta property="og:image:secure_url" content={fullImage} />
             <meta property="og:image:width" content="1200" />
             <meta property="og:image:height" content="630" />
+            <meta property="fb:app_id" content={import.meta.env.VITE_FACEBOOK_APP_ID || ""} />
             <meta property="og:site_name" content={baseTitle} />
 
             {/* Twitter */}
