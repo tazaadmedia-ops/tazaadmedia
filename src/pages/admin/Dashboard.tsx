@@ -49,6 +49,14 @@ const Dashboard: React.FC = () => {
         }
     };
 
+    const totalViews = articles.reduce((sum, article) => sum + (article.view_count || 0), 0);
+
+    const formatViews = (num: number) => {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+        return num.toString();
+    };
+
     const filteredArticles = articles.filter(article =>
         article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         article.slug.toLowerCase().includes(searchTerm.toLowerCase())
@@ -78,7 +86,7 @@ const Dashboard: React.FC = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
                 {[
                     { label: 'Total Articles', value: articles.length, color: '#000' },
-                    { label: 'Total Views', value: '12.4k', color: '#000' },
+                    { label: 'Total Views', value: formatViews(totalViews), color: '#000' },
                     { label: 'Active Editors', value: '3', color: '#000' },
                     { label: 'System Status', value: 'Live', color: '#10b981' },
                 ].map((stat, i) => (
