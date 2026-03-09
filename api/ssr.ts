@@ -20,9 +20,9 @@ export default async function handler(request: any, response: any) {
 
     // Determine Base URL Robustly
     const protocol = request.headers['x-forwarded-proto'] || 'https';
-    const host = request.headers['x-forwarded-host'] || request.headers.host;
-    const isLocal = host.includes('localhost');
-    const baseUrl = isLocal ? `${protocol}://${host}` : `https://thetazaad.com`;
+    const host = request.headers['x-forwarded-host'] || request.headers.host || 'thetazaad.com';
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    const baseUrl = `${protocol}://${host}`;
 
     try {
         // Robust parameter extraction
@@ -179,21 +179,29 @@ export default async function handler(request: any, response: any) {
         html = html.replace(/<meta[^>]*?(?:name|property)=["'](?:description|og:|twitter:)[^>]*?>/gi, '');
         html = html.replace(/<link[^>]*?rel=["']canonical["'][^>]*?>/gi, '');
 
+        const escapeAttr = (str: string) => str
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
         const metaTags = `
-    <title>${meta.title.replace(/"/g, '&quot;')}</title>
-    <meta name="description" content="${meta.description.replace(/"/g, '&quot;')}" />
-    <meta property="og:title" content="${meta.title.replace(/"/g, '&quot;')}" />
-    <meta property="og:description" content="${meta.description.replace(/"/g, '&quot;')}" />
-    <meta property="og:image" content="${meta.image}" />
+    <title>${escapeAttr(meta.title)}</title>
+    <meta name="description" content="${escapeAttr(meta.description)}" />
+    <meta property="og:title" content="${escapeAttr(meta.title)}" />
+    <meta property="og:description" content="${escapeAttr(meta.description)}" />
+    <meta property="og:image" content="${escapeAttr(meta.image)}" />
+    <meta property="og:image:secure_url" content="${escapeAttr(meta.image)}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="${meta.url}" />
+    <meta property="og:url" content="${escapeAttr(meta.url)}" />
     <meta property="og:type" content="${meta.type}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${meta.title.replace(/"/g, '&quot;')}" />
-    <meta name="twitter:description" content="${meta.description.replace(/"/g, '&quot;')}" />
-    <meta name="twitter:image" content="${meta.image}" />
-    <link rel="canonical" href="${meta.url}" />
+    <meta name="twitter:title" content="${escapeAttr(meta.title)}" />
+    <meta name="twitter:description" content="${escapeAttr(meta.description)}" />
+    <meta name="twitter:image" content="${escapeAttr(meta.image)}" />
+    <link rel="canonical" href="${escapeAttr(meta.url)}" />
     <script type="application/ld+json">${JSON.stringify(meta.schema)}</script>
 `;
 
