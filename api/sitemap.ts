@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 let supabase: ReturnType<typeof createClient> | null = null;
 
 export default async function handler(request: any, response: any) {
-    const baseUrl = 'https://tazaadmedia.com';
+    const baseUrl = 'https://thetazaad.com';
 
     // Supabase Setup (using same logic as ssr.ts)
     const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://fppdszejziizibjlgpag.supabase.co';

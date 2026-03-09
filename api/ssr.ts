@@ -20,7 +20,7 @@ export default async function handler(request: any, response: any) {
 
     // Determine Base URL Robustly
     const protocol = request.headers['x-forwarded-proto'] || 'https';
-    const host = request.headers['x-forwarded-host'] || request.headers.host || 'tazaadmedia.com';
+    const host = request.headers['x-forwarded-host'] || request.headers.host || 'thetazaad.com';
     const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
     const baseUrl = `${protocol}://${host}`;
 
@@ -95,7 +95,7 @@ export default async function handler(request: any, response: any) {
                         .eq('slug', slug)
                         .single();
 
-                    const { data: artResult, error: artError } = await withTimeout(query, 8000) as any;
+                    const { data: artResult, error: artError } = await withTimeout(Promise.resolve(query), 8000) as any;
 
                     if (artResult && !artError) {
                         const art = artResult;
@@ -132,7 +132,7 @@ export default async function handler(request: any, response: any) {
             } else if (type === 'category') {
                 try {
                     const query = supabase.from('categories').select('name, slug').eq('slug', slug).single();
-                    const { data: catResult } = await withTimeout(query, 5000) as any;
+                    const { data: catResult } = await withTimeout(Promise.resolve(query), 5000) as any;
                     if (catResult) {
                         const cat = catResult;
                         meta.title = `${cat.name} | تضاد`;
@@ -150,7 +150,7 @@ export default async function handler(request: any, response: any) {
             } else if (type === 'author') {
                 try {
                     const query = supabase.from('users').select('full_name, username, bio, avatar_url').eq('username', slug).single();
-                    const { data: userResult } = await withTimeout(query, 5000) as any;
+                    const { data: userResult } = await withTimeout(Promise.resolve(query), 5000) as any;
                     if (userResult) {
                         const user = userResult;
                         meta.title = `${user.full_name} | ليکڪ`;

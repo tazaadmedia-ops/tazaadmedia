@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /login
 
-Sitemap: https://open-editorial.vercel.app/sitemap
+Sitemap: https://thetazaad.com/sitemap.xml
