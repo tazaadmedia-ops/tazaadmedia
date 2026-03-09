@@ -46,16 +46,10 @@ const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, wi
     // Optimize Supabase images if width is provided
     let optimizedSrc = src;
     if (optimizedSrc && optimizedSrc.includes('supabase.co') && width) {
-        // Use the resizing endpoint instead of direct object access
-        if (optimizedSrc.includes('/storage/v1/object/public/')) {
-            optimizedSrc = optimizedSrc.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-        }
-
-        // Add parameters (ensure we don't double up or break existing ones)
+        // Standard parameters usually work with the default endpoint if handled by a proxy or CDN, 
+        // but let's stick to what was working before.
         if (!optimizedSrc.includes('?')) {
-            optimizedSrc = `${optimizedSrc}?width=${width}&quality=80&format=auto`;
-        } else if (!optimizedSrc.includes('width=')) {
-            optimizedSrc = `${optimizedSrc}&width=${width}&quality=80&format=auto`;
+            optimizedSrc = `${optimizedSrc}?width=${width}&quality=80`;
         }
     }
 
