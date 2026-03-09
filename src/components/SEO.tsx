@@ -105,6 +105,9 @@ const SEO: React.FC<SEOProps> = ({
             <title>{fullTitle}</title>
             <meta name="description" content={description} />
             <link rel="canonical" href={fullUrl} />
+            {type === 'article' && !slug.includes('live/') && (
+                <link rel="amphtml" href={`${siteUrl}/amp/${slug.replace(/^\//, '')}`} />
+            )}
             <link rel="preconnect" href="https://fppdszejziizibjlgpag.supabase.co" crossOrigin="" />
             <link rel="preload" href="/assets/fonts/SF-Arabic.woff2" as="font" type="font/woff2" crossOrigin="" />
 

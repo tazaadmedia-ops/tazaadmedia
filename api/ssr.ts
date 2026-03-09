@@ -47,6 +47,9 @@ export default async function handler(request: any, response: any) {
     const host = request.headers['x-forwarded-host'] || request.headers.host || 'thetazaad.com';
     const baseUrl = `${protocol}://${host}`;
 
+    // Enable large image previews for Google Discover/Search
+    response.setHeader('X-Robots-Tag', 'max-image-preview:large');
+
     try {
         // Robust parameter extraction
         let { type, slug } = request.query;
@@ -106,6 +109,8 @@ export default async function handler(request: any, response: any) {
             }
         };
 
+        let ampLink = '';
+
         // 4. Route Handling
         if (supabase && slug) {
             const withTimeout = (promise: Promise<any>, timeoutMs: number) =>
@@ -115,7 +120,7 @@ export default async function handler(request: any, response: any) {
                 ]);
 
             if (type === 'article' || type === 'live') {
-                const isLive = type === 'live';
+                const isLive = type === 'article' ? false : true;
                 try {
                     const query = supabase
                         .from('articles')
@@ -132,6 +137,12 @@ export default async function handler(request: any, response: any) {
                         meta.description = art.subdeck ? `${art.subdeck} | Tazaad Sindhi News` : `${art.title} - Sindhi Language News | تضاد سنڌي`;
                         meta.url = `${baseUrl}/${isLive ? 'live/' : ''}${slug}`;
                         meta.type = "article";
+
+                        // AMP relation (only for normal articles for now)
+                        if (type === 'article') {
+                            ampLink = `<link rel="amphtml" href="${baseUrl}/amp/${slug}" />`;
+                        }
+
                         if (art.featured_image_url) {
                             meta.image = art.featured_image_url.startsWith('http') ? art.featured_image_url : `${baseUrl}${art.featured_image_url.startsWith('/') ? '' : '/'}${art.featured_image_url}`;
                         }
@@ -143,7 +154,7 @@ export default async function handler(request: any, response: any) {
                                 "@id": meta.url
                             },
                             "headline": art.title,
-                            "description": art.subdeck,
+                            "description": art.subdeck || art.title,
                             "image": [meta.image],
                             "datePublished": art.published_at || art.created_at,
                             "dateModified": art.updated_at || art.published_at,
@@ -154,10 +165,10 @@ export default async function handler(request: any, response: any) {
                                 "logo": { "@type": "ImageObject", "url": `${baseUrl}/logo.png` }
                             },
                             "inLanguage": "sd",
-                            "articleBody": art.content_text // Critical for AI agents
+                            "articleBody": art.content_text
                         };
 
-                        // 5. CONTENT INJECTION (Critical for Bots/AI)
+                        // 5. CONTENT INJECTION
                         if (art.content_text) {
                             const bodyContent = `
                                 <article style="display:none;" aria-hidden="true">
@@ -257,6 +268,7 @@ export default async function handler(request: any, response: any) {
     <meta name="twitter:url" content="${escapeUrl(meta.url)}" />
     <meta name="twitter:domain" content="${host}" />
     <link rel="canonical" href="${escapeUrl(meta.url)}" />
+    ${ampLink}
     <script type="application/ld+json">${JSON.stringify(meta.schema)}</script>
 `;
 
