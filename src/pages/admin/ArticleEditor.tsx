@@ -488,7 +488,7 @@ const ArticleEditor: React.FC = () => {
                 {editor && (
                     <FloatingMenu
                         editor={editor}
-                        shouldShow={({ state }) => {
+                        shouldShow={({ state }: { state: any }) => {
                             const { selection } = state;
                             const { $from } = selection;
                             // Only show if it's an empty paragraph
@@ -999,154 +999,150 @@ const ArticleEditor: React.FC = () => {
                     </div>
                 </div>
 
-                {!isLive && (
-                    <>
-                        {/* Toolbar Container */}
-                        <div style={{
-                            position: 'sticky',
-                            top: '10px',
-                            zIndex: 51,
-                            marginBottom: '2rem',
-                            maxWidth: '100%',
-                            paddingBottom: '10px'
-                        }}>
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                flexWrap: 'wrap',
-                                gap: '4px',
-                                padding: '6px',
-                                backgroundColor: '#fff',
-                                border: '1px solid #e5e5e5',
-                                borderRadius: '12px',
-                                boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
-                                width: '100%'
-                            }}>
-                                {/* Undo/Redo */}
-                                <div style={{ display: 'flex', gap: '2px', padding: '0 4px' }}>
-                                    <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} icon={<RotateCcw size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} icon={<RotateCw size={16} />} />
-                                </div>
-
-                                <ToolbarDivider />
-
-                                {/* Style Dropdown */}
-                                <div style={{ position: 'relative' }}>
-                                    <button
-                                        onMouseDown={(e) => {
-                                            e.preventDefault();
-                                            setShowStyleMenu(!showStyleMenu);
-                                        }}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 8px',
-                                            background: 'transparent', border: 'none', cursor: 'pointer',
-                                            fontSize: '0.85rem', fontWeight: 600, color: '#333', whiteSpace: 'nowrap'
-                                        }}>
-                                        {editor.isActive('heading', { level: 1 }) ? 'Heading 1' :
-                                            editor.isActive('heading', { level: 2 }) ? 'Heading 2' :
-                                                editor.isActive('heading', { level: 3 }) ? 'Heading 3' : 'Normal Text'}
-                                        <ChevronDown size={14} color="#888" />
-                                    </button>
-                                    {showStyleMenu && (
-                                        <div style={{
-                                            position: 'absolute', top: '100%', left: 0, marginTop: '8px',
-                                            backgroundColor: 'white', borderRadius: '8px', border: '1px solid #eee',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '6px', minWidth: '160px', zIndex: 100
-                                        }}>
-                                            {[
-                                                { label: 'Normal Text', level: 0, action: () => editor.chain().focus().setParagraph().run() },
-                                                { label: 'Heading 1', level: 1, action: () => toggleHeadingWithSplit(1) },
-                                                { label: 'Heading 2', level: 2, action: () => toggleHeadingWithSplit(2) },
-                                                { label: 'Heading 3', level: 3, action: () => toggleHeadingWithSplit(3) },
-                                            ].map((opt, i) => {
-                                                const isActive = opt.level === 0 ? editor.isActive('paragraph') : editor.isActive('heading', { level: opt.level });
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        onMouseDown={(e) => {
-                                                            e.preventDefault();
-                                                            opt.action();
-                                                            setShowStyleMenu(false);
-                                                        }}
-                                                        style={{
-                                                            padding: '8px 12px',
-                                                            fontSize: '0.9rem',
-                                                            cursor: 'pointer',
-                                                            borderRadius: '4px',
-                                                            backgroundColor: isActive ? '#f3f4f6' : 'transparent',
-                                                            fontWeight: isActive ? 600 : 400,
-                                                            color: isActive ? '#000' : '#555'
-                                                        }}
-                                                        onMouseEnter={(e) => !isActive && (e.currentTarget.style.backgroundColor = '#f5f5f5')}
-                                                        onMouseLeave={(e) => !isActive && (e.currentTarget.style.backgroundColor = 'transparent')}
-                                                    >
-                                                        {opt.label}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <ToolbarDivider />
-
-                                {/* Formatting */}
-                                <div style={{ display: 'flex', gap: '2px' }}>
-                                    <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} icon={<Bold size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} icon={<Italic size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} icon={<Strikethrough size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} isActive={editor.isActive('code')} icon={<Code size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()} icon={<X size={16} />} tooltip="Clear Formatting" />
-                                </div>
-
-                                <ToolbarDivider />
-
-                                {/* Media & Links */}
-                                <div style={{ display: 'flex', gap: '2px' }}>
-                                    <ToolbarButton onClick={() => {
-                                        const previousUrl = editor?.getAttributes('link').href;
-                                        const url = window.prompt('URL', previousUrl);
-                                        if (url === null) return;
-                                        if (url === '') { editor?.chain().focus().extendMarkRange('link').unsetLink().run(); return; }
-                                        editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-                                    }} isActive={editor.isActive('link')} icon={<LinkIcon size={16} />} />
-                                    <ToolbarButton onClick={() => imageInputRef.current?.click()} icon={<ImageIcon size={16} />} />
-                                    <ToolbarButton onClick={() => {
-                                        const url = prompt('Enter YouTube URL');
-                                        if (url) editor.commands.setYoutubeVideo({ src: url });
-                                    }} icon={<Video size={16} />} />
-                                    <ToolbarButton onClick={() => {
-                                        const url = prompt('Enter Twitter/X URL');
-                                        if (url) editor.commands.setTwitter({ url });
-                                    }} icon={<Twitter size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} icon={<Quote size={16} />} />
-                                </div>
-
-                                <ToolbarDivider />
-
-                                {/* Lists */}
-                                <div style={{ display: 'flex', gap: '2px' }}>
-                                    <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} icon={<List size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive('orderedList')} icon={<ListOrdered size={16} />} />
-                                </div>
-
-                                <ToolbarDivider />
-
-                                {/* Align */}
-                                <div style={{ display: 'flex', gap: '2px' }}>
-                                    <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} isActive={editor.isActive({ textAlign: 'left' })} icon={<AlignLeft size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} isActive={editor.isActive({ textAlign: 'center' })} icon={<AlignCenter size={16} />} />
-                                    <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} isActive={editor.isActive({ textAlign: 'right' })} icon={<AlignRight size={16} />} />
-                                </div>
-                            </div>
+                {/* Toolbar Container */}
+                <div style={{
+                    position: 'sticky',
+                    top: '10px',
+                    zIndex: 51,
+                    marginBottom: '2rem',
+                    maxWidth: '100%',
+                    paddingBottom: '10px'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '4px',
+                        padding: '6px',
+                        backgroundColor: '#fff',
+                        border: '1px solid #e5e5e5',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
+                        width: '100%'
+                    }}>
+                        {/* Undo/Redo */}
+                        <div style={{ display: 'flex', gap: '2px', padding: '0 4px' }}>
+                            <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} icon={<RotateCcw size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} icon={<RotateCw size={16} />} />
                         </div>
 
-                        {/* Editor Area */}
-                        <div style={{ minHeight: '500px', fontSize: '1.1rem', lineHeight: '1.8' }}>
-                            <EditorContent editor={editor} />
+                        <ToolbarDivider />
+
+                        {/* Style Dropdown */}
+                        <div style={{ position: 'relative' }}>
+                            <button
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    setShowStyleMenu(!showStyleMenu);
+                                }}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 8px',
+                                    background: 'transparent', border: 'none', cursor: 'pointer',
+                                    fontSize: '0.85rem', fontWeight: 600, color: '#333', whiteSpace: 'nowrap'
+                                }}>
+                                {editor.isActive('heading', { level: 1 }) ? 'Heading 1' :
+                                    editor.isActive('heading', { level: 2 }) ? 'Heading 2' :
+                                        editor.isActive('heading', { level: 3 }) ? 'Heading 3' : 'Normal Text'}
+                                <ChevronDown size={14} color="#888" />
+                            </button>
+                            {showStyleMenu && (
+                                <div style={{
+                                    position: 'absolute', top: '100%', left: 0, marginTop: '8px',
+                                    backgroundColor: 'white', borderRadius: '8px', border: '1px solid #eee',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '6px', minWidth: '160px', zIndex: 100
+                                }}>
+                                    {[
+                                        { label: 'Normal Text', level: 0, action: () => editor.chain().focus().setParagraph().run() },
+                                        { label: 'Heading 1', level: 1, action: () => toggleHeadingWithSplit(1) },
+                                        { label: 'Heading 2', level: 2, action: () => toggleHeadingWithSplit(2) },
+                                        { label: 'Heading 3', level: 3, action: () => toggleHeadingWithSplit(3) },
+                                    ].map((opt, i) => {
+                                        const isActive = opt.level === 0 ? editor.isActive('paragraph') : editor.isActive('heading', { level: opt.level });
+                                        return (
+                                            <div
+                                                key={i}
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    opt.action();
+                                                    setShowStyleMenu(false);
+                                                }}
+                                                style={{
+                                                    padding: '8px 12px',
+                                                    fontSize: '0.9rem',
+                                                    cursor: 'pointer',
+                                                    borderRadius: '4px',
+                                                    backgroundColor: isActive ? '#f3f4f6' : 'transparent',
+                                                    fontWeight: isActive ? 600 : 400,
+                                                    color: isActive ? '#000' : '#555'
+                                                }}
+                                                onMouseEnter={(e) => !isActive && (e.currentTarget.style.backgroundColor = '#f5f5f5')}
+                                                onMouseLeave={(e) => !isActive && (e.currentTarget.style.backgroundColor = 'transparent')}
+                                            >
+                                                {opt.label}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
-                    </>
-                )}
+
+                        <ToolbarDivider />
+
+                        {/* Formatting */}
+                        <div style={{ display: 'flex', gap: '2px' }}>
+                            <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive('bold')} icon={<Bold size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} icon={<Italic size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} icon={<Strikethrough size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} isActive={editor.isActive('code')} icon={<Code size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()} icon={<X size={16} />} tooltip="Clear Formatting" />
+                        </div>
+
+                        <ToolbarDivider />
+
+                        {/* Media & Links */}
+                        <div style={{ display: 'flex', gap: '2px' }}>
+                            <ToolbarButton onClick={() => {
+                                const previousUrl = editor?.getAttributes('link').href;
+                                const url = window.prompt('URL', previousUrl);
+                                if (url === null) return;
+                                if (url === '') { editor?.chain().focus().extendMarkRange('link').unsetLink().run(); return; }
+                                editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+                            }} isActive={editor.isActive('link')} icon={<LinkIcon size={16} />} />
+                            <ToolbarButton onClick={() => imageInputRef.current?.click()} icon={<ImageIcon size={16} />} />
+                            <ToolbarButton onClick={() => {
+                                const url = prompt('Enter YouTube URL');
+                                if (url) editor.commands.setYoutubeVideo({ src: url });
+                            }} icon={<Video size={16} />} />
+                            <ToolbarButton onClick={() => {
+                                const url = prompt('Enter Twitter/X URL');
+                                if (url) editor.commands.setTwitter({ url });
+                            }} icon={<Twitter size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} icon={<Quote size={16} />} />
+                        </div>
+
+                        <ToolbarDivider />
+
+                        {/* Lists */}
+                        <div style={{ display: 'flex', gap: '2px' }}>
+                            <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive('bulletList')} icon={<List size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive('orderedList')} icon={<ListOrdered size={16} />} />
+                        </div>
+
+                        <ToolbarDivider />
+
+                        {/* Align */}
+                        <div style={{ display: 'flex', gap: '2px' }}>
+                            <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} isActive={editor.isActive({ textAlign: 'left' })} icon={<AlignLeft size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} isActive={editor.isActive({ textAlign: 'center' })} icon={<AlignCenter size={16} />} />
+                            <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} isActive={editor.isActive({ textAlign: 'right' })} icon={<AlignRight size={16} />} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Editor Area */}
+                <div style={{ minHeight: '500px', fontSize: '1.1rem', lineHeight: '1.8' }}>
+                    <EditorContent editor={editor} />
+                </div>
             </div>
         </AdminLayout>
     );
