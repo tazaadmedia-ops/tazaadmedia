@@ -105,6 +105,7 @@ const SEO: React.FC<SEOProps> = ({
             <title>{fullTitle}</title>
             <meta name="description" content={description} />
             <link rel="canonical" href={fullUrl} />
+            <link rel="alternate" type="application/rss+xml" title="Tazaad RSS Feed" href="/feed.xml" />
             {type === 'article' && !slug.includes('live/') && (
                 <link rel="amphtml" href={`${siteUrl}/amp/${slug.replace(/^\//, '')}`} />
             )}
