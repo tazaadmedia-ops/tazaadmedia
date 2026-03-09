@@ -52,7 +52,7 @@ const Home: React.FC = () => {
             .order('published_at', { ascending: false })
             .order('is_pinned', { ascending: false })
             .order('is_live', { ascending: false })
-            .limit(100); // Increased limit due to dynamic sections
+            .limit(40); // Optimized for home page segments
 
         if (error) console.error('Error fetching home articles:', error);
         if (data) setArticles(data);

@@ -45,7 +45,8 @@ const CategoryPage: React.FC = () => {
                         .eq('status', 'published')
                         .order('published_at', { ascending: false })
                         .order('is_pinned', { ascending: false })
-                        .order('is_live', { ascending: false });
+                        .order('is_live', { ascending: false })
+                        .limit(12);
 
                     if (error) throw error;
                     if (data) setArticles(data);

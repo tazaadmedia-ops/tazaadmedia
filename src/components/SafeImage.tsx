@@ -68,6 +68,7 @@ const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, wi
                 pointerEvents: 'auto',
                 aspectRatio: (width && height) ? `${width}/${height}` : undefined
             } as any}
+            decoding="async"
             onError={() => setError(true)}
             {...props}
         />
