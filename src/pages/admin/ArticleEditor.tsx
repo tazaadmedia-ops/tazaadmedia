@@ -434,20 +434,24 @@ const ArticleEditor: React.FC = () => {
     };
 
     const searchArticles = async (query: string) => {
-        if (!query.trim()) {
-            setSearchResults([]);
-            return;
-        }
-
         setIsSearchingArticles(true);
         try {
-            const { data, error } = await supabase
+            // Sanitize query: remove commas and normalize spaces for .or() syntax
+            const safeQuery = query.trim().replace(/[,()]/g, ' ');
+
+            let request = supabase
                 .from('articles')
                 .select('id, title, featured_image_url, slug')
-                .or(`title.ilike.%${query}%,slug.ilike.%${query}%`)
                 .neq('id', id || '') // Don't link to self
-                .limit(5);
+                .eq('status', 'published')
+                .order('updated_at', { ascending: false })
+                .limit(6);
 
+            if (safeQuery) {
+                request = request.or(`title.ilike.%${safeQuery}%,slug.ilike.%${safeQuery}%`);
+            }
+
+            const { data, error } = await request;
             if (error) throw error;
             setSearchResults(data || []);
         } catch (error) {
@@ -509,7 +513,7 @@ const ArticleEditor: React.FC = () => {
                             border: '1px solid #eee',
                         }}>
                             <button
-                                onClick={(e) => {
+                                onMouseDown={(e) => {
                                     e.preventDefault();
                                     setIsFloatingMenuOpen(!isFloatingMenuOpen);
                                 }}
@@ -533,7 +537,8 @@ const ArticleEditor: React.FC = () => {
                                     animation: 'fade-in 0.2s ease-out'
                                 }}>
                                     <button
-                                        onClick={() => {
+                                        onMouseDown={(e) => {
+                                            e.preventDefault();
                                             imageInputRef.current?.click();
                                             setIsFloatingMenuOpen(false);
                                         }}
@@ -548,9 +553,12 @@ const ArticleEditor: React.FC = () => {
                                     </button>
                                     <div style={{ width: '1px', height: '16px', backgroundColor: '#eee', alignSelf: 'center' }} />
                                     <button
-                                        onClick={() => {
+                                        onMouseDown={(e) => {
+                                            e.preventDefault();
                                             setIsLinkModalOpen(true);
                                             setIsFloatingMenuOpen(false);
+                                            // Trigger initial search for recent articles
+                                            searchArticles('');
                                         }}
                                         style={{
                                             display: 'flex', alignItems: 'center', gap: '6px',
@@ -563,9 +571,10 @@ const ArticleEditor: React.FC = () => {
                                     </button>
                                     <div style={{ width: '1px', height: '16px', backgroundColor: '#eee', alignSelf: 'center' }} />
                                     <button
-                                        onClick={() => {
+                                        onMouseDown={(e) => {
+                                            e.preventDefault();
                                             const url = window.prompt('Twitter/X لنڪ پيسٽ ڪريو:');
-                                            if (url) {
+                                            if (url && editor) {
                                                 editor.commands.setTwitter({ url });
                                             }
                                             setIsFloatingMenuOpen(false);
