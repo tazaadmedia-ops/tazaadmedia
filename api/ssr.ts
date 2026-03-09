@@ -178,8 +178,9 @@ export default async function handler(request: any, response: any) {
         // 5. Inject Content
         // Aggressively remove existing metadata to avoid conflicts
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
-        html = html.replace(/<meta[^>]*?(?:name|property)=["'](?:description|og:|twitter:)[^>]*?>/gi, '');
-        html = html.replace(/<link[^>]*?rel=["']canonical["'][^>]*?>/gi, '');
+        // Match all meta tags that we are about to re-inject, including those with different casing or attribute order
+        html = html.replace(/<meta[^>]*?(?:name|property|itemprop)=["'](?:description|og:|twitter:|image)[^>]*?>/gi, '');
+        html = html.replace(/<link[^>]*?rel=["'](?:canonical|image_src)["'][^>]*?>/gi, '');
 
         // WhatsApp/OG Requirement
         if (!html.includes('prefix=')) {
@@ -213,26 +214,33 @@ export default async function handler(request: any, response: any) {
         const finalImage = optimizeImage(meta.image);
         const mimeType = getMimeType(finalImage);
 
+        // Truncate description for better social display
+        const truncatedDesc = meta.description.length > 165
+            ? meta.description.substring(0, 160) + '...'
+            : meta.description;
+
         const metaTags = `
     <title>${escapeAttr(meta.title)}</title>
-    <meta name="description" content="${escapeAttr(meta.description)}" />
-    <meta property="og:title" content="${escapeAttr(meta.title)}" />
-    <meta property="og:description" content="${escapeAttr(meta.description)}" />
+    <meta name="description" content="${escapeAttr(truncatedDesc)}" />
     <meta property="og:image" content="${escapeUrl(finalImage)}" />
     <meta property="og:image:secure_url" content="${escapeUrl(finalImage)}" />
     <meta property="og:image:type" content="${mimeType}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${escapeAttr(meta.title)}" />
+    <meta property="og:title" content="${escapeAttr(meta.title)}" />
+    <meta property="og:description" content="${escapeAttr(truncatedDesc)}" />
     <meta property="og:url" content="${escapeUrl(meta.url)}" />
     <meta property="og:type" content="${meta.type}" />
     <meta property="og:site_name" content="تضاد - سنڌي" />
+    <meta itemprop="image" content="${escapeUrl(finalImage)}" />
+    <link rel="image_src" href="${escapeUrl(finalImage)}" />
     ${fbAppId ? `<meta property="fb:app_id" content="${escapeAttr(fbAppId)}" />` : ''}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@thetazaad" />
     <meta name="twitter:creator" content="@thetazaad" />
     <meta name="twitter:title" content="${escapeAttr(meta.title)}" />
-    <meta name="twitter:description" content="${escapeAttr(meta.description)}" />
+    <meta name="twitter:description" content="${escapeAttr(truncatedDesc)}" />
     <meta name="twitter:image" content="${escapeUrl(finalImage)}" />
     <meta name="twitter:image:src" content="${escapeUrl(finalImage)}" />
     <meta name="twitter:url" content="${escapeUrl(meta.url)}" />
