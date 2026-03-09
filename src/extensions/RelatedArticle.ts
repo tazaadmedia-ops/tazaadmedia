@@ -1,4 +1,4 @@
-import { Node, mergeAttributes } from '@tiptap/core';
+import { Node } from '@tiptap/core';
 
 
 export interface RelatedArticleOptions {
@@ -50,11 +50,13 @@ export const RelatedArticle = Node.create<RelatedArticleOptions>({
     renderHTML({ HTMLAttributes }) {
         return [
             'div',
-            mergeAttributes(HTMLAttributes, { 'data-type': 'related-article', class: 'related-article-embed' }),
-            ['div', { class: 'related-article-content' },
+            { class: 'related-article-card' },
+            ['a', { href: `/${HTMLAttributes.slug}`, class: 'related-article-link' }, [
+                'div',
+                { class: 'related-article-content' },
                 ['span', { class: 'related-label' }, 'وڌيڪ پڙهو'], // "Read More" in Sindhi
-                ['a', { href: `/article/${HTMLAttributes.id}`, target: '_blank', rel: 'noopener noreferrer' }, HTMLAttributes.title]
-            ],
+                ['span', { class: 'related-article-title' }, HTMLAttributes.title]
+            ]],
             HTMLAttributes.image ? ['img', { src: HTMLAttributes.image, class: 'related-article-image' }] : ''
         ];
     },

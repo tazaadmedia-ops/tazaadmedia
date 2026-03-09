@@ -197,7 +197,7 @@ const ArticlePage: React.FC = () => {
                 title={article.title}
                 description={article.subdeck || article.title}
                 image={article.featured_image_url}
-                slug={`article/${slug}`}
+                slug={`${slug}`}
                 type="article"
                 publishedAt={article.published_at || article.created_at}
                 author={authorName || undefined}
@@ -239,7 +239,7 @@ const ArticlePage: React.FC = () => {
 
             {/* Featured Image */}
             {article.featured_image_url && (
-                <div style={{ marginBottom: '2rem', width: '100%', maxWidth: '1080px', margin: '0 auto 2rem auto' }}>
+                <div style={{ marginBottom: '1rem', width: '100%', maxWidth: '1080px', margin: '0 auto 1rem auto' }}>
                     <img src={article.featured_image_url} alt={article.title} fetchPriority="high" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }} />
                     {article.featured_image_caption && (
                         <figcaption className="featured-image-caption">
@@ -249,14 +249,16 @@ const ArticlePage: React.FC = () => {
                 </div>
             )}
 
-            {/* Content */}
-            <div className="article-content" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.65', color: '#2c2c2c' }}>
-                <EditorContent editor={editor} />
-            </div>
+            {/* Content - Only render if there's content to show */}
+            {(article.content_json?.content?.length > 0 || article.content_text) && (
+                <div className="article-content" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.65', color: '#2c2c2c' }}>
+                    <EditorContent editor={editor} />
+                </div>
+            )}
 
             {/* Render Timeline for archived live blogs */}
             {updates.length > 0 && (
-                <div style={{ maxWidth: '800px', margin: '1rem auto 2rem', padding: '2rem', backgroundColor: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+                <div style={{ maxWidth: '800px', margin: '0 auto 2rem', padding: '2rem', backgroundColor: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem' }}>
                         <div style={{ backgroundColor: '#6b7280', color: '#fff', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 800 }}>آرڪائيو</div>
                         <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827' }}>
@@ -269,7 +271,7 @@ const ArticlePage: React.FC = () => {
 
             {/* Related Articles Section */}
             {relatedArticles.length > 0 && (
-                <div style={{ maxWidth: '800px', margin: '6rem auto 2rem' }}>
+                <div style={{ maxWidth: '800px', margin: '4rem auto 2rem' }}>
                     <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
                         وڌيڪ پڙهو {categoryName}
                     </h3>

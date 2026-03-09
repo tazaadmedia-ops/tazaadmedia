@@ -97,7 +97,8 @@ const Header: React.FC = () => {
                 categories (
                     id,
                     name,
-                    slug
+                    slug,
+                    created_at
                 )
             `)
             .eq('status', 'published');
@@ -112,10 +113,15 @@ const Header: React.FC = () => {
             });
 
             const uniqueCategories = Array.from(uniqueCategoriesMap.values());
-            uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
+            // Sort chronologically by created_at
+            uniqueCategories.sort((a, b) => {
+                const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+                const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+                return dateA - dateB;
+            });
 
             const dynItems = uniqueCategories.map(cat => ({
-                to: `/category/${cat.slug}`,
+                to: `/topic/${cat.slug}`,
                 label: cat.name,
                 id: cat.id
             }));
@@ -252,7 +258,7 @@ const Header: React.FC = () => {
                                 {tickerArticles.map((art, i) => (
                                     <Link
                                         key={`${art.id}-${i}`}
-                                        to={art.is_live ? `/article/live/${art.slug}` : `/article/${art.slug}`}
+                                        to={art.is_live ? `/live/${art.slug}` : `/${art.slug}`}
                                         className="news-ticker-item"
                                     >
                                         {art.title}

@@ -65,7 +65,7 @@ const CategoryPage: React.FC = () => {
             <SEO
                 title={`${displayName} | News`}
                 description={`Latest articles in ${displayName}`}
-                slug={`category/${slug}`}
+                slug={`topic/${slug}`}
                 schemaType="CollectionPage"
             />
 
@@ -85,7 +85,7 @@ const CategoryPage: React.FC = () => {
                             textAlign: 'right'
                         }}>
                             <div>
-                                <Link to={`/article/${art.slug}`}>
+                                <Link to={`/${art.slug}`}>
                                     <div style={{
                                         width: '100%',
                                         aspectRatio: '16/10',
@@ -98,7 +98,7 @@ const CategoryPage: React.FC = () => {
                                 </Link>
                             </div>
                             <div>
-                                <Link to={`/article/${art.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <Link to={`/${art.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <h2 style={{
                                         fontSize: '1.8rem',
                                         fontWeight: 800,

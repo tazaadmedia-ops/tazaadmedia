@@ -185,7 +185,7 @@ const Dashboard: React.FC = () => {
                                     <td style={{ padding: '1.2rem 1.5rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <a
-                                                href={`/article/${article.slug}`}
+                                                href={article.is_live ? `/live/${article.slug}` : `/${article.slug}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 style={{ color: '#666', transition: 'color 0.2s' }}

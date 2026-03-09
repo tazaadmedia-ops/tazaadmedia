@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -43,10 +43,8 @@ function App() {
 
           {/* Public Routes */}
           <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/article/:slug" element={<Layout flush><ArticlePage /></Layout>} />
-          <Route path="/article/live/:slug" element={<Layout flush><LiveArticlePage /></Layout>} />
-          <Route path="/author/:username" element={<Layout><AuthorPage /></Layout>} />
-          <Route path="/category/:slug" element={<Layout><CategoryPage /></Layout>} />
+
+          {/* Static and Specific Routes FIRST to avoid catch-all conflict */}
           <Route path="/search" element={<Layout><SearchPage /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
           <Route path="/submit" element={<Layout><Submit /></Layout>} />
@@ -54,6 +52,17 @@ function App() {
           <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
           <Route path="/terms" element={<Layout><Terms /></Layout>} />
           <Route path="/sitemap" element={<Layout><Sitemap /></Layout>} />
+          <Route path="/author/:username" element={<Layout><AuthorPage /></Layout>} />
+          <Route path="/topic/:slug" element={<Layout><CategoryPage /></Layout>} />
+          <Route path="/live/:slug" element={<Layout flush><LiveArticlePage /></Layout>} />
+
+          {/* Legacy Redirects */}
+          <Route path="/article/:slug" element={<Navigate to="/:slug" replace />} />
+          <Route path="/article/live/:slug" element={<Navigate to="/live/:slug" replace />} />
+          <Route path="/category/:slug" element={<Navigate to="/topic/:slug" replace />} />
+
+          {/* Catch-all Article Route LAST */}
+          <Route path="/:slug" element={<Layout flush><ArticlePage /></Layout>} />
         </Routes>
       </Suspense>
     </Router>

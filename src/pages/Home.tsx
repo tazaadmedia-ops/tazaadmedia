@@ -72,7 +72,7 @@ const Home: React.FC = () => {
 
     // Routing helper
     const getArticleLink = (article: any) => {
-        return article.is_live ? `/article/live/${article.slug}` : `/article/${article.slug}`;
+        return article.is_live ? `/live/${article.slug}` : `/${article.slug}`;
     };
 
     // Live Badge Component for Homepage
@@ -197,7 +197,7 @@ const Home: React.FC = () => {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e0e0e0', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 900 }}>{section.title}</h2>
                             <Link
-                                to={`/category/${section.slug}`}
+                                to={`/topic/${section.slug}`}
                                 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#666', textDecoration: 'none' }}
                             >
                                 ڏسو سڀ →

@@ -143,7 +143,7 @@ const AuthorPage: React.FC = () => {
                     {articles.length > 0 ? articles.map((art) => (
                         <div key={art.id} className="article-list-item mobile-grid-1">
                             <div style={{ order: 1 }}>
-                                <Link to={`/article/${art.slug}`}>
+                                <Link to={`/${art.slug}`}>
                                     <div style={{
                                         width: '100%',
                                         aspectRatio: '16/10',
@@ -156,7 +156,7 @@ const AuthorPage: React.FC = () => {
                                 </Link>
                             </div>
                             <div style={{ order: 2 }}>
-                                <Link to={`/article/${art.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <Link to={`/${art.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <h3 style={{
                                         fontSize: '1.6rem',
                                         fontWeight: 900,

@@ -190,7 +190,7 @@ const LiveArticlePage: React.FC = () => {
     // Redirect to normal article page if the live blog has ended
     // Only redirect if explicitly ended (is_live === false) and loading is finished
     if (article && article.is_live === false) {
-        return <Navigate to={`/article/${slug}`} replace />;
+        return <Navigate to={`/${slug}`} replace />;
     }
 
     // Construct LiveBlogPosting Schema
@@ -231,7 +231,7 @@ const LiveArticlePage: React.FC = () => {
                 title={`لائيو: ${article.title}`}
                 description={article.subdeck || article.title}
                 image={article.featured_image_url}
-                slug={`article/live/${slug}`}
+                slug={`live/${slug}`}
                 type="article"
                 publishedAt={article.published_at || article.created_at}
                 author={authorName || undefined}
