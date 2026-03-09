@@ -75,6 +75,7 @@ const ArticleEditor: React.FC = () => {
     const [categoryId, setCategoryId] = useState<string | null>(null);
     const [showCategoryMenu, setShowCategoryMenu] = useState(false);
     const [isLive, setIsLive] = useState(false);
+    const [isPinned, setIsPinned] = useState(false);
     const [hasUpdates, setHasUpdates] = useState(false);
 
     // Featured Image
@@ -226,6 +227,7 @@ const ArticleEditor: React.FC = () => {
                         setFeaturedImageUrl(article.featured_image_url || ''); // Assuming we add this column
                         setFeaturedImageCaption(article.featured_image_caption || '');
                         setIsLive(article.is_live || false);
+                        setIsPinned(article.is_pinned || false);
 
                         if (article.article_authors) {
                             const authors = article.article_authors.map((aa: any) => aa.users).filter(Boolean);
@@ -279,6 +281,7 @@ const ArticleEditor: React.FC = () => {
             content_text: editor.getText(),
             status: 'published',
             is_live: isLive,
+            is_pinned: isPinned,
             updated_at: new Date().toISOString()
         };
 
@@ -903,6 +906,39 @@ const ArticleEditor: React.FC = () => {
                         }}>
                             <span style={{
                                 position: 'absolute', height: '18px', width: '18px', left: isLive ? '22px' : '3px', bottom: '3px',
+                                backgroundColor: 'white', transition: '.4s', borderRadius: '50%'
+                            }}></span>
+                        </span>
+                    </label>
+                </div>
+
+                {/* Pinned toggle */}
+                <div style={{
+                    padding: '2rem', backgroundColor: '#fff', borderRadius: '12px',
+                    border: '1px solid #e5e5e5', display: 'flex', alignItems: 'center', marginBottom: '2.5rem'
+                }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#111', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            مضمون کي پن ڪريو
+                        </span>
+                        <span style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '4px' }}>
+                            هن مضمون کي هوم پيج جي مين ڪارڊ تي پن ڪريو
+                        </span>
+                    </div>
+
+                    <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', marginRight: 'auto' }}>
+                        <input
+                            type="checkbox"
+                            checked={isPinned}
+                            onChange={(e) => setIsPinned(e.target.checked)}
+                            style={{ opacity: 0, width: 0, height: 0 }}
+                        />
+                        <span style={{
+                            position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                            backgroundColor: isPinned ? 'var(--color-accent)' : '#ccc', transition: '.4s', borderRadius: '24px'
+                        }}>
+                            <span style={{
+                                position: 'absolute', height: '18px', width: '18px', left: isPinned ? '22px' : '3px', bottom: '3px',
                                 backgroundColor: 'white', transition: '.4s', borderRadius: '50%'
                             }}></span>
                         </span>
