@@ -76,8 +76,8 @@ export default async function handler(request: any, response: any) {
         if (!html) return response.status(500).send('System Error: Template Missing');
 
         // 2. Env Check & Init
-        const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-        const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+        const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://fppdszejziizibjlgpag.supabase.co';
+        const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwcGRzemVqemlpemliamxncGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxNDg0NTksImV4cCI6MjA4NDcyNDQ1OX0.O_xMpyfCJpjX2sjDZk0rs_x2youjwOVlobNdDL2Ulao';
         const fbAppId = process.env.VITE_FACEBOOK_APP_ID || process.env.FACEBOOK_APP_ID || '';
 
         if (url && key) {
