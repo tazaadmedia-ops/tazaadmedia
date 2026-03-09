@@ -90,12 +90,6 @@ const Header: React.FC = () => {
     };
 
     const fetchNavbarData = async () => {
-        // Fetch Settings
-        const { data: settingsData } = await supabase
-            .from('site_settings')
-            .select('key, value');
-
-        const showAbout = settingsData?.find(s => s.key === 'show_about_in_navbar')?.value ?? true;
 
         // Fetch Categories
         const { data: categories } = await supabase
@@ -118,9 +112,6 @@ const Header: React.FC = () => {
             });
         }
 
-        if (showAbout) {
-            items.push({ to: "/about", label: "اسان بابت", id: 'about' });
-        }
 
         setMenuItems(items);
     };
