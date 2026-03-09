@@ -139,7 +139,7 @@ const Home: React.FC = () => {
                                     </span>
                                 )}
                             </div>
-                            <h1 style={{ fontSize: '2rem', lineHeight: 1.15, marginBottom: '0.5rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
+                            <h1 style={{ fontSize: '2.2rem', lineHeight: 1.1, marginBottom: '0.4rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
                                 {heroStory.title}
                             </h1>
                             <p style={{ fontSize: '1rem', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: '0.5rem', fontWeight: 400 }}>
@@ -157,14 +157,14 @@ const Home: React.FC = () => {
                         <div key={story.id}>
                             <Link to={getArticleLink(story)}>
                                 <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.5rem', overflow: 'hidden' }}>
-                                    <SafeImage src={story.featured_image_url} alt={story.title} width="600" height="375" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <SafeImage src={story.featured_image_url} alt={story.title} width="400" height="250" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                                 <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
                                     {story.is_live ? <LiveBadge /> : getCategory(story)}
                                 </div>
-                                <h3 style={{ fontSize: '0.95rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
+                                <h2 style={{ fontSize: '0.95rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
                                     {story.title}
-                                </h3>
+                                </h2>
                             </Link>
                         </div>
                     ))}
@@ -181,9 +181,9 @@ const Home: React.FC = () => {
                         }}>
                             <Link to={getArticleLink(story)}>
                                 {story.is_live && <div style={{ marginBottom: '0.25rem', fontSize: '0.7rem' }}><LiveBadge /></div>}
-                                <h3 style={{ fontSize: '1rem', lineHeight: 1.4, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
+                                <h2 style={{ fontSize: '1rem', lineHeight: 1.4, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
                                     {story.title}
-                                </h3>
+                                </h2>
                                 {getAuthor(story) && (
                                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
                                         {getAuthor(story)}
@@ -221,8 +221,8 @@ const Home: React.FC = () => {
                                         <SafeImage
                                             src={story.featured_image_url}
                                             alt={story.title}
-                                            width="600"
-                                            height="375"
+                                            width="400"
+                                            height="250"
                                             loading="lazy"
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />

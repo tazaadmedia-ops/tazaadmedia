@@ -1,8 +1,6 @@
 @font-face {
   font-family: "SF Arabic";
-  src: url("./assets/fonts/SF-Arabic.woff2") format("woff2"),
-    url("./assets/fonts/SF-Arabic.woff") format("woff"),
-    url("./assets/fonts/SF-Arabic.ttf") format("truetype");
+  src: url("/assets/fonts/SF-Arabic.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -149,6 +147,8 @@ img {
   max-width: var(--container-width);
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
+  min-height: 1px;
+  /* Prevent collapse */
 }
 
 .page-top-margin {

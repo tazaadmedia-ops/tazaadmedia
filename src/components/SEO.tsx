@@ -111,6 +111,15 @@ const SEO: React.FC<SEOProps> = ({
             )}
             <link rel="preconnect" href="https://fppdszejziizibjlgpag.supabase.co" crossOrigin="" />
             <link rel="preload" href="/assets/fonts/SF-Arabic.woff2" as="font" type="font/woff2" crossOrigin="" />
+            {type === 'article' && image && (
+                <link
+                    rel="preload"
+                    as="image"
+                    href={optimizedImage}
+                    imageSrcSet={optimizedImage}
+                    {...({ fetchpriority: "high" } as any)}
+                />
+            )}
 
             {/* Open Graph / Facebook */}
             <meta property="og:type" content={type} />

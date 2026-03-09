@@ -45,8 +45,18 @@ const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, wi
 
     // Optimize Supabase images if width is provided
     let optimizedSrc = src;
-    if (optimizedSrc && optimizedSrc.includes('supabase.co') && !optimizedSrc.includes('?') && width) {
-        optimizedSrc = `${optimizedSrc}?width=${width}&quality=80`;
+    if (optimizedSrc && optimizedSrc.includes('supabase.co') && width) {
+        // Use the resizing endpoint instead of direct object access
+        if (optimizedSrc.includes('/storage/v1/object/public/')) {
+            optimizedSrc = optimizedSrc.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+        }
+
+        // Add parameters (ensure we don't double up or break existing ones)
+        if (!optimizedSrc.includes('?')) {
+            optimizedSrc = `${optimizedSrc}?width=${width}&quality=80&format=auto`;
+        } else if (!optimizedSrc.includes('width=')) {
+            optimizedSrc = `${optimizedSrc}&width=${width}&quality=80&format=auto`;
+        }
     }
 
     return (

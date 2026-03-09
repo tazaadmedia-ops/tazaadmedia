@@ -5,7 +5,14 @@ import SafeImage from './SafeImage';
 
 const Footer: React.FC = () => {
     return (
-        <footer style={{ backgroundColor: '#000', color: '#fff', paddingTop: '4rem', paddingBottom: '2rem', marginTop: '4rem' }}>
+        <footer style={{
+            backgroundColor: '#000',
+            color: '#fff',
+            paddingTop: '4rem',
+            paddingBottom: '2rem',
+            marginTop: '4rem',
+            minHeight: '400px' // Prevent massive layout shift when footer loads
+        }}>
             <div className="container">
 
                 {/* Top Section: Navigation Columns */}
