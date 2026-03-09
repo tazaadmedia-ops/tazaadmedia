@@ -47,9 +47,12 @@ const ArticlePage: React.FC = () => {
     const [relatedArticles, setRelatedArticles] = useState<any[]>([]);
     const [authorName, setAuthorName] = useState<string | null>(null);
     const [authorUsername, setAuthorUsername] = useState<string | null>(null);
+    const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
+
     const [categoryName, setCategoryName] = useState('News');
     const [updates, setUpdates] = useState<LiveUpdate[]>([]);
     const [loading, setLoading] = useState(true);
+
 
     const editor = useEditor({
         editable: false,
@@ -89,9 +92,10 @@ const ArticlePage: React.FC = () => {
                     *,
                     categories ( name ),
                     article_authors (
-                        users ( id, full_name, username )
+                        users ( id, full_name, username, avatar_url )
                     )
                 `)
+
                     .eq('slug', slug)
                     .single();
 
@@ -107,8 +111,10 @@ const ArticlePage: React.FC = () => {
                         if (user && user.full_name) {
                             setAuthorName(user.full_name);
                             setAuthorUsername(user.username);
+                            setAuthorAvatar(user.avatar_url);
                         }
                     }
+
 
                     // Category Translation
                     if (art.categories) {
@@ -228,7 +234,20 @@ const ArticlePage: React.FC = () => {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0', padding: '1.25rem 0' }}>
                     {authorName && (
-                        <>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            {authorAvatar && (
+                                <img
+                                    src={authorAvatar}
+                                    alt={authorName}
+                                    style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        borderRadius: '50%',
+                                        objectFit: 'cover',
+                                        border: '1px solid #f0f0f0'
+                                    }}
+                                />
+                            )}
                             <div style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>
                                 قلمڪار <span style={{ color: 'var(--color-accent)' }}>
                                     {authorUsername ? (
@@ -238,9 +257,10 @@ const ArticlePage: React.FC = () => {
                                     ) : authorName}
                                 </span>
                             </div>
-                            <span style={{ color: '#eee' }}>|</span>
-                        </>
+                            <span style={{ color: '#eee', margin: '0 0.5rem' }}>|</span>
+                        </div>
                     )}
+
                     <div style={{ fontSize: '0.9rem', color: '#888' }}>
                         {formatSindhiDate(article.published_at || article.created_at)}
                     </div>

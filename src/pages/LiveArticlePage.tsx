@@ -32,7 +32,9 @@ const LiveArticlePage: React.FC = () => {
     const [updates, setUpdates] = useState<LiveUpdate[]>([]);
     const [pendingUpdates, setPendingUpdates] = useState<LiveUpdate[]>([]);
     const [authorName, setAuthorName] = useState<string | null>(null);
+    const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
     const [newlyAddedIds, setNewlyAddedIds] = useState<Set<string>>(new Set());
     const updatesRef = useRef<LiveUpdate[]>([]);
@@ -76,7 +78,8 @@ const LiveArticlePage: React.FC = () => {
                 // Fetch Article
                 const { data: art, error: artError } = await supabase
                     .from('articles')
-                    .select('*, article_authors(users(full_name))')
+                    .select('*, article_authors(users(full_name, avatar_url))')
+
                     .eq('slug', slug)
                     // .eq('is_live', true) // Ideally uncomment when DB is fully populated
                     .single();
@@ -87,7 +90,9 @@ const LiveArticlePage: React.FC = () => {
                     setArticle(art);
                     if (articleWithAuthors.article_authors?.[0]?.users?.full_name) {
                         setAuthorName(articleWithAuthors.article_authors[0].users.full_name);
+                        setAuthorAvatar(articleWithAuthors.article_authors[0].users.avatar_url);
                     }
+
 
                     // Fetch Updates (Mocking query if table doesn't exist yet gracefully)
                     const { data: upds, error: updError } = await supabase
@@ -315,10 +320,26 @@ const LiveArticlePage: React.FC = () => {
                         </p>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '1rem 0', fontSize: '0.95rem', color: '#6b7280' }}>
-                            {authorName && <div>قلمڪار: <span style={{ fontWeight: 700, color: '#111827' }}>{authorName}</span></div>}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                {authorAvatar && (
+                                    <img
+                                        src={authorAvatar}
+                                        alt={authorName || ''}
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            border: '1px solid #e5e7eb'
+                                        }}
+                                    />
+                                )}
+                                {authorName && <div>قلمڪار: <span style={{ fontWeight: 700, color: '#111827' }}>{authorName}</span></div>}
+                            </div>
                             <span>•</span>
                             <div>{formatSindhiDate(article.published_at || article.created_at)}</div>
                         </div>
+
                     </div>
 
                     {/* Main Body Content for Live Blog */}
