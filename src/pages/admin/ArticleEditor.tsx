@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'; // Vercel cache clear
 import { useParams, useNavigate } from 'react-router-dom';
 // @ts-ignore
-import { useEditor, EditorContent, FloatingMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 // import Image from '@tiptap/extension-image'; // Replaced by Figure
@@ -502,25 +502,22 @@ const ArticleEditor: React.FC = () => {
             <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
 
                 {/* Floating "+" Menu */}
-                <FloatingMenu
-                    editor={editor}
-                    tippyOptions={{
-                        duration: 100,
-                        offset: [0, 10], // Adjusted for context
-                        placement: 'right-start', // Side-aligned
-                        zIndex: 1000,
-                    }}
-                    shouldShow={({ state }: { state: any }) => {
-                        const { selection } = state;
-                        const { $from } = selection;
-                        return selection.empty && $from.parent.type.name === 'paragraph' && $from.parent.content.size === 0;
-                    }}
-                >
+                {editor && editor.isEditable && (
                     <div style={{
+                        position: 'fixed',
+                        left: '50%',
+                        bottom: '20px',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1000,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        pointerEvents: 'auto'
+                        backgroundColor: '#fff',
+                        padding: '8px',
+                        borderRadius: '30px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                        border: '1px solid #eee',
+                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                     }}>
                         <button
                             onClick={(e) => {
@@ -530,27 +527,21 @@ const ArticleEditor: React.FC = () => {
                             title="Add Section"
                             style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                width: '30px', height: '30px', borderRadius: '50%',
-                                border: '1px solid #eee', backgroundColor: '#fff',
-                                cursor: 'pointer', color: isFloatingMenuOpen ? '#B70100' : '#999',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                                width: '36px', height: '36px', borderRadius: '50%',
+                                border: 'none', backgroundColor: isFloatingMenuOpen ? '#B70100' : '#000',
+                                cursor: 'pointer', color: '#fff',
                                 transition: 'all 0.2s',
                                 transform: isFloatingMenuOpen ? 'rotate(45deg)' : 'none'
                             }}
                         >
-                            <Plus size={18} />
+                            <Plus size={20} />
                         </button>
 
                         {isFloatingMenuOpen && (
                             <div style={{
                                 display: 'flex',
-                                gap: '6px',
-                                backgroundColor: '#fff',
-                                padding: '4px',
-                                borderRadius: '24px',
-                                border: '1px solid #eee',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                animation: 'fade-in-right 0.2s ease-out'
+                                gap: '4px',
+                                animation: 'fade-in 0.2s ease-out'
                             }}>
                                 <button
                                     onClick={() => {
@@ -558,8 +549,8 @@ const ArticleEditor: React.FC = () => {
                                         setIsFloatingMenuOpen(false);
                                     }}
                                     style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        padding: '6px 12px', borderRadius: '20px',
                                         border: 'none', backgroundColor: 'transparent',
                                         cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
                                     }}
@@ -573,8 +564,8 @@ const ArticleEditor: React.FC = () => {
                                         setIsFloatingMenuOpen(false);
                                     }}
                                     style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        padding: '6px 12px', borderRadius: '20px',
                                         border: 'none', backgroundColor: 'transparent',
                                         cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
                                     }}
@@ -591,8 +582,8 @@ const ArticleEditor: React.FC = () => {
                                         setIsFloatingMenuOpen(false);
                                     }}
                                     style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        padding: '6px 12px', borderRadius: '20px',
                                         border: 'none', backgroundColor: 'transparent',
                                         cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
                                     }}
@@ -602,7 +593,7 @@ const ArticleEditor: React.FC = () => {
                             </div>
                         )}
                     </div>
-                </FloatingMenu>
+                )}
 
                 {/* Article Search Modal */}
                 {isLinkModalOpen && (
