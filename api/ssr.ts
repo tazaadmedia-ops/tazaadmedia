@@ -16,12 +16,35 @@ interface Metadata {
 
 export default async function handler(request: any, response: any) {
     let html = '';
-    const start = Date.now();
+
+    // Helper functions for metadata and content injection
+    const escapeAttr = (str: string) => (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    const escapeUrl = (str: string) => (str || '').replace(/"/g, '&quot;');
+
+    const optimizeImage = (url: string) => {
+        if (url && url.includes('supabase.co') && !url.includes('?')) {
+            return `${url}?width=800&quality=80`;
+        }
+        return url;
+    };
+
+    const getMimeType = (url: string) => {
+        const ext = (url || '').split('?')[0].split('.').pop()?.toLowerCase();
+        if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+        if (ext === 'png') return 'image/png';
+        if (ext === 'webp') return 'image/webp';
+        return 'image/jpeg';
+    };
 
     // Determine Base URL Robustly
     const protocol = request.headers['x-forwarded-proto'] || 'https';
     const host = request.headers['x-forwarded-host'] || request.headers.host || 'thetazaad.com';
-    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
     const baseUrl = `${protocol}://${host}`;
 
     try {
@@ -50,10 +73,8 @@ export default async function handler(request: any, response: any) {
         if (!html) return response.status(500).send('System Error: Template Missing');
 
         // 2. Env Check & Init
-        const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://fppdszejziizibjlgpag.supabase.co';
-        const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwcGRzemVqemlpemliamxncGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxNDg0NTksImV4cCI6MjA4NDcyNDQ1OX0.O_xMpyfCJpjX2sjDZk0rs_x2youjwOVlobNdDL2Ulao';
-        const hasEnv = !!(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL);
-
+        const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+        const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
         const fbAppId = process.env.VITE_FACEBOOK_APP_ID || process.env.FACEBOOK_APP_ID || '';
 
         if (url && key) {
@@ -63,7 +84,7 @@ export default async function handler(request: any, response: any) {
         // 3. Default Metadata (Home)
         let meta: Metadata = {
             title: "تضاد - سنڌي",
-            description: "تازيون خبرون، تجزيا ۽ رپورٽون - تضاد سنڌي",
+            description: "Tazaad — Sindhi Language News and Analysis | تضاد سنڌي - تازيون خبرون، تجزيا ۽ رپورٽون",
             image: `${baseUrl}/default-og.jpg`,
             url: baseUrl,
             type: "website",
@@ -78,7 +99,6 @@ export default async function handler(request: any, response: any) {
 
         // 4. Route Handling
         if (supabase && slug) {
-            // Helper for query timeout
             const withTimeout = (promise: Promise<any>, timeoutMs: number) =>
                 Promise.race([
                     promise,
@@ -88,7 +108,6 @@ export default async function handler(request: any, response: any) {
             if (type === 'article' || type === 'live') {
                 const isLive = type === 'live';
                 try {
-                    // OPTIMIZED: Only select columns needed for SEO/Meta + content_text for crawlability
                     const query = supabase
                         .from('articles')
                         .select('title, subdeck, slug, featured_image_url, published_at, created_at, updated_at, content_text')
@@ -101,7 +120,7 @@ export default async function handler(request: any, response: any) {
                         const art = artResult;
                         const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
                         meta.title = prefixedTitle;
-                        meta.description = art.subdeck ? `${art.subdeck} | تضاد سنڌي` : `${art.title} - Sindhi Language News | تضاد سنڌي`;
+                        meta.description = art.subdeck ? `${art.subdeck} | Tazaad Sindhi News` : `${art.title} - Sindhi Language News | تضاد سنڌي`;
                         meta.url = `${baseUrl}/${isLive ? 'live/' : ''}${slug}`;
                         meta.type = "article";
                         if (art.featured_image_url) {
@@ -118,16 +137,12 @@ export default async function handler(request: any, response: any) {
                             "publisher": {
                                 "@type": "Organization",
                                 "name": "تضاد",
-                                "logo": {
-                                    "@type": "ImageObject",
-                                    "url": `${baseUrl}/logo.png`
-                                }
+                                "logo": { "@type": "ImageObject", "url": `${baseUrl}/logo.png` }
                             },
                             "inLanguage": "sd"
                         };
 
-                        // 5. CONTENT INJECTION (Critical for SPAs)
-                        // Inject the article text into the root div so bots can read it without JS
+                        // 5. CONTENT INJECTION (Critical for Bots/AI)
                         if (art.content_text) {
                             const bodyContent = `
                                 <article style="display:none;" aria-hidden="true">
@@ -140,7 +155,7 @@ export default async function handler(request: any, response: any) {
                         }
                     }
                 } catch (e) {
-                    console.error(`[SSR] Article Fetch Failed/Timed out:`, e);
+                    console.error(`[SSR] Article Fetch Failed:`, e);
                 }
             } else if (type === 'category') {
                 try {
@@ -148,8 +163,8 @@ export default async function handler(request: any, response: any) {
                     const { data: catResult } = await withTimeout(Promise.resolve(query), 5000) as any;
                     if (catResult) {
                         const cat = catResult;
-                        meta.title = `${cat.name} | تضاد`;
-                        meta.description = `تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
+                        meta.title = `${cat.name} | Tazaad News`;
+                        meta.description = `${cat.name} - Latest News and Articles | تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
                         meta.url = `${baseUrl}/topic/${slug}`;
                         meta.schema = {
                             "@context": "https://schema.org",
@@ -167,7 +182,7 @@ export default async function handler(request: any, response: any) {
                     if (userResult) {
                         const user = userResult;
                         meta.title = `${user.full_name} | ليکڪ`;
-                        meta.description = user.bio || `${user.full_name} جون لکڻيون تضاد تي.`;
+                        meta.description = user.bio || `${user.full_name}'s articles on Tazaad. ${user.full_name} جون لکڻيون تضاد تي.`;
                         meta.url = `${baseUrl}/author/${slug}`;
                         if (user.avatar_url) {
                             meta.image = user.avatar_url.startsWith('http') ? user.avatar_url : `${baseUrl}${user.avatar_url.startsWith('/') ? '' : '/'}${user.avatar_url}`;
@@ -177,10 +192,7 @@ export default async function handler(request: any, response: any) {
                             "@type": "ProfilePage",
                             "name": user.full_name,
                             "url": meta.url,
-                            "agent": {
-                                "@type": "Person",
-                                "name": user.full_name
-                            },
+                            "agent": { "@type": "Person", "name": user.full_name },
                             "inLanguage": "sd"
                         };
                     }
@@ -188,23 +200,17 @@ export default async function handler(request: any, response: any) {
             }
         }
 
-        // 5. Inject Content
-        // Aggressively remove existing metadata to avoid conflicts
+        // 6. Final Template Assembly
         html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
-        // Match all meta tags that we are about to re-inject, including those with different casing or attribute order
         html = html.replace(/<meta[^>]*?(?:name|property|itemprop)=["'](?:description|og:|twitter:|image)[^>]*?>/gi, '');
         html = html.replace(/<link[^>]*?rel=["'](?:canonical|image_src)["'][^>]*?>/gi, '');
 
-        // WhatsApp/OG Requirement
         if (!html.includes('prefix=')) {
             html = html.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
         }
 
-
         const finalImage = optimizeImage(meta.image);
         const mimeType = getMimeType(finalImage);
-
-        // Truncate description for better social display
         const truncatedDesc = meta.description.length > 165
             ? meta.description.substring(0, 160) + '...'
             : meta.description;
