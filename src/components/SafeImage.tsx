@@ -8,6 +8,7 @@ interface SafeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 
 const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, width, height, ...props }) => {
     const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     if (error || !src) {
         return (
@@ -43,36 +44,59 @@ const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, wi
         );
     }
 
-    // Optimize Supabase images if width is provided
-    let optimizedSrc = src;
+    const optimizedSrc = src;
+    // Remove experimental optimization that might cause 404s on some Supabase setups
+    /* 
     if (optimizedSrc && optimizedSrc.includes('supabase.co') && width) {
-        // Standard parameters usually work with the default endpoint if handled by a proxy or CDN, 
-        // but let's stick to what was working before.
         if (!optimizedSrc.includes('?')) {
             optimizedSrc = `${optimizedSrc}?width=${width}&quality=80`;
         }
     }
+    */
 
     return (
-        <img
-            src={optimizedSrc}
-            alt={alt}
-            width={width}
-            height={height}
-            style={{
-                ...style,
-                borderRadius: '0',
-                display: 'block',
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-                pointerEvents: 'auto',
-                aspectRatio: (width && height) ? `${width}/${height}` : undefined
-            } as any}
-            decoding="async"
-            onError={() => setError(true)}
-            {...props}
-        />
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            {loading && (
+                <div
+                    className="skeleton"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        zIndex: 1,
+                        aspectRatio: (width && height) ? `${width}/${height}` : undefined
+                    }}
+                />
+            )}
+            <img
+                src={optimizedSrc}
+                alt={alt}
+                width={width}
+                height={height}
+                onLoad={() => setLoading(false)}
+                onError={() => {
+                    setError(true);
+                    setLoading(false);
+                }}
+                style={{
+                    ...style,
+                    borderRadius: '0',
+                    display: 'block',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    pointerEvents: 'auto',
+                    opacity: loading ? 0 : 1,
+                    transition: 'opacity 0.3s ease-in-out',
+                    aspectRatio: (width && height) ? `${width}/${height}` : undefined
+                } as any}
+                decoding="async"
+                {...props}
+            />
+        </div>
     );
 };
 
 export default SafeImage;
+

@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import LoadingSpinner from '../components/LoadingSpinner';
+import SkeletonHome from '../components/SkeletonHome';
 import SEO from '../components/SEO';
 import SafeImage from '../components/SafeImage';
-
-
-
 
 const Home: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
@@ -89,7 +86,8 @@ const Home: React.FC = () => {
         </span>
     );
 
-    if (loading) return <LoadingSpinner />;
+    if (loading) return <SkeletonHome />;
+
 
     // Distribute top items
     const heroStory = articles[0];

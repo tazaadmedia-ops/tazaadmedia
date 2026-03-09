@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import LoadingSpinner from '../components/LoadingSpinner';
+import SkeletonList from '../components/SkeletonList';
 import SEO from '../components/SEO';
 import SafeImage from '../components/SafeImage';
 
@@ -62,7 +62,8 @@ const CategoryPage: React.FC = () => {
         window.scrollTo(0, 0);
     }, [slug]);
 
-    if (loading) return <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}><LoadingSpinner /></div>;
+    if (loading) return <SkeletonList />;
+
 
     return (
         <div className="container page-top-margin" style={{ fontFamily: 'var(--font-main)', direction: 'rtl' }}>

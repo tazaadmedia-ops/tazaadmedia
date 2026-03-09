@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import LoadingSpinner from '../components/LoadingSpinner';
+import SkeletonList from '../components/SkeletonList';
 import SafeImage from '../components/SafeImage';
 
 const SearchPage: React.FC = () => {
@@ -46,6 +46,8 @@ const SearchPage: React.FC = () => {
         fetchResults();
     }, [query]);
 
+    if (loading) return <SkeletonList />;
+
     return (
         <div className="container page-top-margin" style={{ fontFamily: 'var(--font-main)', direction: 'rtl' }}>
             <header style={{ borderBottom: '1px solid #eee', paddingBottom: '1rem', marginBottom: '3rem' }}>
@@ -55,9 +57,7 @@ const SearchPage: React.FC = () => {
 
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', marginBottom: '5rem' }}>
-                    {loading ? (
-                        <div style={{ padding: '4rem 0' }}><LoadingSpinner /></div>
-                    ) : articles.length > 0 ? articles.map((art) => (
+                    {articles.length > 0 ? articles.map((art) => (
                         <div key={art.id} className="mobile-grid-1" style={{
                             display: 'grid',
                             gridTemplateColumns: '300px 1fr',
@@ -119,3 +119,4 @@ const SearchPage: React.FC = () => {
 };
 
 export default SearchPage;
+

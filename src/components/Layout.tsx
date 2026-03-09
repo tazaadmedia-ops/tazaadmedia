@@ -10,7 +10,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, flush }) => {
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
             <Header />
             <main style={{ flex: 1, paddingTop: flush ? '0' : '1.5rem' }}>
                 <PageTransition>
