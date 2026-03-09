@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'; // Vercel cache clear
 import { useParams, useNavigate } from 'react-router-dom';
+import { useEditor, EditorContent } from '@tiptap/react';
 // @ts-ignore
-import { useEditor, EditorContent, FloatingMenu } from '@tiptap/react';
+import { FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 // import Image from '@tiptap/extension-image'; // Replaced by Figure
@@ -16,7 +17,7 @@ import {
     RotateCcw, RotateCw, Bold, Italic, Strikethrough,
     Code, Link as LinkIcon, Video, Quote,
     ListOrdered, ChevronDown, AlignLeft, AlignCenter, AlignRight,
-    Loader, Check, Twitter
+    Loader, Check, Twitter as TwitterIcon
 } from 'lucide-react';
 import FloatingMenuExtension from '@tiptap/extension-floating-menu';
 import AdminLayout from '../../components/admin/AdminLayout';
@@ -488,13 +489,11 @@ const ArticleEditor: React.FC = () => {
                 {editor && (
                     <FloatingMenu
                         editor={editor}
-                        shouldShow={({ state }: { state: any }) => {
-                            const { selection } = state;
-                            const { $from } = selection;
+                        shouldShow={({ state }) => {
                             // Only show if it's an empty paragraph
-                            return $from.parent.type.name === 'paragraph' && $from.parent.content.size === 0;
+                            return state.selection.$from.parent.type.name === 'paragraph' && state.selection.$from.parent.content.size === 0;
                         }}
-                        tippyOptions={{ duration: 100, offset: [0, 10] }}
+                        options={{ offset: 10, placement: 'right' }}
                     >
                         <div style={{
                             display: 'flex',
@@ -575,7 +574,7 @@ const ArticleEditor: React.FC = () => {
                                             cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
                                         }}
                                     >
-                                        <Twitter size={16} /> ٽوئيٽ
+                                        <TwitterIcon size={16} /> ٽوئيٽ
                                     </button>
                                 </div>
                             )}
@@ -1116,7 +1115,7 @@ const ArticleEditor: React.FC = () => {
                             <ToolbarButton onClick={() => {
                                 const url = prompt('Enter Twitter/X URL');
                                 if (url) editor.commands.setTwitter({ url });
-                            }} icon={<Twitter size={16} />} />
+                            }} icon={<TwitterIcon size={16} />} />
                             <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} icon={<Quote size={16} />} />
                         </div>
 
