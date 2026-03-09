@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import LoadingSpinner from '../components/LoadingSpinner';
+
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Figure } from '../extensions/Figure';
@@ -14,6 +14,8 @@ import SEO from '../components/SEO';
 import SafeImage from '../components/SafeImage';
 import LiveUpdateTimeline from '../components/LiveUpdateTimeline';
 import type { LiveUpdate } from '../components/LiveUpdateTimeline';
+import SkeletonArticle from '../components/SkeletonArticle';
+
 
 const CATEGORY_MAP: Record<string, string> = {
     'Politics': 'سياست',
@@ -193,7 +195,9 @@ const ArticlePage: React.FC = () => {
         window.scrollTo(0, 0);
     }, [slug]);
 
-    if (loading) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}><LoadingSpinner /></div>;
+    if (loading) return <SkeletonArticle />;
+    if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>مضمون نہ مليو</div>;
+
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>مضمون نہ مليو</div>;
 
     return (

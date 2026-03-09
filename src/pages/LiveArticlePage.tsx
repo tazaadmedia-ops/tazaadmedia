@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import LoadingSpinner from '../components/LoadingSpinner';
+
 import SEO from '../components/SEO';
 import SafeImage from '../components/SafeImage';
 import LivePulseIndicator from '../components/LivePulseIndicator';
@@ -16,6 +16,8 @@ import Youtube from '@tiptap/extension-youtube';
 import LinkExtension from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import type { LiveUpdate } from '../components/LiveUpdateTimeline';
+import SkeletonArticle from '../components/SkeletonArticle';
+
 
 const formatSindhiDate = (dateString: string) => {
     if (!dateString) return '';
@@ -218,7 +220,8 @@ const LiveArticlePage: React.FC = () => {
         }, 3000);
     }, [pendingUpdates]);
 
-    if (loading) return <div className="container page-top-margin" style={{ textAlign: 'center' }}><LoadingSpinner /></div>;
+    if (loading) return <SkeletonArticle />;
+
     if (!article) return <div className="container page-top-margin" style={{ textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
 
     // Redirect to normal article page if the live blog has ended

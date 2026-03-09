@@ -20,10 +20,34 @@ const Header: React.FC = () => {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
 
+    const [scrollProgress, setScrollProgress] = useState(0);
+
     useEffect(() => {
         fetchNavbarData();
         fetchTickerArticles();
     }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const isArticlePage = location.pathname.startsWith('/article/') || location.pathname.startsWith('/live/') || (location.pathname !== '/' && location.pathname.split('/').length === 2 && !location.pathname.includes('.'));
+
+            // Note: The second check is for the "short slug" URLs like /slug-name
+            if (isArticlePage) {
+                const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+                if (totalScroll > 0) {
+                    const currentProgress = (window.scrollY / totalScroll) * 100;
+                    setScrollProgress(currentProgress);
+                }
+            } else {
+                setScrollProgress(0);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        // Initial check for progress on page load/navigation
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [location.pathname]);
 
     useEffect(() => {
         if (tickerArticles.length > 1) {
@@ -43,6 +67,7 @@ const Header: React.FC = () => {
             return () => clearInterval(timer);
         }
     }, [tickerArticles, currentNewsIndex]);
+
 
     // Close menu/search on route change
     useEffect(() => {
@@ -225,7 +250,7 @@ const Header: React.FC = () => {
                 </div>
 
                 {/* --- BOTTOM BAR (RED NEWS SLIDER) --- */}
-                <div style={{ backgroundColor: 'var(--color-accent)', width: '100%' }}>
+                <div style={{ backgroundColor: 'var(--color-accent)', width: '100%', position: 'relative' }}>
                     <div className="container">
                         <div className="news-ticker-bar">
                             <div className="news-ticker-label">
@@ -252,8 +277,22 @@ const Header: React.FC = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Reading Progress Bar */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0,
+                        height: '3px',
+                        backgroundColor: '#fff',
+                        width: `${scrollProgress}%`,
+                        transition: 'width 0.1s ease-out',
+                        opacity: scrollProgress > 0 ? 1 : 0,
+                        zIndex: 10
+                    }} />
                 </div>
             </header>
+
 
             {/* --- MOBILE DRAWER MENU --- */}
             <div className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`} onClick={() => setIsMenuOpen(false)}>
