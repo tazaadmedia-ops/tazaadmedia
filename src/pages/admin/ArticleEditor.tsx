@@ -8,6 +8,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { Figure } from '../../extensions/Figure';
 import { RelatedArticle } from '../../extensions/RelatedArticle';
+import { Twitter as TwitterExtension } from '../../extensions/Twitter';
 import Youtube from '@tiptap/extension-youtube';
 import TextAlign from '@tiptap/extension-text-align';
 import {
@@ -109,6 +110,7 @@ const ArticleEditor: React.FC = () => {
             }),
             Figure,
             RelatedArticle,
+            TwitterExtension,
             Youtube.configure({ controls: true }),
             Link.configure({ openOnClick: false }),
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -558,7 +560,7 @@ const ArticleEditor: React.FC = () => {
                                     onClick={() => {
                                         const url = window.prompt('Twitter/X لنڪ پيسٽ ڪريو:');
                                         if (url) {
-                                            editor.chain().focus().insertContent(`<p>${url}</p>`).run();
+                                            editor.commands.setTwitter({ url });
                                         }
                                         setIsFloatingMenuOpen(false);
                                     }}
@@ -1108,6 +1110,10 @@ const ArticleEditor: React.FC = () => {
                                         const url = prompt('Enter YouTube URL');
                                         if (url) editor.commands.setYoutubeVideo({ src: url });
                                     }} icon={<Video size={16} />} />
+                                    <ToolbarButton onClick={() => {
+                                        const url = prompt('Enter Twitter/X URL');
+                                        if (url) editor.commands.setTwitter({ url });
+                                    }} icon={<Twitter size={16} />} />
                                     <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} icon={<Quote size={16} />} />
                                 </div>
 
