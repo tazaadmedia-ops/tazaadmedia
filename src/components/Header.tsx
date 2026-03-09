@@ -283,9 +283,9 @@ const Header: React.FC = () => {
 
                 {/* Reading Progress Bar (Now below the ticker) */}
                 <div style={{
-                    height: '3px',
+                    height: '2px',
                     width: '100%',
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(0,0,0,0.05)',
                     position: 'relative',
                     overflow: 'hidden'
                 }}>
@@ -294,13 +294,16 @@ const Header: React.FC = () => {
                         top: 0,
                         right: 0,
                         height: '100%',
-                        backgroundColor: '#ffd140',
-                        width: `${scrollProgress}%`,
-                        transition: 'width 0.3s cubic-bezier(0.1, 0, 0, 1)',
+                        backgroundColor: '#000',
+                        width: '100%',
+                        transform: `scaleX(${scrollProgress / 100})`,
+                        transformOrigin: 'right',
+                        transition: 'transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
                         opacity: scrollProgress > 0 ? 1 : 0,
                         zIndex: 10
                     }} />
                 </div>
+
             </header>
 
 
