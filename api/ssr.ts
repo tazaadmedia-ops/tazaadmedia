@@ -188,23 +188,31 @@ export default async function handler(request: any, response: any) {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
 
+        const escapeUrl = (str: string) => str.replace(/"/g, '&quot;');
+
         const metaTags = `
     <title>${escapeAttr(meta.title)}</title>
     <meta name="description" content="${escapeAttr(meta.description)}" />
     <meta property="og:title" content="${escapeAttr(meta.title)}" />
     <meta property="og:description" content="${escapeAttr(meta.description)}" />
-    <meta property="og:image" content="${escapeAttr(meta.image)}" />
-    <meta property="og:image:secure_url" content="${escapeAttr(meta.image)}" />
+    <meta property="og:image" content="${escapeUrl(meta.image)}" />
+    <meta property="og:image:secure_url" content="${escapeUrl(meta.image)}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="${escapeAttr(meta.url)}" />
+    <meta property="og:url" content="${escapeUrl(meta.url)}" />
     <meta property="og:type" content="${meta.type}" />
+    <meta property="og:site_name" content="تضاد - سنڌي" />
     ${fbAppId ? `<meta property="fb:app_id" content="${escapeAttr(fbAppId)}" />` : ''}
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@thetazaad" />
+    <meta name="twitter:creator" content="@thetazaad" />
     <meta name="twitter:title" content="${escapeAttr(meta.title)}" />
     <meta name="twitter:description" content="${escapeAttr(meta.description)}" />
-    <meta name="twitter:image" content="${escapeAttr(meta.image)}" />
-    <link rel="canonical" href="${escapeAttr(meta.url)}" />
+    <meta name="twitter:image" content="${escapeUrl(meta.image)}" />
+    <meta name="twitter:image:src" content="${escapeUrl(meta.image)}" />
+    <meta name="twitter:url" content="${escapeUrl(meta.url)}" />
+    <meta name="twitter:domain" content="${host}" />
+    <link rel="canonical" href="${escapeUrl(meta.url)}" />
     <script type="application/ld+json">${JSON.stringify(meta.schema)}</script>
 `;
 
