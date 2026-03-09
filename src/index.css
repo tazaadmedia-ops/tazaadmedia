@@ -85,6 +85,8 @@ h6 {
   /* Slightly softer black */
   font-feature-settings: 'kern' 1;
   /* Enable kerning for headings */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 h1 {

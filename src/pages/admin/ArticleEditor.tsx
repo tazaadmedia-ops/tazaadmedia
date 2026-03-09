@@ -506,7 +506,7 @@ const ArticleEditor: React.FC = () => {
                     const isRtl = document.dir === 'rtl' || getComputedStyle(editor.view.dom).direction === 'rtl';
                     setFloatingMenuPos({
                         top: start.top - editorRect.top,
-                        left: start.left - editorRect.left + (isRtl ? -45 : 15)
+                        left: start.left - editorRect.left + (isRtl ? -60 : 25)
                     });
                 }
             } else {
@@ -547,14 +547,17 @@ const ArticleEditor: React.FC = () => {
                             position: 'absolute',
                             top: floatingMenuPos.top,
                             left: floatingMenuPos.left,
-                            zIndex: 100,
+                            zIndex: 1000, // Increased z-index
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px',
                             pointerEvents: 'auto'
                         }}>
                             <button
-                                onClick={() => setIsFloatingMenuOpen(!isFloatingMenuOpen)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setIsFloatingMenuOpen(!isFloatingMenuOpen);
+                                }}
                                 title="Add Section"
                                 style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -578,7 +581,8 @@ const ArticleEditor: React.FC = () => {
                                     borderRadius: '24px',
                                     border: '1px solid #eee',
                                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                    animation: 'fade-in-right 0.2s ease-out'
+                                    animation: 'fade-in-right 0.2s ease-out',
+                                    zIndex: 1001
                                 }}>
                                     <button
                                         onClick={() => {
@@ -819,8 +823,7 @@ const ArticleEditor: React.FC = () => {
                 </div>
 
                 {/* Title & Deck */}
-                <input
-                    type="text"
+                <textarea
                     placeholder="Article Title"
                     value={title}
                     onChange={(e) => {
@@ -830,10 +833,20 @@ const ArticleEditor: React.FC = () => {
                         if (id === 'new' && !slug && newTitle.trim().length > 0) {
                             setSlug(generateRandomSlug());
                         }
+
+                        // Auto-resize
+                        e.target.style.height = 'auto';
+                        e.target.style.height = e.target.scrollHeight + 'px';
                     }}
+                    onFocus={(e) => {
+                        e.target.style.height = 'auto';
+                        e.target.style.height = e.target.scrollHeight + 'px';
+                    }}
+                    rows={1}
                     style={{
-                        width: '100%', fontSize: '2.5rem', fontWeight: 800, border: 'none', outline: 'none',
-                        marginBottom: '1rem', background: 'transparent', color: '#111', lineHeight: '1.2', direction: 'rtl'
+                        width: '100%', fontSize: '2.5rem', fontWeight: 900, border: 'none', outline: 'none',
+                        marginBottom: '1rem', background: 'transparent', color: '#111', lineHeight: '1.2',
+                        direction: 'rtl', fontFamily: 'var(--font-main)', resize: 'none', overflow: 'hidden'
                     }}
                 />
 
@@ -861,16 +874,25 @@ const ArticleEditor: React.FC = () => {
                 </div>
 
                 <div style={{ position: 'relative', marginBottom: '2rem' }}>
-                    <input
-                        type="text"
+                    <textarea
                         placeholder="Add a short intro..."
                         value={subdeck}
                         maxLength={250}
-                        onChange={(e) => setSubdeck(e.target.value)}
+                        onChange={(e) => {
+                            setSubdeck(e.target.value);
+                            // Auto-resize
+                            e.target.style.height = 'auto';
+                            e.target.style.height = e.target.scrollHeight + 'px';
+                        }}
+                        onFocus={(e) => {
+                            e.target.style.height = 'auto';
+                            e.target.style.height = e.target.scrollHeight + 'px';
+                        }}
+                        rows={1}
                         style={{
                             width: '100%', fontSize: '1.25rem', color: '#666', border: 'none', outline: 'none',
                             background: 'transparent', lineHeight: '1.5', direction: 'rtl',
-                            paddingBottom: '4px'
+                            paddingBottom: '4px', fontFamily: 'var(--font-main)', resize: 'none', overflow: 'hidden'
                         }}
                     />
                     <div style={{
