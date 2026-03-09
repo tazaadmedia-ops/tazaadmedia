@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
+import SafeImage from '../components/SafeImage';
 
 const SearchPage: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -71,10 +72,17 @@ const SearchPage: React.FC = () => {
                                         aspectRatio: '16/10',
                                         backgroundColor: '#f5f5f5',
                                         borderRadius: '4px',
-                                        backgroundImage: `url(${art.featured_image_url})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center'
-                                    }} />
+                                        overflow: 'hidden'
+                                    }}>
+                                        <SafeImage
+                                            src={art.featured_image_url}
+                                            alt={art.title}
+                                            width="600"
+                                            height="375"
+                                            loading="lazy"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    </div>
                                 </Link>
                             </div>
                             <div>
