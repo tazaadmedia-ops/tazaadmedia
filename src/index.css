@@ -226,32 +226,26 @@ img {
 }
 
 /* Article specific */
-.article-content {
+/* Article specific */
+.article-content,
+.prose,
+.ProseMirror {
   max-width: var(--article-width);
   margin: 0 auto;
   font-size: 1.2rem;
-  /* Slightly larger for comfortable reading */
-  line-height: 1.55;
-  /* Extra compact line-height */
+  line-height: 1.6;
   color: #2A2A2A;
-  /* Softer black, easier on eyes */
   font-weight: 400;
   letter-spacing: 0.01em;
-  /* Better kerning */
   word-spacing: 0.05em;
-  /* Improved word spacing */
 }
 
-.article-content p {
-  margin-top: 0;
-  margin-bottom: 0.8rem;
-  /* Very compact paragraph spacing */
-}
-
-/* Target Tiptap specifically to remove its default spacing */
-.article-content .ProseMirror p {
-  margin-top: 0;
-  margin-bottom: 0.8rem;
+.article-content p,
+.prose p,
+.ProseMirror p {
+  margin-top: 0 !important;
+  margin-bottom: 0.4rem !important;
+  /* Extremely tight for "actual line break" feel */
 }
 
 .article-content h3 {
