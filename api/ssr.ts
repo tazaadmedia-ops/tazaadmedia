@@ -20,7 +20,7 @@ export default async function handler(request: any, response: any) {
 
     // Determine Base URL Robustly
     const protocol = request.headers['x-forwarded-proto'] || 'https';
-    const host = request.headers['x-forwarded-host'] || request.headers.host || 'thetazaad.com';
+    const host = request.headers['x-forwarded-host'] || request.headers.host || 'tazaadmedia.com';
     const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
     const baseUrl = `${protocol}://${host}`;
 
@@ -102,7 +102,7 @@ export default async function handler(request: any, response: any) {
                         const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
                         meta.title = prefixedTitle;
                         meta.description = art.subdeck || meta.description;
-                        meta.url = `${baseUrl}/${type === 'live' ? 'article/live' : 'article'}/${slug}`;
+                        meta.url = `${baseUrl}/${isLive ? 'live/' : ''}${slug}`;
                         meta.type = "article";
                         if (art.featured_image_url) {
                             meta.image = art.featured_image_url.startsWith('http') ? art.featured_image_url : `${baseUrl}${art.featured_image_url.startsWith('/') ? '' : '/'}${art.featured_image_url}`;
@@ -137,7 +137,7 @@ export default async function handler(request: any, response: any) {
                         const cat = catResult;
                         meta.title = `${cat.name} | تضاد`;
                         meta.description = `تازيون خبرون ۽ مضمون ڪيٽيگري: ${cat.name}`;
-                        meta.url = `${baseUrl}/category/${slug}`;
+                        meta.url = `${baseUrl}/topic/${slug}`;
                         meta.schema = {
                             "@context": "https://schema.org",
                             "@type": "CollectionPage",

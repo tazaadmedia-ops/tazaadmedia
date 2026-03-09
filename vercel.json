@@ -9,20 +9,20 @@
       "destination": "/api/ssr?type=home"
     },
     {
-      "source": "/article/live/:slug",
+      "source": "/live/:slug",
       "destination": "/api/ssr?type=live&slug=:slug"
     },
     {
-      "source": "/article/:slug",
-      "destination": "/api/ssr?type=article&slug=:slug"
-    },
-    {
-      "source": "/category/:slug",
+      "source": "/topic/:slug",
       "destination": "/api/ssr?type=category&slug=:slug"
     },
     {
       "source": "/author/:slug",
       "destination": "/api/ssr?type=author&slug=:slug"
+    },
+    {
+      "source": "/:slug((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/|live/|topic/|author/|admin/|login|search|about|submit|contact|privacy|terms|sitemap).*)",
+      "destination": "/api/ssr?type=article&slug=:slug"
     },
     {
       "source": "/((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/).*)",

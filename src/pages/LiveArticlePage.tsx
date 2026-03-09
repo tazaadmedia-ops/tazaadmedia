@@ -210,7 +210,7 @@ const LiveArticlePage: React.FC = () => {
             "name": "Tazaad",
             "logo": {
                 "@type": "ImageObject",
-                "url": "https://thetazaad.com/logo.png"
+                "url": "https://tazaadmedia.com/logo.png"
             }
         },
         "liveBlogUpdate": updates.slice(0, 10).map(upd => ({

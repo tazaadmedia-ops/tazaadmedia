@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 let supabase: ReturnType<typeof createClient> | null = null;
 
 export default async function handler(request: any, response: any) {
-    const baseUrl = 'https://thetazaad.com';
+    const baseUrl = 'https://tazaadmedia.com';
 
     // Supabase Setup (using same logic as ssr.ts)
     const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://fppdszejziizibjlgpag.supabase.co';
@@ -42,7 +42,7 @@ export default async function handler(request: any, response: any) {
     <!-- Articles -->
     ${(articles || []).map((art: any) => `
     <url>
-        <loc>${baseUrl}/${art.type === 'live' ? 'article/live' : 'article'}/${art.slug}</loc>
+        <loc>${baseUrl}/${art.type === 'live' ? 'live/' : ''}${art.slug}</loc>
         <lastmod>${new Date(art.updated_at).toISOString()}</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
@@ -51,7 +51,7 @@ export default async function handler(request: any, response: any) {
     <!-- Categories -->
     ${(categories || []).map((cat: any) => `
     <url>
-        <loc>${baseUrl}/category/${cat.slug}</loc>
+        <loc>${baseUrl}/topic/${cat.slug}</loc>
         <changefreq>daily</changefreq>
         <priority>0.6</priority>
     </url>`).join('')}

@@ -28,7 +28,7 @@ const SEO: React.FC<SEOProps> = ({
         document.documentElement.setAttribute('prefix', 'og: http://ogp.me/ns#');
     }, []);
 
-    const siteUrl = 'https://thetazaad.com'; // Final production domain
+    const siteUrl = 'https://tazaadmedia.com'; // Final production domain
     const fullUrl = `${siteUrl}${slug ? (slug.startsWith('/') ? slug : `/${slug}`) : ''}`;
 
     // Ensure image is absolute and handles Supabase paths
