@@ -77,27 +77,27 @@ const LiveArticlePage: React.FC = () => {
             }
         };
 
-        useEffect(() => {
-            if (article?.id) {
-                // Increment view count in background
-                supabase.rpc('increment_view_count', { article_id: article.id })
-                    .then(({ error }) => {
-                        if (error) {
-                            // Fallback if RPC doesn't exist: simple update (less accurate but works)
-                            supabase
-                                .from('articles')
-                                .update({ view_count: (article.view_count || 0) + 1 })
-                                .eq('id', article.id)
-                                .then(({ error: updateError }) => {
-                                    if (updateError) console.error('Error incrementing view count:', updateError);
-                                });
-                        }
-                    });
-            }
-        }, [article?.id]);
-
         fetchLiveArticle();
     }, [slug]);
+
+    useEffect(() => {
+        if (article?.id) {
+            // Increment view count in background
+            supabase.rpc('increment_view_count', { article_id: article.id })
+                .then(({ error }) => {
+                    if (error) {
+                        // Fallback if RPC doesn't exist: simple update (less accurate but works)
+                        supabase
+                            .from('articles')
+                            .update({ view_count: (article.view_count || 0) + 1 })
+                            .eq('id', article.id)
+                            .then(({ error: updateError }) => {
+                                if (updateError) console.error('Error incrementing view count:', updateError);
+                            });
+                    }
+                });
+        }
+    }, [article?.id]);
 
     // Realtime Subscription
     useEffect(() => {
