@@ -64,7 +64,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <AdminLayout>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
                 <div>
                     <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Dashboard</h1>
                     <p style={{ color: '#666' }}>Manage your content and website statistics.</p>
@@ -76,14 +76,20 @@ const Dashboard: React.FC = () => {
                     borderRadius: '8px',
                     textDecoration: 'none',
                     fontWeight: 700,
-                    fontSize: '0.9rem'
+                    fontSize: '0.9rem',
+                    whiteSpace: 'nowrap'
                 }}>
                     + New Article
                 </Link>
             </div>
 
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '3rem'
+            }}>
                 {[
                     { label: 'Total Articles', value: articles.length, color: '#000' },
                     { label: 'Total Views', value: formatViews(totalViews), color: '#000' },
@@ -97,11 +103,19 @@ const Dashboard: React.FC = () => {
                 ))}
             </div>
 
-            {/* Articles Table */}
+            {/* Articles Table Container */}
             <div style={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{
+                    padding: '1.5rem',
+                    borderBottom: '1px solid #f0f0f0',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '1rem'
+                }}>
                     <div style={{ fontWeight: 700 }}>Recent Articles</div>
-                    <div style={{ position: 'relative', width: '300px' }}>
+                    <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
                         <input
                             type="text"
                             placeholder="Search articles..."
@@ -121,118 +135,120 @@ const Dashboard: React.FC = () => {
                         />
                     </div>
                 </div>
-                {loading ? <p style={{ padding: '2rem' }}>Loading...</p> : (
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
-                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '40%' }}>Title</th>
-                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Slug</th>
-                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Status</th>
-                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Live</th>
-                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredArticles.map((article) => (
-                                <tr key={article.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                    <td style={{ padding: '1.2rem 1.5rem' }}>
-                                        <div style={{ fontWeight: 600, fontSize: '0.95rem', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            {article.title}
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1.2rem 1.5rem', fontSize: '0.85rem', color: '#666', fontFamily: 'monospace' }}>
-                                        /{article.slug}
-                                    </td>
-                                    <td style={{ padding: '1.2rem 1.5rem' }}>
-                                        <span style={{
-                                            backgroundColor: article.status === 'published' ? '#dcfce7' : article.status === 'scheduled' ? '#fef9c3' : '#f3f4f6',
-                                            color: article.status === 'published' ? '#166534' : article.status === 'scheduled' ? '#854d0e' : '#666',
-                                            padding: '4px 10px',
-                                            borderRadius: '20px',
-                                            fontSize: '0.75rem',
-                                            fontWeight: 700,
-                                            display: 'inline-block',
-                                            textTransform: 'capitalize'
-                                        }}>
-                                            {article.status || 'draft'}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1.2rem 1.5rem' }}>
-                                        <div
-                                            onClick={() => handleToggleLive(article.id, article.is_live)}
-                                            style={{
-                                                width: '40px',
-                                                height: '20px',
-                                                backgroundColor: article.is_live ? '#ef4444' : '#e5e7eb',
-                                                borderRadius: '20px',
-                                                position: 'relative',
-                                                cursor: 'pointer',
-                                                transition: 'background-color 0.2s'
-                                            }}
-                                        >
-                                            <div style={{
-                                                width: '16px',
-                                                height: '16px',
-                                                backgroundColor: '#fff',
-                                                borderRadius: '50%',
-                                                position: 'absolute',
-                                                top: '2px',
-                                                left: article.is_live ? '22px' : '2px',
-                                                transition: 'left 0.2s'
-                                            }} />
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1.2rem 1.5rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <a
-                                                href={article.is_live ? `/live/${article.slug}` : `/${article.slug}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                style={{ color: '#666', transition: 'color 0.2s' }}
-                                                title="View"
-                                            >
-                                                <Eye size={18} />
-                                            </a>
-                                            <button
-                                                onClick={() => navigate(`/admin/edit/${article.id}`)}
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    color: 'var(--color-accent)',
-                                                    cursor: 'pointer',
-                                                    padding: 0,
-                                                    fontWeight: 600,
-                                                    fontSize: '0.9rem',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '4px'
-                                                }}
-                                            >
-                                                <Edit2 size={16} /> Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(article.id, article.title)}
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    color: '#ef4444',
-                                                    cursor: 'pointer',
-                                                    padding: 0,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    transition: 'opacity 0.2s'
-                                                }}
-                                                title="Delete"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
+                <div style={{ overflowX: 'auto' }}>
+                    {loading ? <p style={{ padding: '2rem' }}>Loading...</p> : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '40%' }}>Title</th>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Slug</th>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Status</th>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Live</th>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Action</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
+                            </thead>
+                            <tbody>
+                                {filteredArticles.map((article) => (
+                                    <tr key={article.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                        <td style={{ padding: '1.2rem 1.5rem' }}>
+                                            <div style={{ fontWeight: 600, fontSize: '0.95rem', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {article.title}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1.2rem 1.5rem', fontSize: '0.85rem', color: '#666', fontFamily: 'monospace' }}>
+                                            /{article.slug}
+                                        </td>
+                                        <td style={{ padding: '1.2rem 1.5rem' }}>
+                                            <span style={{
+                                                backgroundColor: article.status === 'published' ? '#dcfce7' : article.status === 'scheduled' ? '#fef9c3' : '#f3f4f6',
+                                                color: article.status === 'published' ? '#166534' : article.status === 'scheduled' ? '#854d0e' : '#666',
+                                                padding: '4px 10px',
+                                                borderRadius: '20px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 700,
+                                                display: 'inline-block',
+                                                textTransform: 'capitalize'
+                                            }}>
+                                                {article.status || 'draft'}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '1.2rem 1.5rem' }}>
+                                            <div
+                                                onClick={() => handleToggleLive(article.id, article.is_live)}
+                                                style={{
+                                                    width: '40px',
+                                                    height: '20px',
+                                                    backgroundColor: article.is_live ? '#ef4444' : '#e5e7eb',
+                                                    borderRadius: '20px',
+                                                    position: 'relative',
+                                                    cursor: 'pointer',
+                                                    transition: 'background-color 0.2s'
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: '16px',
+                                                    height: '16px',
+                                                    backgroundColor: '#fff',
+                                                    borderRadius: '50%',
+                                                    position: 'absolute',
+                                                    top: '2px',
+                                                    left: article.is_live ? '22px' : '2px',
+                                                    transition: 'left 0.2s'
+                                                }} />
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1.2rem 1.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                <a
+                                                    href={article.is_live ? `/live/${article.slug}` : `/${article.slug}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    style={{ color: '#666', transition: 'color 0.2s' }}
+                                                    title="View"
+                                                >
+                                                    <Eye size={18} />
+                                                </a>
+                                                <button
+                                                    onClick={() => navigate(`/admin/edit/${article.id}`)}
+                                                    style={{
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        color: 'var(--color-accent)',
+                                                        cursor: 'pointer',
+                                                        padding: 0,
+                                                        fontWeight: 600,
+                                                        fontSize: '0.9rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px'
+                                                    }}
+                                                >
+                                                    <Edit2 size={16} /> Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(article.id, article.title)}
+                                                    style={{
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        color: '#ef4444',
+                                                        cursor: 'pointer',
+                                                        padding: 0,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        transition: 'opacity 0.2s'
+                                                    }}
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
             </div>
         </AdminLayout>
     );

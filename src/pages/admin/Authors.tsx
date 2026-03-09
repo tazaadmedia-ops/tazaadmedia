@@ -125,10 +125,10 @@ const Authors: React.FC = () => {
             <div style={{ padding: '0 2rem' }}>
 
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
                     <div>
-                        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#111', letterSpacing: '-0.02em' }}>Authors & Team</h1>
-                        <p style={{ color: '#666', marginTop: '0.5rem' }}>Manage your editorial team and contributors.</p>
+                        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#111', letterSpacing: '-0.02em' }}>Authors & Team</h1>
+                        <p style={{ color: '#666', marginTop: '0.25rem', fontSize: '0.9rem' }}>Manage editorial team and contributors.</p>
                     </div>
                     <button
                         onClick={() => { setFormData({ role: 'author' }); setShowModal(true); }}
@@ -136,7 +136,7 @@ const Authors: React.FC = () => {
                             display: 'flex', alignItems: 'center', gap: '8px',
                             backgroundColor: '#000', color: '#fff',
                             padding: '10px 16px', borderRadius: '8px',
-                            fontWeight: 600, border: 'none', cursor: 'pointer'
+                            fontWeight: 600, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap'
                         }}>
                         <Plus size={18} /> Add Author
                     </button>
@@ -202,9 +202,9 @@ const Authors: React.FC = () => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                         <div style={{
-                            backgroundColor: '#fff', width: '500px', borderRadius: '16px',
+                            backgroundColor: '#fff', width: '100%', maxWidth: '500px', borderRadius: '16px',
                             padding: '2rem', boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
-                            position: 'relative'
+                            position: 'relative', margin: '1rem'
                         }}>
                             <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', border: 'none', background: 'none', cursor: 'pointer' }}>
                                 <X size={24} color="#666" />

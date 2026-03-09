@@ -77,10 +77,10 @@ const Categories: React.FC = () => {
             <div style={{ padding: '0 2rem' }}>
 
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
                     <div>
-                        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#111', letterSpacing: '-0.02em' }}>Categories</h1>
-                        <p style={{ color: '#666', marginTop: '0.5rem' }}>Organize your content into topics.</p>
+                        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#111', letterSpacing: '-0.02em' }}>Categories</h1>
+                        <p style={{ color: '#666', marginTop: '0.25rem', fontSize: '0.9rem' }}>Organize your content into topics.</p>
                     </div>
                     <button
                         onClick={() => { setFormData({}); setShowModal(true); }}
@@ -88,7 +88,7 @@ const Categories: React.FC = () => {
                             display: 'flex', alignItems: 'center', gap: '8px',
                             backgroundColor: '#000', color: '#fff',
                             padding: '10px 16px', borderRadius: '8px',
-                            fontWeight: 600, border: 'none', cursor: 'pointer'
+                            fontWeight: 600, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap'
                         }}>
                         <Plus size={18} /> Add Category
                     </button>
@@ -111,42 +111,45 @@ const Categories: React.FC = () => {
                 </div>
 
                 {/* List */}
+                {/* List Container */}
                 <div style={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                    {loading ? <p style={{ padding: '2rem' }}>Loading...</p> : (
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
-                                <tr>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '40%' }}>Name</th>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Slug</th>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Description</th>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', textAlign: 'right' }}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredCategories.map(cat => (
-                                    <tr key={cat.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                        <td style={{ padding: '1.2rem 1.5rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <Folder size={18} color="#999" /> {cat.name}
-                                        </td>
-                                        <td style={{ padding: '1.2rem 1.5rem', fontFamily: 'monospace', color: '#666', fontSize: '0.9rem' }}>/{cat.slug}</td>
-                                        <td style={{ padding: '1.2rem 1.5rem', color: '#666', fontSize: '0.9rem' }}>{cat.description || '-'}</td>
-                                        <td style={{ padding: '1.2rem 1.5rem', textAlign: 'right' }}>
-                                            <button
-                                                onClick={() => { setFormData(cat); setShowModal(true); }}
-                                                style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#666' }}>
-                                                <Edit2 size={16} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {filteredCategories.length === 0 && (
+                    <div style={{ overflowX: 'auto' }}>
+                        {loading ? <p style={{ padding: '2rem' }}>Loading...</p> : (
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                <thead style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
                                     <tr>
-                                        <td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: '#999' }}>No categories found.</td>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '40%' }}>Name</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Slug</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Description</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', textAlign: 'right' }}>Actions</th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    )}
+                                </thead>
+                                <tbody>
+                                    {filteredCategories.map(cat => (
+                                        <tr key={cat.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                            <td style={{ padding: '1.2rem 1.5rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <Folder size={18} color="#999" /> {cat.name}
+                                            </td>
+                                            <td style={{ padding: '1.2rem 1.5rem', fontFamily: 'monospace', color: '#666', fontSize: '0.9rem' }}>/{cat.slug}</td>
+                                            <td style={{ padding: '1.2rem 1.5rem', color: '#666', fontSize: '0.9rem' }}>{cat.description || '-'}</td>
+                                            <td style={{ padding: '1.2rem 1.5rem', textAlign: 'right' }}>
+                                                <button
+                                                    onClick={() => { setFormData(cat); setShowModal(true); }}
+                                                    style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#666' }}>
+                                                    <Edit2 size={16} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {filteredCategories.length === 0 && (
+                                        <tr>
+                                            <td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: '#999' }}>No categories found.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
                 </div>
 
                 {/* Modal */}
@@ -157,9 +160,9 @@ const Categories: React.FC = () => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                         <div style={{
-                            backgroundColor: '#fff', width: '450px', borderRadius: '16px',
+                            backgroundColor: '#fff', width: '100%', maxWidth: '450px', borderRadius: '16px',
                             padding: '2rem', boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
-                            position: 'relative'
+                            position: 'relative', margin: '1rem'
                         }}>
                             <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', border: 'none', background: 'none', cursor: 'pointer' }}>
                                 <X size={24} color="#666" />

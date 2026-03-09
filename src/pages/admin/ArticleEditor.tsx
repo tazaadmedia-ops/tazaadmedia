@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'; // Vercel cache clear
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEditor, EditorContent, FloatingMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 // import Image from '@tiptap/extension-image'; // Replaced by Figure
@@ -501,25 +501,22 @@ const ArticleEditor: React.FC = () => {
             <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
 
                 {/* Floating "+" Menu */}
-                <FloatingMenu
-                    editor={editor}
-                    tippyOptions={{
-                        duration: 100,
-                        offset: [-20, 10], // Adjusted for RTL
-                        placement: 'right-start',
-                        zIndex: 1000,
-                    }}
-                    shouldShow={({ state }) => {
-                        const { selection } = state;
-                        const { $from } = selection;
-                        return selection.empty && $from.parent.type.name === 'paragraph' && $from.parent.content.size === 0;
-                    }}
-                >
+                {editor && editor.isEditable && (
                     <div style={{
+                        position: 'fixed',
+                        left: '50%',
+                        bottom: '20px',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1000,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        pointerEvents: 'auto'
+                        backgroundColor: '#fff',
+                        padding: '8px',
+                        borderRadius: '30px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                        border: '1px solid #eee',
+                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                     }}>
                         <button
                             onClick={(e) => {
@@ -529,39 +526,30 @@ const ArticleEditor: React.FC = () => {
                             title="Add Section"
                             style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                width: '32px', height: '32px', borderRadius: '50%',
-                                border: '1px solid #ddd', backgroundColor: '#fff',
-                                cursor: 'pointer', color: isFloatingMenuOpen ? '#B70100' : '#666',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                width: '36px', height: '36px', borderRadius: '50%',
+                                border: 'none', backgroundColor: isFloatingMenuOpen ? '#B70100' : '#000',
+                                cursor: 'pointer', color: '#fff',
                                 transition: 'all 0.2s',
                                 transform: isFloatingMenuOpen ? 'rotate(45deg)' : 'none'
                             }}
                         >
-                            <Plus size={18} />
+                            <Plus size={20} />
                         </button>
 
                         {isFloatingMenuOpen && (
                             <div style={{
                                 display: 'flex',
-                                gap: '6px',
-                                backgroundColor: '#fff',
-                                padding: '4px',
-                                borderRadius: '24px',
-                                border: '1px solid #eee',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                animation: 'fade-in-right 0.2s ease-out',
-                                zIndex: 1001
+                                gap: '4px',
+                                animation: 'fade-in 0.2s ease-out'
                             }}>
                                 <button
                                     onClick={() => {
                                         imageInputRef.current?.click();
                                         setIsFloatingMenuOpen(false);
                                     }}
-                                    className="floating-menu-btn"
-                                    title="Add Image"
                                     style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        padding: '6px 12px', borderRadius: '20px',
                                         border: 'none', backgroundColor: 'transparent',
                                         cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
                                     }}
@@ -574,11 +562,9 @@ const ArticleEditor: React.FC = () => {
                                         setIsLinkModalOpen(true);
                                         setIsFloatingMenuOpen(false);
                                     }}
-                                    className="floating-menu-btn"
-                                    title="Link Article"
                                     style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        padding: '6px 12px', borderRadius: '20px',
                                         border: 'none', backgroundColor: 'transparent',
                                         cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
                                     }}
@@ -594,11 +580,9 @@ const ArticleEditor: React.FC = () => {
                                         }
                                         setIsFloatingMenuOpen(false);
                                     }}
-                                    className="floating-menu-btn"
-                                    title="Twitter Embed"
                                     style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px',
-                                        padding: '6px 14px', borderRadius: '18px',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        padding: '6px 12px', borderRadius: '20px',
                                         border: 'none', backgroundColor: 'transparent',
                                         cursor: 'pointer', color: '#444', fontSize: '0.85rem', fontWeight: 600
                                     }}
@@ -608,7 +592,7 @@ const ArticleEditor: React.FC = () => {
                             </div>
                         )}
                     </div>
-                </FloatingMenu>
+                )}
 
                 {/* Article Search Modal */}
                 {isLinkModalOpen && (
@@ -675,28 +659,32 @@ const ArticleEditor: React.FC = () => {
                     </div>
                 )}
 
-                {/* Top Actions */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-
-                    {/* Breadcrumbs / Category Selector */}
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', color: '#888', fontSize: '0.9rem', fontWeight: 500 }}>
-                        <span>Drafts</span>
-                        <span style={{ color: '#ccc' }}>/</span>
-
+                {/* Header Actions */}
+                <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '2rem',
+                    gap: '1rem',
+                    backgroundColor: '#fff',
+                    padding: '0.5rem 0'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{ position: 'relative' }}>
-                            <div
+                            <button
                                 onClick={() => setShowCategoryMenu(!showCategoryMenu)}
                                 style={{
-                                    cursor: 'pointer', color: categoryId ? '#000' : '#888',
-                                    fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px'
+                                    display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px',
+                                    backgroundColor: '#f3f4f6', borderRadius: '6px', border: '1px solid #e5e7eb',
+                                    fontSize: '0.85rem', fontWeight: 600, color: '#374151', cursor: 'pointer'
                                 }}>
-                                {categories.find(c => c.id === categoryId)?.name || 'Select Category'}
-                                <ChevronDown size={14} color="#999" />
-                            </div>
-
+                                {categoryId ? categories.find(c => c.id === categoryId)?.name : 'Select Topic'}
+                                <ChevronDown size={14} />
+                            </button>
                             {showCategoryMenu && (
                                 <div style={{
-                                    position: 'absolute', top: '100%', left: -10, marginTop: '8px',
+                                    position: 'absolute', top: '100%', left: 0, marginTop: '8px',
                                     background: 'white', border: '1px solid #eee', borderRadius: '8px',
                                     padding: '6px', zIndex: 60, minWidth: '180px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
                                 }}>
@@ -732,13 +720,21 @@ const ArticleEditor: React.FC = () => {
                         </div>
 
                         <span style={{ color: '#ccc' }}>/</span>
-                        <span style={{ color: '#000', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <span style={{
+                            color: '#000',
+                            maxWidth: '150px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            fontSize: '0.9rem',
+                            fontWeight: 600
+                        }}>
                             {title || 'Untitled'}
                         </span>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', marginLeft: 'auto' }}>
+                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '8px' }}>
                             <MoreHorizontal size={20} />
                         </button>
                         <button
@@ -748,10 +744,10 @@ const ArticleEditor: React.FC = () => {
                                 backgroundColor: '#000', color: '#fff', border: 'none',
                                 padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer',
                                 display: 'flex', alignItems: 'center', gap: '8px', opacity: isSaving ? 0.7 : 1,
-                                fontSize: '0.9rem'
+                                fontSize: '0.9rem', whiteSpace: 'nowrap'
                             }}>
                             {isSaving && <Loader size={14} className="animate-spin" />}
-                            {isSaving ? 'Saving' : 'Publish'}
+                            {isSaving ? 'Saving' : (id && id !== 'new' ? 'Update' : 'Publish')}
                         </button>
                     </div>
                 </div>
@@ -814,13 +810,13 @@ const ArticleEditor: React.FC = () => {
                 />
 
                 {/* Slug Editor */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem', direction: 'ltr' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', direction: 'ltr' }}>
                     <span style={{ fontSize: '0.9rem', color: '#999', fontWeight: 600 }}>Slug:</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f9f9f9', padding: '4px 8px', borderRadius: '6px', border: '1px solid #eee' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f9f9f9', padding: '4px 8px', borderRadius: '6px', border: '1px solid #eee', maxWidth: '100%' }}>
                         <input
                             value={slug}
                             onChange={(e) => setSlug(e.target.value)}
-                            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '16px', color: '#555', fontFamily: 'monospace', width: '200px' }}
+                            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '15px', color: '#555', fontFamily: 'monospace', width: '100%', minWidth: '150px' }}
                         />
                         <button
                             onClick={() => {
@@ -829,7 +825,7 @@ const ArticleEditor: React.FC = () => {
                                 }
                             }}
                             title="Regenerate Slug"
-                            style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#888' }}
+                            style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#888', flexShrink: 0 }}
                         >
                             <RotateCw size={14} />
                         </button>
@@ -1016,14 +1012,30 @@ const ArticleEditor: React.FC = () => {
 
                 {!isLive && (
                     <>
-                        {/* Toolbar */}
-                        <div style={{ position: 'sticky', top: '20px', zIndex: 50, marginBottom: '2rem' }}>
+                        {/* Toolbar Container */}
+                        <div style={{
+                            position: 'sticky',
+                            top: '10px',
+                            zIndex: 50,
+                            marginBottom: '2rem',
+                            maxWidth: '100%',
+                            overflowX: 'auto',
+                            WebkitOverflowScrolling: 'touch',
+                            msOverflowStyle: 'none',
+                            scrollbarWidth: 'none',
+                            paddingBottom: '10px' // Space for scroll shadow or just breather
+                        }}>
                             <div style={{
-                                display: 'flex', alignItems: 'center', padding: '4px',
-                                backgroundColor: '#fff', border: '1px solid #e5e5e5', borderRadius: '12px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)', width: 'fit-content'
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: '6px',
+                                backgroundColor: '#fff',
+                                border: '1px solid #e5e5e5',
+                                borderRadius: '12px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                                width: 'max-content',
+                                minWidth: '100%'
                             }}>
-
                                 {/* Undo/Redo */}
                                 <div style={{ display: 'flex', gap: '2px', padding: '0 4px' }}>
                                     <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} icon={<RotateCcw size={16} />} />
@@ -1032,14 +1044,14 @@ const ArticleEditor: React.FC = () => {
 
                                 <ToolbarDivider />
 
-                                {/* Style Dropdown Mock */}
+                                {/* Style Dropdown */}
                                 <div style={{ position: 'relative' }}>
                                     <button
                                         onClick={() => setShowStyleMenu(!showStyleMenu)}
                                         style={{
-                                            display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 10px',
+                                            display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 8px',
                                             background: 'transparent', border: 'none', cursor: 'pointer',
-                                            fontSize: '0.9rem', fontWeight: 500, color: '#333'
+                                            fontSize: '0.85rem', fontWeight: 600, color: '#333', whiteSpace: 'nowrap'
                                         }}>
                                         Style <ChevronDown size={14} color="#888" />
                                     </button>
@@ -1047,26 +1059,24 @@ const ArticleEditor: React.FC = () => {
                                         <div style={{
                                             position: 'absolute', top: '100%', left: 0, marginTop: '8px',
                                             backgroundColor: 'white', borderRadius: '8px', border: '1px solid #eee',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '6px', minWidth: '160px'
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)', padding: '6px', minWidth: '160px', zIndex: 100
                                         }}>
-                                            {
-                                                [
-                                                    { label: 'Normal Text', action: () => editor.chain().focus().setParagraph().run() },
-                                                    { label: 'Heading 1', action: () => toggleHeadingWithSplit(1) },
-                                                    { label: 'Heading 2', action: () => toggleHeadingWithSplit(2) },
-                                                    { label: 'Heading 3', action: () => toggleHeadingWithSplit(3) },
-                                                ].map((opt, i) => (
-                                                    <div
-                                                        key={i}
-                                                        onClick={() => { opt.action(); setShowStyleMenu(false); }}
-                                                        style={{ padding: '8px 12px', fontSize: '0.9rem', cursor: 'pointer', borderRadius: '4px' }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                                                    >
-                                                        {opt.label}
-                                                    </div>
-                                                ))
-                                            }
+                                            {[
+                                                { label: 'Normal Text', action: () => editor.chain().focus().setParagraph().run() },
+                                                { label: 'Heading 1', action: () => toggleHeadingWithSplit(1) },
+                                                { label: 'Heading 2', action: () => toggleHeadingWithSplit(2) },
+                                                { label: 'Heading 3', action: () => toggleHeadingWithSplit(3) },
+                                            ].map((opt, i) => (
+                                                <div
+                                                    key={i}
+                                                    onClick={() => { opt.action(); setShowStyleMenu(false); }}
+                                                    style={{ padding: '8px 12px', fontSize: '0.9rem', cursor: 'pointer', borderRadius: '4px' }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                                >
+                                                    {opt.label}
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
@@ -1098,7 +1108,6 @@ const ArticleEditor: React.FC = () => {
                                         if (url) editor.commands.setYoutubeVideo({ src: url });
                                     }} icon={<Video size={16} />} />
                                     <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} icon={<Quote size={16} />} />
-
                                 </div>
 
                                 <ToolbarDivider />
@@ -1117,7 +1126,6 @@ const ArticleEditor: React.FC = () => {
                                     <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} isActive={editor.isActive({ textAlign: 'center' })} icon={<AlignCenter size={16} />} />
                                     <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} isActive={editor.isActive({ textAlign: 'right' })} icon={<AlignRight size={16} />} />
                                 </div>
-
                             </div>
                         </div>
 
