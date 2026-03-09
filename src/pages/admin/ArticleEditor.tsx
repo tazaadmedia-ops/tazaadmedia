@@ -998,25 +998,22 @@ const ArticleEditor: React.FC = () => {
                         <div style={{
                             position: 'sticky',
                             top: '10px',
-                            zIndex: 50,
+                            zIndex: 51,
                             marginBottom: '2rem',
                             maxWidth: '100%',
-                            overflowX: 'auto',
-                            WebkitOverflowScrolling: 'touch',
-                            msOverflowStyle: 'none',
-                            scrollbarWidth: 'none',
-                            paddingBottom: '10px' // Space for scroll shadow or just breather
+                            paddingBottom: '10px'
                         }}>
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
+                                flexWrap: 'wrap',
+                                gap: '4px',
                                 padding: '6px',
                                 backgroundColor: '#fff',
                                 border: '1px solid #e5e5e5',
                                 borderRadius: '12px',
                                 boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
-                                width: 'max-content',
-                                minWidth: '100%'
+                                width: '100%'
                             }}>
                                 {/* Undo/Redo */}
                                 <div style={{ display: 'flex', gap: '2px', padding: '0 4px' }}>
