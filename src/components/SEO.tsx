@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 interface SEOProps {
@@ -24,6 +24,10 @@ const SEO: React.FC<SEOProps> = ({
     schemaType,
     jsonLd
 }) => {
+    useEffect(() => {
+        document.documentElement.setAttribute('prefix', 'og: http://ogp.me/ns#');
+    }, []);
+
     const siteUrl = 'https://thetazaad.com'; // Final production domain
     const fullUrl = `${siteUrl}${slug ? (slug.startsWith('/') ? slug : `/${slug}`) : ''}`;
 
@@ -36,6 +40,19 @@ const SEO: React.FC<SEOProps> = ({
             fullImage = `${siteUrl}${image.startsWith('/') ? image : `/${image}`}`;
         }
     }
+
+    const optimizedImage = fullImage.includes('supabase.co') && !fullImage.includes('?')
+        ? `${fullImage}?width=800&quality=80`
+        : fullImage;
+
+    const getMimeType = (url: string) => {
+        const ext = url.split('?')[0].split('.').pop()?.toLowerCase() || 'jpeg';
+        if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+        if (ext === 'png') return 'image/png';
+        if (ext === 'webp') return 'image/webp';
+        return 'image/jpeg';
+    };
+    const mimeType = getMimeType(optimizedImage);
 
     const baseTitle = "تضاد - سنڌي";
     const fullTitle = title === "هوم" || title === "Home" || title === baseTitle ? baseTitle : `${title} - ${baseTitle}`;
@@ -73,10 +90,12 @@ const SEO: React.FC<SEOProps> = ({
             <meta property="og:url" content={fullUrl} />
             <meta property="og:title" content={fullTitle} />
             <meta property="og:description" content={description} />
-            <meta property="og:image" content={fullImage} />
-            <meta property="og:image:secure_url" content={fullImage} />
+            <meta property="og:image" content={optimizedImage} />
+            <meta property="og:image:secure_url" content={optimizedImage} />
+            <meta property="og:image:type" content={mimeType} />
             <meta property="og:image:width" content="1200" />
             <meta property="og:image:height" content="630" />
+            <meta property="og:image:alt" content={fullTitle} />
             <meta property="fb:app_id" content={import.meta.env.VITE_FACEBOOK_APP_ID || ""} />
             <meta property="og:site_name" content={baseTitle} />
 
@@ -85,7 +104,7 @@ const SEO: React.FC<SEOProps> = ({
             <meta name="twitter:url" content={fullUrl} />
             <meta name="twitter:title" content={fullTitle} />
             <meta name="twitter:description" content={description} />
-            <meta name="twitter:image" content={fullImage} />
+            <meta name="twitter:image" content={optimizedImage} />
             <meta name="twitter:site" content="@thetazaad" />
 
             {/* Structured Data (JSON-LD) */}

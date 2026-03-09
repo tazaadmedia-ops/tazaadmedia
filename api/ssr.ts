@@ -181,6 +181,11 @@ export default async function handler(request: any, response: any) {
         html = html.replace(/<meta[^>]*?(?:name|property)=["'](?:description|og:|twitter:)[^>]*?>/gi, '');
         html = html.replace(/<link[^>]*?rel=["']canonical["'][^>]*?>/gi, '');
 
+        // WhatsApp/OG Requirement
+        if (!html.includes('prefix=')) {
+            html = html.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
+        }
+
         const escapeAttr = (str: string) => str
             .replace(/&/g, '&amp;')
             .replace(/"/g, '&quot;')
@@ -190,15 +195,35 @@ export default async function handler(request: any, response: any) {
 
         const escapeUrl = (str: string) => str.replace(/"/g, '&quot;');
 
+        const optimizeImage = (url: string) => {
+            if (url.includes('supabase.co') && !url.includes('?')) {
+                return `${url}?width=800&quality=80`;
+            }
+            return url;
+        };
+
+        const getMimeType = (url: string) => {
+            const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
+            if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+            if (ext === 'png') return 'image/png';
+            if (ext === 'webp') return 'image/webp';
+            return 'image/jpeg';
+        };
+
+        const finalImage = optimizeImage(meta.image);
+        const mimeType = getMimeType(finalImage);
+
         const metaTags = `
     <title>${escapeAttr(meta.title)}</title>
     <meta name="description" content="${escapeAttr(meta.description)}" />
     <meta property="og:title" content="${escapeAttr(meta.title)}" />
     <meta property="og:description" content="${escapeAttr(meta.description)}" />
-    <meta property="og:image" content="${escapeUrl(meta.image)}" />
-    <meta property="og:image:secure_url" content="${escapeUrl(meta.image)}" />
+    <meta property="og:image" content="${escapeUrl(finalImage)}" />
+    <meta property="og:image:secure_url" content="${escapeUrl(finalImage)}" />
+    <meta property="og:image:type" content="${mimeType}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="${escapeAttr(meta.title)}" />
     <meta property="og:url" content="${escapeUrl(meta.url)}" />
     <meta property="og:type" content="${meta.type}" />
     <meta property="og:site_name" content="تضاد - سنڌي" />
@@ -208,8 +233,8 @@ export default async function handler(request: any, response: any) {
     <meta name="twitter:creator" content="@thetazaad" />
     <meta name="twitter:title" content="${escapeAttr(meta.title)}" />
     <meta name="twitter:description" content="${escapeAttr(meta.description)}" />
-    <meta name="twitter:image" content="${escapeUrl(meta.image)}" />
-    <meta name="twitter:image:src" content="${escapeUrl(meta.image)}" />
+    <meta name="twitter:image" content="${escapeUrl(finalImage)}" />
+    <meta name="twitter:image:src" content="${escapeUrl(finalImage)}" />
     <meta name="twitter:url" content="${escapeUrl(meta.url)}" />
     <meta name="twitter:domain" content="${host}" />
     <link rel="canonical" href="${escapeUrl(meta.url)}" />
