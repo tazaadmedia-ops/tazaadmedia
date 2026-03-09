@@ -25,7 +25,7 @@ export default async function handler(request: any, response: any) {
             { data: categories },
             { data: authors }
         ] = await Promise.all([
-            supabase.from('articles').select('slug, updated_at, type').eq('status', 'published').order('updated_at', { ascending: false }),
+            supabase.from('articles').select('slug, updated_at, is_live').eq('status', 'published').order('updated_at', { ascending: false }),
             supabase.from('categories').select('slug'),
             supabase.from('users').select('username')
         ]);
@@ -42,7 +42,7 @@ export default async function handler(request: any, response: any) {
     <!-- Articles -->
     ${(articles || []).map((art: any) => `
     <url>
-        <loc>${baseUrl}/${art.type === 'live' ? 'live/' : ''}${art.slug}</loc>
+        <loc>${baseUrl}/${art.is_live ? 'live/' : ''}${art.slug}</loc>
         <lastmod>${new Date(art.updated_at).toISOString()}</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
