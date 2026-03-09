@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Lazy init to avoid cold start crashes
 let supabase: ReturnType<typeof createClient> | null = null;
 
 export default async function handler(request: any, response: any) {
@@ -21,15 +22,17 @@ export default async function handler(request: any, response: any) {
     }
 
     try {
-        const { data: art, error } = await supabase
+        const { data: artData, error } = await supabase
             .from('articles')
             .select('*, categories(name)')
             .eq('slug', slug)
             .single();
 
-        if (error || !art) {
+        if (error || !artData) {
             return response.status(404).send('Article Not Found');
         }
+
+        const art = artData as any;
 
         const escapeHtml = (unsafe: string) => (unsafe || '')
             .replace(/&/g, '&amp;')
