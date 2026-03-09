@@ -19,7 +19,7 @@ const Dashboard: React.FC = () => {
         const { data } = await supabase
             .from('articles')
             .select('*')
-            .order('updated_at', { ascending: false });
+            .order('published_at', { ascending: false });
 
         if (data) setArticles(data);
         setLoading(false);

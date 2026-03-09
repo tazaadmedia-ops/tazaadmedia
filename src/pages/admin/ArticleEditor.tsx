@@ -76,6 +76,7 @@ const ArticleEditor: React.FC = () => {
     const [showCategoryMenu, setShowCategoryMenu] = useState(false);
     const [isLive, setIsLive] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
+    const [publishedAt, setPublishedAt] = useState<string | null>(null);
     const [hasUpdates, setHasUpdates] = useState(false);
 
     // Featured Image
@@ -228,6 +229,7 @@ const ArticleEditor: React.FC = () => {
                         setFeaturedImageCaption(article.featured_image_caption || '');
                         setIsLive(article.is_live || false);
                         setIsPinned(article.is_pinned || false);
+                        setPublishedAt(article.published_at);
 
                         if (article.article_authors) {
                             const authors = article.article_authors.map((aa: any) => aa.users).filter(Boolean);
@@ -284,6 +286,15 @@ const ArticleEditor: React.FC = () => {
             is_pinned: isPinned,
             updated_at: new Date().toISOString()
         };
+
+        // Set published_at only if it's new or not yet set
+        if (!id || id === 'new' || !publishedAt) {
+            const now = new Date().toISOString();
+            basePayload.published_at = now;
+            setPublishedAt(now);
+        } else {
+            basePayload.published_at = publishedAt;
+        }
 
         // Recursive save helper to handle duplications
         const saveToDb = async (slugToTry: string, retries = 0): Promise<{ id: string, finalSlug: string }> => {
@@ -444,7 +455,7 @@ const ArticleEditor: React.FC = () => {
                 .select('id, title, featured_image_url, slug')
                 .neq('id', id || '') // Don't link to self
                 .eq('status', 'published')
-                .order('updated_at', { ascending: false })
+                .order('published_at', { ascending: false })
                 .limit(6);
 
             if (safeQuery) {

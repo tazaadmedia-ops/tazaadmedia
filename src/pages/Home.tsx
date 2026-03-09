@@ -50,7 +50,7 @@ const Home: React.FC = () => {
             .eq('status', 'published')
             .order('is_pinned', { ascending: false })
             .order('is_live', { ascending: false })
-            .order('updated_at', { ascending: false })
+            .order('published_at', { ascending: false })
             .limit(100); // Increased limit due to dynamic sections
 
         if (error) console.error('Error fetching home articles:', error);

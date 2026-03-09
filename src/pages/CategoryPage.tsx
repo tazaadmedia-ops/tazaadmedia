@@ -42,7 +42,7 @@ const CategoryPage: React.FC = () => {
                         `)
                         .eq('primary_category_id', catData.id)
                         .eq('status', 'published')
-                        .order('updated_at', { ascending: false });
+                        .order('published_at', { ascending: false });
 
                     if (error) throw error;
                     if (data) setArticles(data);

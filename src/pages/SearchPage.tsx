@@ -31,7 +31,7 @@ const SearchPage: React.FC = () => {
                 `)
                 .or(`title.ilike.%${safeQuery}%,subdeck.ilike.%${safeQuery}%`)
                 .eq('status', 'published')
-                .order('updated_at', { ascending: false });
+                .order('published_at', { ascending: false });
 
             if (data) {
                 setArticles(data);
