@@ -273,7 +273,7 @@ const ArticleEditor: React.FC = () => {
             setSlug(currentSlug);
         }
 
-        const basePayload = {
+        const basePayload: any = {
             title,
             subdeck,
             primary_category_id: categoryId,
@@ -284,16 +284,13 @@ const ArticleEditor: React.FC = () => {
             status: 'published',
             is_live: isLive,
             is_pinned: isPinned,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            published_at: publishedAt || new Date().toISOString()
         };
 
-        // Set published_at only if it's new or not yet set
-        if (!id || id === 'new' || !publishedAt) {
-            const now = new Date().toISOString();
-            basePayload.published_at = now;
-            setPublishedAt(now);
-        } else {
-            basePayload.published_at = publishedAt;
+        // Update state if we just set it
+        if (!publishedAt) {
+            setPublishedAt(basePayload.published_at);
         }
 
         // Recursive save helper to handle duplications
@@ -356,8 +353,8 @@ const ArticleEditor: React.FC = () => {
                     if (authError) console.error('Error saving authors:', authError);
                 }
 
-                if (id === 'new') {
-                    navigate(`/admin/edit/${savedId}`);
+                if (!id || id === 'new') {
+                    navigate(`/admin/edit/${savedId}`, { replace: true });
                 } else {
                     alert('Saved successfully!' + (finalSlug !== currentSlug ? ` (Slug updated to ${finalSlug})` : ''));
                 }
@@ -800,7 +797,7 @@ const ArticleEditor: React.FC = () => {
                         const newTitle = e.target.value;
                         setTitle(newTitle);
                         // Auto-generate random slug for new articles if slug is empty
-                        if (id === 'new' && !slug && newTitle.trim().length > 0) {
+                        if ((!id || id === 'new') && !slug && newTitle.trim().length > 0) {
                             setSlug(generateRandomSlug());
                         }
 
