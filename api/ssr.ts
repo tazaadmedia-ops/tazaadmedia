@@ -88,10 +88,10 @@ export default async function handler(request: any, response: any) {
             if (type === 'article' || type === 'live') {
                 const isLive = type === 'live';
                 try {
-                    // OPTIMIZED: Only select columns needed for SEO/Meta
+                    // OPTIMIZED: Only select columns needed for SEO/Meta + content_text for crawlability
                     const query = supabase
                         .from('articles')
-                        .select('title, subdeck, slug, featured_image_url, published_at, created_at, updated_at')
+                        .select('title, subdeck, slug, featured_image_url, published_at, created_at, updated_at, content_text')
                         .eq('slug', slug)
                         .single();
 
@@ -101,7 +101,7 @@ export default async function handler(request: any, response: any) {
                         const art = artResult;
                         const prefixedTitle = (isLive ? 'لائيو: ' : '') + art.title;
                         meta.title = prefixedTitle;
-                        meta.description = art.subdeck || meta.description;
+                        meta.description = art.subdeck ? `${art.subdeck} | تضاد سنڌي` : `${art.title} - Sindhi Language News | تضاد سنڌي`;
                         meta.url = `${baseUrl}/${isLive ? 'live/' : ''}${slug}`;
                         meta.type = "article";
                         if (art.featured_image_url) {
@@ -120,11 +120,24 @@ export default async function handler(request: any, response: any) {
                                 "name": "تضاد",
                                 "logo": {
                                     "@type": "ImageObject",
-                                    "url": `${baseUrl}/default-og.jpg`
+                                    "url": `${baseUrl}/logo.png`
                                 }
                             },
                             "inLanguage": "sd"
                         };
+
+                        // 5. CONTENT INJECTION (Critical for SPAs)
+                        // Inject the article text into the root div so bots can read it without JS
+                        if (art.content_text) {
+                            const bodyContent = `
+                                <article style="display:none;" aria-hidden="true">
+                                    <h1>${escapeAttr(art.title)}</h1>
+                                    <p>${escapeAttr(art.subdeck || '')}</p>
+                                    <div>${escapeAttr(art.content_text)}</div>
+                                </article>
+                            `;
+                            html = html.replace('<div id="root"></div>', `<div id="root">${bodyContent}</div>`);
+                        }
                     }
                 } catch (e) {
                     console.error(`[SSR] Article Fetch Failed/Timed out:`, e);
@@ -187,29 +200,6 @@ export default async function handler(request: any, response: any) {
             html = html.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
         }
 
-        const escapeAttr = (str: string) => str
-            .replace(/&/g, '&amp;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-
-        const escapeUrl = (str: string) => str.replace(/"/g, '&quot;');
-
-        const optimizeImage = (url: string) => {
-            if (url.includes('supabase.co') && !url.includes('?')) {
-                return `${url}?width=800&quality=80`;
-            }
-            return url;
-        };
-
-        const getMimeType = (url: string) => {
-            const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
-            if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
-            if (ext === 'png') return 'image/png';
-            if (ext === 'webp') return 'image/webp';
-            return 'image/jpeg';
-        };
 
         const finalImage = optimizeImage(meta.image);
         const mimeType = getMimeType(finalImage);

@@ -80,6 +80,7 @@ const SEO: React.FC<SEOProps> = ({
 
     return (
         <Helmet>
+            <html lang="sd" dir="rtl" />
             {/* Standard Meta Tags */}
             <title>{fullTitle}</title>
             <meta name="description" content={description} />
