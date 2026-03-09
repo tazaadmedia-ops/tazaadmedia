@@ -8,6 +8,8 @@ import { Figure } from '../extensions/Figure';
 import LinkExtension from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
 import TextAlign from '@tiptap/extension-text-align';
+import { RelatedArticle } from '../extensions/RelatedArticle';
+import { Twitter } from '../extensions/Twitter';
 import SEO from '../components/SEO';
 import LiveUpdateTimeline from '../components/LiveUpdateTimeline';
 import type { LiveUpdate } from '../components/LiveUpdateTimeline';
@@ -51,6 +53,8 @@ const ArticlePage: React.FC = () => {
         extensions: [
             StarterKit,
             Figure,
+            RelatedArticle,
+            Twitter,
             Youtube,
             LinkExtension,
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -250,11 +254,11 @@ const ArticlePage: React.FC = () => {
             )}
 
             {/* Content - Only render if there's content to show */}
-            {(article.content_json?.content?.length > 0 || article.content_text) && (
+            {article.content_json || article.content_text ? (
                 <div className="article-content" style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.2rem', lineHeight: '1.65', color: '#2c2c2c' }}>
                     <EditorContent editor={editor} />
                 </div>
-            )}
+            ) : null}
 
             {/* Render Timeline for archived live blogs */}
             {updates.length > 0 && (

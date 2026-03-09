@@ -6,6 +6,14 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
 import LivePulseIndicator from '../components/LivePulseIndicator';
 import LiveUpdateTimeline from '../components/LiveUpdateTimeline';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { Figure } from '../extensions/Figure';
+import { RelatedArticle } from '../extensions/RelatedArticle';
+import { Twitter } from '../extensions/Twitter';
+import Youtube from '@tiptap/extension-youtube';
+import LinkExtension from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
 import type { LiveUpdate } from '../components/LiveUpdateTimeline';
 
 const formatSindhiDate = (dateString: string) => {
@@ -26,6 +34,31 @@ const LiveArticlePage: React.FC = () => {
     const [newlyAddedIds, setNewlyAddedIds] = useState<Set<string>>(new Set());
     const updatesRef = useRef<LiveUpdate[]>([]);
 
+    const editor = useEditor({
+        editable: false,
+        extensions: [
+            StarterKit,
+            Figure,
+            RelatedArticle,
+            Twitter,
+            Youtube,
+            LinkExtension,
+            TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        ],
+        editorProps: {
+            attributes: {
+                class: 'prose prose-lg mx-auto focus:outline-none',
+                style: 'font-family: var(--font-main);'
+            },
+        },
+    });
+
+    useEffect(() => {
+        if (editor && article) {
+            editor.commands.setContent(article.content_json || article.content_text || '');
+        }
+    }, [editor, article]);
+
     useEffect(() => {
         updatesRef.current = updates;
     }, [updates]);
@@ -40,7 +73,7 @@ const LiveArticlePage: React.FC = () => {
                 // Fetch Article
                 const { data: art, error: artError } = await supabase
                     .from('articles')
-                    .select('id, title, subdeck, slug, featured_image_url, published_at, created_at, is_live, article_authors(users(full_name))')
+                    .select('*, article_authors(users(full_name))')
                     .eq('slug', slug)
                     // .eq('is_live', true) // Ideally uncomment when DB is fully populated
                     .single();
@@ -276,6 +309,12 @@ const LiveArticlePage: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Main Body Content for Live Blog */}
+                    {(article.content_json || article.content_text) && (
+                        <div className="article-content" style={{ marginBottom: '3rem', fontSize: '1.2rem', lineHeight: '1.65', color: '#2c2c2c' }}>
+                            <EditorContent editor={editor} />
+                        </div>
+                    )}
                 </div>
 
 
