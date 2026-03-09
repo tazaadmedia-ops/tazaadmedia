@@ -51,7 +51,7 @@ export const RelatedArticle = Node.create<RelatedArticleOptions>({
         return [
             'div',
             { class: 'related-article-card' },
-            ['a', { href: `/${HTMLAttributes.slug}`, class: 'related-article-link' }, [
+            ['a', { href: HTMLAttributes.url, class: 'related-article-link' }, [
                 'div',
                 { class: 'related-article-content' },
                 ['span', { class: 'related-label' }, 'وڌيڪ پڙهو'], // "Read More" in Sindhi

@@ -1014,7 +1014,7 @@ const ArticleEditor: React.FC = () => {
                                 backgroundColor: '#fff',
                                 border: '1px solid #e5e5e5',
                                 borderRadius: '12px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                                boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
                                 width: 'max-content',
                                 minWidth: '100%'
                             }}>
@@ -1029,7 +1029,10 @@ const ArticleEditor: React.FC = () => {
                                 {/* Style Dropdown */}
                                 <div style={{ position: 'relative' }}>
                                     <button
-                                        onClick={() => setShowStyleMenu(!showStyleMenu)}
+                                        onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            setShowStyleMenu(!showStyleMenu);
+                                        }}
                                         style={{
                                             display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 8px',
                                             background: 'transparent', border: 'none', cursor: 'pointer',
@@ -1089,6 +1092,7 @@ const ArticleEditor: React.FC = () => {
                                     <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive('italic')} icon={<Italic size={16} />} />
                                     <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} icon={<Strikethrough size={16} />} />
                                     <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} isActive={editor.isActive('code')} icon={<Code size={16} />} />
+                                    <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()} icon={<X size={16} />} tooltip="Clear Formatting" />
                                 </div>
 
                                 <ToolbarDivider />
