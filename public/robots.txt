@@ -3,4 +3,9 @@ Allow: /
 Disallow: /admin/
 Disallow: /login
 
+# AI Crawlers
+User-agent: PerplexityBot
+Allow: /
+
 Sitemap: https://thetazaad.com/sitemap.xml
+Sitemap: https://thetazaad.com/sitemap-news.xml

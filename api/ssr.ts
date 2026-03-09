@@ -92,8 +92,17 @@ export default async function handler(request: any, response: any) {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
                 "name": "تضاد",
+                "alternateName": "Tazaad",
                 "url": baseUrl,
-                "inLanguage": "sd"
+                "inLanguage": "sd",
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "تضاد",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": `${baseUrl}/logo.png`
+                    }
+                }
             }
         };
 
@@ -129,7 +138,12 @@ export default async function handler(request: any, response: any) {
                         meta.schema = {
                             "@context": "https://schema.org",
                             "@type": isLive ? "LiveBlogPosting" : "NewsArticle",
+                            "mainEntityOfPage": {
+                                "@type": "WebPage",
+                                "@id": meta.url
+                            },
                             "headline": art.title,
+                            "description": art.subdeck,
                             "image": [meta.image],
                             "datePublished": art.published_at || art.created_at,
                             "dateModified": art.updated_at || art.published_at,
@@ -139,7 +153,8 @@ export default async function handler(request: any, response: any) {
                                 "name": "تضاد",
                                 "logo": { "@type": "ImageObject", "url": `${baseUrl}/logo.png` }
                             },
-                            "inLanguage": "sd"
+                            "inLanguage": "sd",
+                            "articleBody": art.content_text // Critical for AI agents
                         };
 
                         // 5. CONTENT INJECTION (Critical for Bots/AI)

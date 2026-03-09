@@ -269,6 +269,7 @@ const LiveArticlePage: React.FC = () => {
                 type="article"
                 publishedAt={article.published_at || article.created_at}
                 author={authorName || undefined}
+                articleBody={article.content_text}
                 schemaType="LiveBlogPosting"
                 jsonLd={liveBlogSchema}
             />
