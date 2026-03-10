@@ -450,10 +450,13 @@ const ArticleEditor: React.FC = () => {
             let request = supabase
                 .from('articles')
                 .select('id, title, featured_image_url, slug')
-                .neq('id', id || '') // Don't link to self
                 .eq('status', 'published')
                 .order('published_at', { ascending: false })
                 .limit(6);
+
+            if (id && id !== 'new') {
+                request = request.neq('id', id);
+            }
 
             if (safeQuery) {
                 request = request.or(`title.ilike.%${safeQuery}%,slug.ilike.%${safeQuery}%`);
