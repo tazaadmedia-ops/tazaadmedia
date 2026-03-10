@@ -103,11 +103,11 @@ const CookieConsent: React.FC = () => {
                         border: 1px solid transparent;
                     }
                     .cookie-btn-primary {
-                        background-color: #10b981; /* Green */
+                        background-color: var(--color-accent);
                         color: white;
                     }
                     .cookie-btn-primary:hover {
-                        background-color: #059669; /* Darker green on hover */
+                        opacity: 0.9;
                         transform: translateY(-1px);
                     }
                     .cookie-btn-secondary {
@@ -158,8 +158,8 @@ const CookieConsent: React.FC = () => {
                         اسان توهان جي تجربي کي بهتر بڻائڻ لاءِ اينالائيٽڪس ڪوڪيز استعمال ڪندا آهيون. ڇا توهان ان جي اجازت ڏيندؤ؟
                     </p>
                     <div className="cookie-button-group">
-                        <button onClick={handleAcceptAll} className="cookie-btn cookie-btn-primary cookie-btn-half">سڀ قبول ڪريو</button>
-                        <button onClick={handleRejectAll} className="cookie-btn cookie-btn-secondary cookie-btn-half">سڀ رد ڪريو</button>
+                        <button onClick={handleAcceptAll} className="cookie-btn cookie-btn-primary cookie-btn-half">قبول ڪريو</button>
+                        <button onClick={handleRejectAll} className="cookie-btn cookie-btn-secondary cookie-btn-half">رد ڪريو</button>
                         <button onClick={() => setShowDetails(true)} className="cookie-btn cookie-link cookie-link-full">انتظام ڪريو</button>
                     </div>
                 </>
