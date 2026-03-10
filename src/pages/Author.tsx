@@ -103,7 +103,7 @@ const AuthorPage: React.FC = () => {
                 <div className="author-info">
                     <div className="meta-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '1.5rem', marginBottom: '1rem' }}>
                         <h1 style={{
-                            fontSize: '2.4rem',
+                            fontSize: '2rem',
                             fontWeight: 800,
                             margin: 0,
                             color: '#111',
@@ -114,7 +114,7 @@ const AuthorPage: React.FC = () => {
                         </h1>
                     </div>
                     <p style={{
-                        fontSize: '1.15rem',
+                        fontSize: '1rem',
                         lineHeight: 1.6,
                         color: '#333',
                         maxWidth: '800px',
@@ -122,32 +122,32 @@ const AuthorPage: React.FC = () => {
                     }}>
                         {author.bio || 'هن ليکڪ لاءِ ڪا به بايو موجود ناهي.'}
                     </p>
-                    <div className="meta-row" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap', marginTop: '1.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: '#111', fontWeight: 800 }}>
-                            <FileText size={18} strokeWidth={2.5} />
+                    <div className="meta-row" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap', marginTop: '1.25rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#111', fontWeight: 800 }}>
+                            <FileText size={16} strokeWidth={2.5} />
                             <span>{articles.length} لکڻيون</span>
                         </div>
 
                         {author.social_links && (Object.values(author.social_links).some(link => link)) && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', borderRight: '2px solid #eee', paddingRight: '1.25rem', marginRight: '0.25rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderRight: '2px solid #eee', paddingRight: '1rem', marginRight: '0.25rem' }}>
                                 {author.social_links.twitter && (
                                     <a href={author.social_links.twitter} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#1da1f2'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
-                                        <Twitter size={20} fill="currentColor" strokeWidth={0} />
+                                        <Twitter size={18} fill="currentColor" strokeWidth={0} />
                                     </a>
                                 )}
                                 {author.social_links.facebook && (
                                     <a href={author.social_links.facebook} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#1877f2'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
-                                        <Facebook size={20} fill="currentColor" strokeWidth={0} />
+                                        <Facebook size={18} fill="currentColor" strokeWidth={0} />
                                     </a>
                                 )}
                                 {author.social_links.instagram && (
                                     <a href={author.social_links.instagram} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#e4405f'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
-                                        <Instagram size={20} strokeWidth={2.5} />
+                                        <Instagram size={18} strokeWidth={2.5} />
                                     </a>
                                 )}
                                 {author.social_links.website && (
                                     <a href={author.social_links.website} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
-                                        <Globe size={20} strokeWidth={2.5} />
+                                        <Globe size={18} strokeWidth={2.5} />
                                     </a>
                                 )}
                             </div>

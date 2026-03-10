@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 
-import { RefreshCw, Calendar, Share2 } from 'lucide-react';
+import { RefreshCw, Calendar, Share2, Twitter as TwitterIcon, Facebook, MessageCircle } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
 
@@ -340,30 +340,36 @@ const LiveArticlePage: React.FC = () => {
                             {article.title}
                         </h1>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                        {article.subdeck && (
+                            <p style={{ fontSize: '1.25rem', color: '#4b5563', marginBottom: '2rem', lineHeight: 1.5, fontWeight: 500 }}>
+                                {article.subdeck}
+                            </p>
+                        )}
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
                             {/* Author Row */}
                             {authorName && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     {authorAvatar ? (
                                         <img
                                             src={authorAvatar}
                                             alt={authorName}
                                             style={{
-                                                width: '60px',
-                                                height: '60px',
+                                                width: '45px',
+                                                height: '45px',
                                                 borderRadius: '50%',
                                                 objectFit: 'cover',
-                                                border: '1px solid #e5e7eb'
+                                                border: '1px solid #eee'
                                             }}
                                         />
                                     ) : (
-                                        <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontWeight: 800 }}>
+                                        <div style={{ width: '45px', height: '45px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontWeight: 800, fontSize: '0.9rem' }}>
                                             {authorName.charAt(0)}
                                         </div>
                                     )}
                                     <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '1rem', color: '#666', marginBottom: '2px' }}>قلمڪار</div>
-                                        <div style={{ fontWeight: 900, fontSize: '1.25rem', color: '#111' }}>
+                                        <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1px' }}>قلمڪار</div>
+                                        <div style={{ fontWeight: 900, fontSize: '1.1rem', color: '#111' }}>
                                             {authorUsername ? (
                                                 <Link to={`/author/${authorUsername}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                                     {authorName}
@@ -375,31 +381,61 @@ const LiveArticlePage: React.FC = () => {
                             )}
 
                             {/* Date & Action Row */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '1rem' }}>
-                                    <Calendar size={18} strokeWidth={2} />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666', fontSize: '0.9rem' }}>
+                                    <Calendar size={16} strokeWidth={2} />
                                     <span>{formatSindhiDate(article.published_at || article.created_at)}</span>
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '1.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                                     <button
                                         onClick={handleShare}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '8px',
+                                            gap: '6px',
                                             background: 'none',
                                             border: 'none',
                                             padding: 0,
                                             cursor: 'pointer',
-                                            color: '#111827',
+                                            color: '#111',
                                             fontWeight: 700,
-                                            fontSize: '1rem'
+                                            fontSize: '0.9rem'
                                         }}
                                     >
-                                        <Share2 size={20} strokeWidth={2.5} />
+                                        <Share2 size={18} strokeWidth={2.5} />
                                         <span>شيئر ڪريو</span>
                                     </button>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderRight: '1px solid #eee', paddingRight: '1rem', marginRight: '0.5rem' }}>
+                                        <a
+                                            href={`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + window.location.href)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ color: '#25D366', display: 'flex' }}
+                                            title="WhatsApp تي شيئر ڪريو"
+                                        >
+                                            <MessageCircle size={20} fill="currentColor" strokeWidth={0} />
+                                        </a>
+                                        <a
+                                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ color: '#000', display: 'flex' }}
+                                            title="X تي شيئر ڪريو"
+                                        >
+                                            <TwitterIcon size={18} fill="currentColor" strokeWidth={0} />
+                                        </a>
+                                        <a
+                                            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ color: '#1877F2', display: 'flex' }}
+                                            title="Facebook تي شيئر ڪريو"
+                                        >
+                                            <Facebook size={20} fill="currentColor" strokeWidth={0} />
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
