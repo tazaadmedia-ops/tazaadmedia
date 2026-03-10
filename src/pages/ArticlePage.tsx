@@ -14,7 +14,9 @@ import SEO from '../components/SEO';
 import SafeImage from '../components/SafeImage';
 import LiveUpdateTimeline from '../components/LiveUpdateTimeline';
 import type { LiveUpdate } from '../components/LiveUpdateTimeline';
+import { Calendar, Share2 } from 'lucide-react';
 import SkeletonArticle from '../components/SkeletonArticle';
+
 
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -201,7 +203,26 @@ const ArticlePage: React.FC = () => {
         window.scrollTo(0, 0);
     }, [slug]);
 
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: article.title,
+                    text: article.subdeck || article.title,
+                    url: window.location.href,
+                });
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        } else {
+            // Fallback: Copy to clipboard
+            navigator.clipboard.writeText(window.location.href);
+            alert('لنڪ ڪاپي ڪئي وئي!');
+        }
+    };
+
     if (loading) return <SkeletonArticle />;
+
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>مضمون نہ مليو</div>;
 
     if (!article) return <div className="container" style={{ marginTop: '5rem', textAlign: 'center' }}>مضمون نہ مليو</div>;
@@ -225,47 +246,75 @@ const ArticlePage: React.FC = () => {
                 <div style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     ● {categoryName}
                 </div>
-                <h1 className="article-title" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', lineHeight: 1.1, marginBottom: '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
+                <h1 className="article-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.1, marginBottom: '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>
                     {article.title}
                 </h1>
-                <p className="article-subdeck" style={{ fontSize: '1.25rem', lineHeight: 1.6, color: '#666', marginBottom: '2rem' }}>
-                    {article.subdeck}
-                </p>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0', padding: '1.25rem 0' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                    {/* Author Row */}
                     {authorName && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            {authorAvatar && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            {authorAvatar ? (
                                 <img
                                     src={authorAvatar}
                                     alt={authorName}
                                     style={{
-                                        width: '40px',
-                                        height: '40px',
+                                        width: '60px',
+                                        height: '60px',
                                         borderRadius: '50%',
                                         objectFit: 'cover',
-                                        border: '1px solid #f0f0f0'
+                                        border: '1px solid #eee'
                                     }}
                                 />
+                            ) : (
+                                <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontWeight: 800 }}>
+                                    {authorName.charAt(0)}
+                                </div>
                             )}
-                            <div style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>
-                                قلمڪار <span style={{ color: 'var(--color-accent)' }}>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: '1rem', color: '#666', marginBottom: '2px' }}>قلمڪار</div>
+                                <div style={{ fontWeight: 900, fontSize: '1.25rem', color: '#111' }}>
                                     {authorUsername ? (
                                         <Link to={`/author/${authorUsername}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                             {authorName}
                                         </Link>
                                     ) : authorName}
-                                </span>
+                                </div>
                             </div>
-                            <span style={{ color: '#eee', margin: '0 0.5rem' }}>|</span>
                         </div>
                     )}
 
-                    <div style={{ fontSize: '0.9rem', color: '#888' }}>
-                        {formatSindhiDate(article.published_at || article.created_at)}
+                    {/* Date & Action Row */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666', fontSize: '1rem' }}>
+                            <Calendar size={18} strokeWidth={2} />
+                            <span>{formatSindhiDate(article.published_at || article.created_at)}</span>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1.5rem' }}>
+                            <button
+                                onClick={handleShare}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    background: 'none',
+                                    border: 'none',
+                                    padding: 0,
+                                    cursor: 'pointer',
+                                    color: '#111',
+                                    fontWeight: 700,
+                                    fontSize: '1rem'
+                                }}
+                            >
+                                <Share2 size={20} strokeWidth={2.5} />
+                                <span>شيئر ڪريو</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
+
 
             {/* Featured Image */}
             {article.featured_image_url && (

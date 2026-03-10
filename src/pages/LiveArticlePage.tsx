@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
-import { RefreshCw } from 'lucide-react';
+import { useParams, Navigate, Link } from 'react-router-dom';
+
+import { RefreshCw, Calendar, Share2 } from 'lucide-react';
+
 import { supabase } from '../lib/supabase';
 
 import SEO from '../components/SEO';
@@ -32,7 +34,9 @@ const LiveArticlePage: React.FC = () => {
     const [updates, setUpdates] = useState<LiveUpdate[]>([]);
     const [pendingUpdates, setPendingUpdates] = useState<LiveUpdate[]>([]);
     const [authorName, setAuthorName] = useState<string | null>(null);
+    const [authorUsername, setAuthorUsername] = useState<string | null>(null);
     const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
+
     const [loading, setLoading] = useState(true);
 
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
@@ -78,7 +82,8 @@ const LiveArticlePage: React.FC = () => {
                 // Fetch Article
                 const { data: art, error: artError } = await supabase
                     .from('articles')
-                    .select('*, article_authors(users(full_name, avatar_url))')
+                    .select('*, article_authors(users(full_name, username, avatar_url))')
+
 
                     .eq('slug', slug)
                     // .eq('is_live', true) // Ideally uncomment when DB is fully populated
@@ -90,8 +95,10 @@ const LiveArticlePage: React.FC = () => {
                     setArticle(art);
                     if (articleWithAuthors.article_authors?.[0]?.users?.full_name) {
                         setAuthorName(articleWithAuthors.article_authors[0].users.full_name);
+                        setAuthorUsername(articleWithAuthors.article_authors[0].users.username);
                         setAuthorAvatar(articleWithAuthors.article_authors[0].users.avatar_url);
                     }
+
 
 
                     // Fetch Updates (Mocking query if table doesn't exist yet gracefully)
@@ -225,7 +232,25 @@ const LiveArticlePage: React.FC = () => {
         }, 3000);
     }, [pendingUpdates]);
 
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `لائيو: ${article.title}`,
+                    text: article.subdeck || article.title,
+                    url: window.location.href,
+                });
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('لنڪ ڪاپي ڪئي وئي!');
+        }
+    };
+
     if (loading) return <SkeletonArticle />;
+
 
     if (!article) return <div className="container page-top-margin" style={{ textAlign: 'center' }}>لائيو مضمون نہ مليو</div>;
 
@@ -311,35 +336,73 @@ const LiveArticlePage: React.FC = () => {
                             <LivePulseIndicator text="لائيو" />
                         </div>
 
-                        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, lineHeight: 1.25, color: '#111827', marginBottom: '1.5rem', letterSpacing: '-0.02em', fontFeatureSettings: "'kern' 1" }}>
+                        <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: 900, lineHeight: 1.25, color: '#111827', marginBottom: '1.5rem', letterSpacing: '-0.02em', fontFeatureSettings: "'kern' 1" }}>
                             {article.title}
                         </h1>
 
-                        <p style={{ fontSize: '1.35rem', color: '#4b5563', marginBottom: '2rem', lineHeight: 1.6, fontWeight: 500 }}>
-                            {article.subdeck}
-                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                            {/* Author Row */}
+                            {authorName && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    {authorAvatar ? (
+                                        <img
+                                            src={authorAvatar}
+                                            alt={authorName}
+                                            style={{
+                                                width: '60px',
+                                                height: '60px',
+                                                borderRadius: '50%',
+                                                objectFit: 'cover',
+                                                border: '1px solid #e5e7eb'
+                                            }}
+                                        />
+                                    ) : (
+                                        <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontWeight: 800 }}>
+                                            {authorName.charAt(0)}
+                                        </div>
+                                    )}
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontSize: '1rem', color: '#666', marginBottom: '2px' }}>قلمڪار</div>
+                                        <div style={{ fontWeight: 900, fontSize: '1.25rem', color: '#111' }}>
+                                            {authorUsername ? (
+                                                <Link to={`/author/${authorUsername}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                    {authorName}
+                                                </Link>
+                                            ) : authorName}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '1rem 0', fontSize: '0.95rem', color: '#6b7280' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                {authorAvatar && (
-                                    <img
-                                        src={authorAvatar}
-                                        alt={authorName || ''}
+                            {/* Date & Action Row */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '1rem' }}>
+                                    <Calendar size={18} strokeWidth={2} />
+                                    <span>{formatSindhiDate(article.published_at || article.created_at)}</span>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '1.5rem' }}>
+                                    <button
+                                        onClick={handleShare}
                                         style={{
-                                            width: '40px',
-                                            height: '40px',
-                                            borderRadius: '50%',
-                                            objectFit: 'cover',
-                                            border: '1px solid #e5e7eb'
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            background: 'none',
+                                            border: 'none',
+                                            padding: 0,
+                                            cursor: 'pointer',
+                                            color: '#111827',
+                                            fontWeight: 700,
+                                            fontSize: '1rem'
                                         }}
-                                    />
-                                )}
-                                {authorName && <div>قلمڪار: <span style={{ fontWeight: 700, color: '#111827' }}>{authorName}</span></div>}
+                                    >
+                                        <Share2 size={20} strokeWidth={2.5} />
+                                        <span>شيئر ڪريو</span>
+                                    </button>
+                                </div>
                             </div>
-                            <span>•</span>
-                            <div>{formatSindhiDate(article.published_at || article.created_at)}</div>
                         </div>
-
                     </div>
 
                     {/* Main Body Content for Live Blog */}
