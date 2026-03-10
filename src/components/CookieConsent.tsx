@@ -77,15 +77,14 @@ const CookieConsent: React.FC = () => {
             left: '20px',
             maxWidth: '500px',
             margin: '0 auto',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '16px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+            backgroundColor: '#ffffff',
+            borderRadius: '0',
+            boxShadow: 'none',
             padding: '24px',
             zIndex: 9999,
             direction: 'rtl',
             fontFamily: 'var(--font-main)',
-            border: '1px solid rgba(0,0,0,0.05)',
+            border: '2px solid #000',
             animation: 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
         }}>
             <style>
@@ -96,13 +95,13 @@ const CookieConsent: React.FC = () => {
                     }
                     .cookie-btn {
                         padding: 10px 20px;
-                        border-radius: 8px;
+                        border-radius: 0;
                         font-weight: 700;
                         cursor: pointer;
                         transition: all 0.2s;
                         font-family: var(--font-main);
                         font-size: 0.95rem;
-                        border: none;
+                        border: 1px solid transparent;
                     }
                     .cookie-btn-primary {
                         background-color: var(--color-accent);
@@ -115,6 +114,7 @@ const CookieConsent: React.FC = () => {
                     .cookie-btn-secondary {
                         background-color: #f0f0f0;
                         color: #333;
+                        border: 1px solid #ddd;
                     }
                     .cookie-btn-secondary:hover {
                         background-color: #e5e5e5;
@@ -169,7 +169,7 @@ const PreferencesView: React.FC<{ onSave: (a: boolean, m: boolean) => void; onBa
                     <div style={{ fontWeight: 700 }}>اينالائيٽڪس (Analytics)</div>
                     <div style={{ fontSize: '0.8rem', color: '#777' }}>اسان کي سائيٽ استعمال ڪندڙن جي ڄاڻ ڏين ٿيون.</div>
                 </div>
-                <input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: 'var(--color-accent)' }} />
+                <input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: 'var(--color-accent)', borderRadius: '0' }} />
             </div>
 
             <div className="cookie-toggle" style={{ borderBottom: 'none', marginBottom: '20px' }}>
