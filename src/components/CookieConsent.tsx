@@ -83,7 +83,7 @@ const CookieConsent: React.FC = () => {
             zIndex: 9999,
             direction: 'rtl',
             fontFamily: 'var(--font-main)',
-            border: '2px solid #000',
+            border: '1px solid #ddd',
             animation: 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
         }}>
             <style>
@@ -103,11 +103,11 @@ const CookieConsent: React.FC = () => {
                         border: 1px solid transparent;
                     }
                     .cookie-btn-primary {
-                        background-color: var(--color-accent);
+                        background-color: #10b981; /* Green */
                         color: white;
                     }
                     .cookie-btn-primary:hover {
-                        opacity: 0.9;
+                        background-color: #059669; /* Darker green on hover */
                         transform: translateY(-1px);
                     }
                     .cookie-btn-secondary {
@@ -125,6 +125,30 @@ const CookieConsent: React.FC = () => {
                         padding: 12px 0;
                         border-bottom: 1px solid #eee;
                     }
+                    .cookie-link {
+                        background-color: transparent;
+                        text-decoration: none;
+                        color: #555;
+                        border: none;
+                    }
+                    .cookie-link:hover {
+                        text-decoration: underline;
+                        color: #111;
+                    }
+                    .cookie-button-group {
+                        display: flex;
+                        gap: 12px;
+                        flex-direction: column;
+                    }
+                    @media (min-width: 480px) {
+                        .cookie-button-group {
+                            flex-direction: row;
+                            flex-wrap: wrap;
+                        }
+                        .cookie-btn {
+                            flex: 1;
+                        }
+                    }
                 `}
             </style>
 
@@ -134,10 +158,10 @@ const CookieConsent: React.FC = () => {
                     <p style={{ fontSize: '0.95rem', color: '#555', marginBottom: '20px', lineHeight: '1.6' }}>
                         اسان توهان جي تجربي کي بهتر بڻائڻ لاءِ اينالائيٽڪس ڪوڪيز استعمال ڪندا آهيون. ڇا توهان ان جي اجازت ڏيندؤ؟
                     </p>
-                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    <div className="cookie-button-group">
                         <button onClick={handleAcceptAll} className="cookie-btn cookie-btn-primary">سڀ قبول ڪريو</button>
                         <button onClick={handleRejectAll} className="cookie-btn cookie-btn-secondary">سڀ رد ڪريو</button>
-                        <button onClick={() => setShowDetails(true)} className="cookie-btn cookie-btn-secondary" style={{ backgroundColor: 'transparent', textDecoration: 'underline' }}>انتظام ڪريو</button>
+                        <button onClick={() => setShowDetails(true)} className="cookie-btn cookie-link">انتظام ڪريو</button>
                     </div>
                 </>
             ) : (
@@ -170,8 +194,8 @@ const PreferencesView: React.FC<{ onSave: (a: boolean) => void; onBack: () => vo
                 <input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: 'var(--color-accent)', borderRadius: '0' }} />
             </div>
 
-            <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => onSave(analytics)} className="cookie-btn cookie-btn-primary" style={{ flex: 1 }}>محفوظ ڪريو</button>
+            <div className="cookie-button-group">
+                <button onClick={() => onSave(analytics)} className="cookie-btn cookie-btn-primary">محفوظ ڪريو</button>
                 <button onClick={onBack} className="cookie-btn cookie-btn-secondary">واپس</button>
             </div>
         </div>
