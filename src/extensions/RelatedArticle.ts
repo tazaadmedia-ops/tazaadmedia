@@ -49,15 +49,12 @@ export const RelatedArticle = Node.create<RelatedArticleOptions>({
 
     renderHTML({ HTMLAttributes }) {
         return [
-            'div',
-            { class: 'related-article-card' },
-            ['a', { href: HTMLAttributes.url, class: 'related-article-link' }, [
-                'div',
-                { class: 'related-article-content' },
-                ['span', { class: 'related-label' }, 'وڌيڪ پڙهو'], // "Read More" in Sindhi
+            'a',
+            { href: HTMLAttributes.url, class: 'related-article-card', contenteditable: "false" },
+            HTMLAttributes.image ? ['img', { src: HTMLAttributes.image, class: 'related-article-image' }] : ['div', { class: 'related-article-image-placeholder' }],
+            ['div', { class: 'related-article-content' },
                 ['span', { class: 'related-article-title' }, HTMLAttributes.title]
-            ]],
-            HTMLAttributes.image ? ['img', { src: HTMLAttributes.image, class: 'related-article-image' }] : ''
+            ]
         ];
     },
 
