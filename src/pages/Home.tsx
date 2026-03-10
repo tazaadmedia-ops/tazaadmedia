@@ -89,12 +89,10 @@ const Home: React.FC = () => {
     if (loading) return <SkeletonHome />;
 
 
-    // Distribute top items for 3-column layout
-    // Assuming RTL layout, visually: [Left Col (articles 5-8)] [Center Col (0, 9, 10)] [Right Col (articles 1-4)]
-    const rightColStories = articles.slice(1, 5); // visually rightmost
-    const heroStory = articles[0]; // center top
-    const centerSubStories = articles.slice(9, 11); // center bottom (up to 2)
-    const leftColStories = articles.slice(5, 9); // visually leftmost
+    // Distribute top items for the updated layout
+    const heroStory = articles[0]; // main featured
+    const sideStories = articles.slice(1, 3); // 2 side vertically stacked on RTL left (visual left)
+    const bottomStories = articles.slice(3, 7); // 4 full width in a row
 
     return (
         <div className="container" style={{ marginTop: '0', fontFamily: 'var(--font-main)' }}>
@@ -107,43 +105,20 @@ const Home: React.FC = () => {
             {/* --- TOP LATEST NEWS --- */}
             <h2 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: '0' }}>تازيون خبرون</h2>
 
-            {/* 3-Column Hero Grid */}
+            {/* Hero + Side Column Grid */}
             <div className="mobile-grid-1" style={{
                 display: 'grid',
-                gridTemplateColumns: 'minmax(250px, 1fr) minmax(400px, 2fr) minmax(250px, 1fr)',
-                gap: '1.5rem',
-                marginBottom: '3rem',
-                borderBottom: '1px solid #E8E8E8',
-                paddingBottom: '2.5rem'
+                gridTemplateColumns: 'minmax(500px, 7fr) minmax(280px, 3fr)',
+                gap: '2.5rem',
+                marginBottom: '2.5rem'
             }}>
 
-                {/* Right Column (RTL visually left) - 4 small cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {rightColStories.map((story, idx) => (
-                        <div key={story.id} style={{ borderBottom: idx !== rightColStories.length - 1 ? '1px solid #f0f0f0' : 'none', paddingBottom: idx !== rightColStories.length - 1 ? '1.25rem' : 0 }}>
-                            <Link to={getArticleLink(story)} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                <div style={{ flex: '1' }}>
-                                    <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
-                                        {story.is_live ? <LiveBadge /> : getCategory(story)}
-                                    </div>
-                                    <h2 style={{ fontSize: '0.95rem', lineHeight: 1.4, fontWeight: 900, marginBottom: '0.2rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
-                                        {story.title}
-                                    </h2>
-                                </div>
-                                <div style={{ width: '90px', height: '65px', flexShrink: 0, backgroundColor: '#f5f5f5', borderRadius: '4px', overflow: 'hidden' }}>
-                                    <SafeImage src={story.featured_image_url} alt={story.title} width="150" height="110" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
-                            </Link>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Center Column - Hero + 2 sub items */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {/* Center/Main Column - Hero (Visually Right in RTL) */}
+                <div>
                     {heroStory ? (
-                        <Link to={getArticleLink(heroStory)} style={{ display: 'block', borderBottom: centerSubStories.length > 0 ? '1px solid #f0f0f0' : 'none', paddingBottom: centerSubStories.length > 0 ? '1.5rem' : 0 }}>
+                        <Link to={getArticleLink(heroStory)} style={{ display: 'block' }}>
                             <div style={{ position: 'relative' }}>
-                                <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#eee', borderRadius: '0', marginBottom: '1rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#eee', borderRadius: '4px', marginBottom: '1rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {heroStory.featured_image_url ? (
                                         <SafeImage
                                             src={heroStory.featured_image_url}
@@ -178,50 +153,61 @@ const Home: React.FC = () => {
                     ) : (
                         <div style={{ padding: '2rem', border: '1px dashed #ccc', textAlign: 'center' }}>No featured story yet. Publish one!</div>
                     )}
-
-                    {/* Center Column Sub-items */}
-                    {centerSubStories.length > 0 && (
-                        <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                            {centerSubStories.map((story, i) => (
-                                <div key={story.id} style={{ borderRight: i === 0 ? '1px solid #f0f0f0' : 'none', paddingRight: i === 0 ? '1.5rem' : 0 }}>
-                                    <Link to={getArticleLink(story)}>
-                                        <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
-                                            {story.is_live ? <LiveBadge /> : getCategory(story)}
-                                        </div>
-                                        <h2 style={{ fontSize: '1.2rem', lineHeight: 1.35, fontWeight: 900, marginBottom: '0.4rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
-                                            {story.title}
-                                        </h2>
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                            {story.subdeck}
-                                        </div>
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
 
-                {/* Left Column (RTL visually right) - 4 small cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {leftColStories.map((story, idx) => (
-                        <div key={story.id} style={{ borderBottom: idx !== leftColStories.length - 1 ? '1px solid #f0f0f0' : 'none', paddingBottom: idx !== leftColStories.length - 1 ? '1.25rem' : 0 }}>
-                            <Link to={getArticleLink(story)} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                <div style={{ flex: '1' }}>
-                                    <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
-                                        {story.is_live ? <LiveBadge /> : getCategory(story)}
-                                    </div>
-                                    <h2 style={{ fontSize: '0.95rem', lineHeight: 1.4, fontWeight: 900, marginBottom: '0.2rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
-                                        {story.title}
-                                    </h2>
+                {/* Side Column (RTL visual left) - 2 cards */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    {sideStories.map(story => (
+                        <div key={story.id}>
+                            <Link to={getArticleLink(story)} style={{ display: 'block' }}>
+                                <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
+                                    <SafeImage src={story.featured_image_url} alt={story.title} width="400" height="250" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                                <div style={{ width: '90px', height: '65px', flexShrink: 0, backgroundColor: '#f5f5f5', borderRadius: '4px', overflow: 'hidden' }}>
-                                    <SafeImage src={story.featured_image_url} alt={story.title} width="150" height="110" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
+                                    {story.is_live ? <LiveBadge /> : getCategory(story)}
                                 </div>
+                                <h2 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.4rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
+                                    {story.title}
+                                </h2>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {story.subdeck}
+                                </p>
                             </Link>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {/* Bottom Row - 4 cards full width */}
+            {bottomStories.length > 0 && (
+                <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid #E8E8E8', marginBottom: '3rem' }}>
+                    {bottomStories.map(story => (
+                        <div key={story.id}>
+                            <Link to={getArticleLink(story)} style={{ display: 'block' }}>
+                                <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f9f9f9', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
+                                    <SafeImage
+                                        src={story.featured_image_url}
+                                        alt={story.title}
+                                        width="400"
+                                        height="250"
+                                        loading="lazy"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                </div>
+                                <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
+                                    {story.is_live ? <LiveBadge /> : getCategory(story)}
+                                </div>
+                                <h2 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
+                                    {story.title}
+                                </h2>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {story.subdeck}
+                                </p>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            )}
 
 
             {/* --- DYNAMIC SECTIONS --- */}
