@@ -89,10 +89,10 @@ const Home: React.FC = () => {
     if (loading) return <SkeletonHome />;
 
 
-    // Distribute top items for the updated layout
-    const heroStory = articles[0]; // main featured
-    const sideStories = articles.slice(1, 3); // 2 side vertically stacked on RTL left (visual left)
-    const bottomStories = articles.slice(3, 7); // 4 full width in a row
+    // Distribute top items
+    const heroStory = articles[0];
+    const sideStories = articles.slice(1, 5);
+    const bottomStories = articles.slice(5, 9);
 
     return (
         <div className="container" style={{ marginTop: '0', fontFamily: 'var(--font-main)' }}>
@@ -105,20 +105,14 @@ const Home: React.FC = () => {
             {/* --- TOP LATEST NEWS --- */}
             <h2 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: '0', margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: '0' }}>تازيون خبرون</h2>
 
-            {/* Hero + Side Column Grid */}
-            <div className="mobile-grid-1" style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(500px, 7fr) minmax(280px, 3fr)',
-                gap: '2.5rem',
-                marginBottom: '2.5rem'
-            }}>
-
-                {/* Center/Main Column - Hero (Visually Right in RTL) */}
+            {/* Hero + Side Grid */}
+            <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                {/* Hero */}
                 <div>
                     {heroStory ? (
-                        <Link to={getArticleLink(heroStory)} style={{ display: 'block' }}>
+                        <Link to={getArticleLink(heroStory)}>
                             <div style={{ position: 'relative' }}>
-                                <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#eee', borderRadius: '4px', marginBottom: '1rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#eee', borderRadius: '0', marginBottom: '0.75rem', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {heroStory.featured_image_url ? (
                                         <SafeImage
                                             src={heroStory.featured_image_url}
@@ -134,19 +128,19 @@ const Home: React.FC = () => {
                                 </div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                                <span style={{ color: heroStory.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                                <span style={{ color: heroStory.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>
                                     {heroStory.is_live ? <LiveBadge /> : `● ${getCategory(heroStory)}`}
                                 </span>
                                 {getAuthor(heroStory) && (
-                                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
                                         {getAuthor(heroStory)}
                                     </span>
                                 )}
                             </div>
-                            <h1 style={{ fontSize: '2.4rem', lineHeight: 1.15, marginBottom: '0.5rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
+                            <h1 style={{ fontSize: '2.2rem', lineHeight: 1.1, marginBottom: '0.4rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#1A1A1A' }}>
                                 {heroStory.title}
                             </h1>
-                            <p style={{ fontSize: '1.05rem', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: '0.5rem', fontWeight: 400 }}>
+                            <p style={{ fontSize: '1rem', color: 'var(--color-text-light)', lineHeight: 1.6, marginBottom: '0.5rem', fontWeight: 400 }}>
                                 {heroStory.subdeck}
                             </p>
                         </Link>
@@ -155,54 +149,44 @@ const Home: React.FC = () => {
                     )}
                 </div>
 
-                {/* Side Column (RTL visual left) - 2 cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                {/* Side Grid */}
+                <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem', alignContent: 'start' }}>
                     {sideStories.map(story => (
                         <div key={story.id}>
-                            <Link to={getArticleLink(story)} style={{ display: 'block' }}>
-                                <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
+                            <Link to={getArticleLink(story)}>
+                                <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f5f5f5', borderRadius: '4px', marginBottom: '0.5rem', overflow: 'hidden' }}>
                                     <SafeImage src={story.featured_image_url} alt={story.title} width="400" height="250" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                                <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
+                                <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.7rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>
                                     {story.is_live ? <LiveBadge /> : getCategory(story)}
                                 </div>
-                                <h2 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.4rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
+                                <h2 style={{ fontSize: '0.95rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
                                     {story.title}
                                 </h2>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                    {story.subdeck}
-                                </p>
                             </Link>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Bottom Row - 4 cards full width */}
+            {/* Bottom Text Row */}
             {bottomStories.length > 0 && (
-                <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid #E8E8E8', marginBottom: '3rem' }}>
-                    {bottomStories.map(story => (
-                        <div key={story.id}>
-                            <Link to={getArticleLink(story)} style={{ display: 'block' }}>
-                                <div style={{ width: '100%', aspectRatio: '16/10', backgroundColor: '#f9f9f9', borderRadius: '4px', marginBottom: '0.8rem', overflow: 'hidden' }}>
-                                    <SafeImage
-                                        src={story.featured_image_url}
-                                        alt={story.title}
-                                        width="400"
-                                        height="250"
-                                        loading="lazy"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    />
-                                </div>
-                                <div style={{ color: story.is_live ? '#dc2626' : 'var(--color-accent)', fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
-                                    {story.is_live ? <LiveBadge /> : getCategory(story)}
-                                </div>
-                                <h2 style={{ fontSize: '1.1rem', lineHeight: 1.3, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
+                <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid #F0F0F0', marginBottom: '3rem' }}>
+                    {bottomStories.map((story, i) => (
+                        <div key={story.id} style={{
+                            paddingLeft: i < 3 ? '1.5rem' : 0,
+                            borderRight: i < 3 ? '1px solid #F0F0F0' : 'none'
+                        }}>
+                            <Link to={getArticleLink(story)}>
+                                {story.is_live && <div style={{ marginBottom: '0.25rem', fontSize: '0.7rem' }}><LiveBadge /></div>}
+                                <h2 style={{ fontSize: '1rem', lineHeight: 1.4, fontWeight: 900, marginBottom: '0.3rem', letterSpacing: '-0.01em', color: '#1A1A1A' }}>
                                     {story.title}
                                 </h2>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                    {story.subdeck}
-                                </p>
+                                {getAuthor(story) && (
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-lighter)', fontWeight: 500 }}>
+                                        {getAuthor(story)}
+                                    </div>
+                                )}
                             </Link>
                         </div>
                     ))}

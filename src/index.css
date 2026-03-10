@@ -673,38 +673,13 @@ figcaption {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  /* Modern hover base */
-  position: relative;
-  z-index: 1;
+  /* Individual item fade for "unique" look */
   opacity: 0.9;
-  transition: opacity 0.3s ease, color 0.3s ease;
-}
-
-/* Modern sliding highlight effect */
-.news-ticker-item::before {
-  content: '';
-  position: absolute;
-  top: 10%;
-  bottom: 10%;
-  left: 1rem;
-  right: -0.5rem;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  z-index: -1;
-  transform: translateX(10px) scaleX(0.95);
-  transform-origin: right center;
-  opacity: 0;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s ease;
 }
 
 .news-ticker-item:hover {
-  opacity: 1;
-  text-decoration: none;
-}
-
-.news-ticker-item:hover::before {
-  transform: translateX(0) scaleX(1);
-  opacity: 1;
+  text-decoration: underline;
 }
 
 /* Mobile adjustments */
