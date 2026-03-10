@@ -6,7 +6,6 @@ const GA_MEASUREMENT_ID = 'G-6CC69WFL8K';
 interface ConsentState {
     essential: boolean;
     analytics: boolean;
-    marketing: boolean;
     version: number;
 }
 
@@ -46,18 +45,18 @@ const CookieConsent: React.FC = () => {
     };
 
     const handleAcceptAll = () => {
-        const newState = { essential: true, analytics: true, marketing: true, version: 1 };
+        const newState = { essential: true, analytics: true, version: 1 };
         saveConsent(newState);
         loadAnalytics();
     };
 
     const handleRejectAll = () => {
-        const newState = { essential: true, analytics: false, marketing: false, version: 1 };
+        const newState = { essential: true, analytics: false, version: 1 };
         saveConsent(newState);
     };
 
-    const handleSavePreferences = (analytics: boolean, marketing: boolean) => {
-        const newState = { essential: true, analytics, marketing, version: 1 };
+    const handleSavePreferences = (analytics: boolean) => {
+        const newState = { essential: true, analytics, version: 1 };
         saveConsent(newState);
         if (analytics) loadAnalytics();
     };
@@ -133,7 +132,7 @@ const CookieConsent: React.FC = () => {
                 <>
                     <h3 style={{ marginBottom: '12px', fontSize: '1.25rem', fontWeight: 900 }}>ڪوڪيز جي اجازت</h3>
                     <p style={{ fontSize: '0.95rem', color: '#555', marginBottom: '20px', lineHeight: '1.6' }}>
-                        اسان اينالائيٽڪس ۽ اشتهارن لاءِ ڪوڪيز استعمال ڪندا آهيون ته جيئن توهان جي تجربي کي بهتر بڻائي سگهجي. ڇا توهان ان جي اجازت ڏيندؤ؟
+                        اسان توهان جي تجربي کي بهتر بڻائڻ لاءِ اينالائيٽڪس ڪوڪيز استعمال ڪندا آهيون. ڇا توهان ان جي اجازت ڏيندؤ؟
                     </p>
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                         <button onClick={handleAcceptAll} className="cookie-btn cookie-btn-primary">سڀ قبول ڪريو</button>
@@ -148,9 +147,8 @@ const CookieConsent: React.FC = () => {
     );
 };
 
-const PreferencesView: React.FC<{ onSave: (a: boolean, m: boolean) => void; onBack: () => void }> = ({ onSave, onBack }) => {
+const PreferencesView: React.FC<{ onSave: (a: boolean) => void; onBack: () => void }> = ({ onSave, onBack }) => {
     const [analytics, setAnalytics] = useState(true);
-    const [marketing, setMarketing] = useState(true);
 
     return (
         <div>
@@ -172,16 +170,8 @@ const PreferencesView: React.FC<{ onSave: (a: boolean, m: boolean) => void; onBa
                 <input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: 'var(--color-accent)', borderRadius: '0' }} />
             </div>
 
-            <div className="cookie-toggle" style={{ borderBottom: 'none', marginBottom: '20px' }}>
-                <div>
-                    <div style={{ fontWeight: 700 }}>مارڪيٽنگ (Marketing)</div>
-                    <div style={{ fontSize: '0.8rem', color: '#777' }}>بهتر اشتهارن ۽ فيچرز لاءِ.</div>
-                </div>
-                <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: 'var(--color-accent)' }} />
-            </div>
-
             <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => onSave(analytics, marketing)} className="cookie-btn cookie-btn-primary" style={{ flex: 1 }}>محفوظ ڪريو</button>
+                <button onClick={() => onSave(analytics)} className="cookie-btn cookie-btn-primary" style={{ flex: 1 }}>محفوظ ڪريو</button>
                 <button onClick={onBack} className="cookie-btn cookie-btn-secondary">واپس</button>
             </div>
         </div>
