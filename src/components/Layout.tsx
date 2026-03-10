@@ -2,6 +2,7 @@ import React, { type ReactNode } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import PageTransition from './PageTransition';
+import CookieConsent from './CookieConsent';
 
 interface LayoutProps {
     children: ReactNode;
@@ -18,6 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children, flush }) => {
                 </PageTransition>
             </main>
             <Footer />
+            <CookieConsent />
         </div>
     );
 };
