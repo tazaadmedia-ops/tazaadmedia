@@ -388,7 +388,8 @@ const LiveArticlePage: React.FC = () => {
                                             cursor: 'pointer',
                                             color: '#111',
                                             fontWeight: 700,
-                                            fontSize: '0.9rem'
+                                            fontSize: '0.9rem',
+                                            fontFamily: 'var(--font-main)'
                                         }}
                                     >
                                         <Share2 size={18} strokeWidth={2.5} />
