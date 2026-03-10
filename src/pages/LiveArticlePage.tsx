@@ -38,6 +38,7 @@ const LiveArticlePage: React.FC = () => {
     const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
 
     const [loading, setLoading] = useState(true);
+    const [showShareOptions, setShowShareOptions] = useState(false);
 
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
     const [newlyAddedIds, setNewlyAddedIds] = useState<Set<string>>(new Set());
@@ -232,21 +233,8 @@ const LiveArticlePage: React.FC = () => {
         }, 3000);
     }, [pendingUpdates]);
 
-    const handleShare = async () => {
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: `لائيو: ${article.title}`,
-                    text: article.subdeck || article.title,
-                    url: window.location.href,
-                });
-            } catch (err) {
-                console.error('Error sharing:', err);
-            }
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            alert('لنڪ ڪاپي ڪئي وئي!');
-        }
+    const handleShare = () => {
+        setShowShareOptions(!showShareOptions);
     };
 
     if (loading) return <SkeletonArticle />;
@@ -407,18 +395,29 @@ const LiveArticlePage: React.FC = () => {
                                         <span>شيئر ڪريو</span>
                                     </button>
 
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderRight: '1px solid #eee', paddingRight: '1rem', marginRight: '0.5rem' }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '1rem',
+                                        borderRight: '1px solid #eee',
+                                        paddingRight: '1rem',
+                                        marginRight: '0.5rem',
+                                        opacity: showShareOptions ? 1 : 0,
+                                        visibility: showShareOptions ? 'visible' : 'hidden',
+                                        transform: showShareOptions ? 'translateX(0)' : 'translateX(10px)',
+                                        transition: 'all 0.3s ease'
+                                    }}>
                                         <a
-                                            href={`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + window.location.href)}`}
+                                            href={`https://wa.me/?text=${encodeURIComponent(article.title + (article.subdeck ? '\n' + article.subdeck : '') + '\n' + window.location.href)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            style={{ color: '#25D366', display: 'flex' }}
+                                            style={{ color: '#000', display: 'flex' }}
                                             title="WhatsApp تي شيئر ڪريو"
                                         >
                                             <MessageCircle size={20} fill="currentColor" strokeWidth={0} />
                                         </a>
                                         <a
-                                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(window.location.href)}`}
+                                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title + (article.subdeck ? '\n' + article.subdeck : ''))}&url=${encodeURIComponent(window.location.href)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             style={{ color: '#000', display: 'flex' }}
@@ -430,7 +429,7 @@ const LiveArticlePage: React.FC = () => {
                                             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            style={{ color: '#1877F2', display: 'flex' }}
+                                            style={{ color: '#000', display: 'flex' }}
                                             title="Facebook تي شيئر ڪريو"
                                         >
                                             <Facebook size={20} fill="currentColor" strokeWidth={0} />

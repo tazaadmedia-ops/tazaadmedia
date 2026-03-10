@@ -131,22 +131,22 @@ const AuthorPage: React.FC = () => {
                         {author.social_links && (Object.values(author.social_links).some(link => link)) && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderRight: '2px solid #eee', paddingRight: '1rem', marginRight: '0.25rem' }}>
                                 {author.social_links.twitter && (
-                                    <a href={author.social_links.twitter} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#1da1f2'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                    <a href={author.social_links.twitter} target="_blank" rel="noopener noreferrer" style={{ color: '#000', transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'} onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
                                         <Twitter size={18} fill="currentColor" strokeWidth={0} />
                                     </a>
                                 )}
                                 {author.social_links.facebook && (
-                                    <a href={author.social_links.facebook} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#1877f2'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                    <a href={author.social_links.facebook} target="_blank" rel="noopener noreferrer" style={{ color: '#000', transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'} onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
                                         <Facebook size={18} fill="currentColor" strokeWidth={0} />
                                     </a>
                                 )}
                                 {author.social_links.instagram && (
-                                    <a href={author.social_links.instagram} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#e4405f'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                    <a href={author.social_links.instagram} target="_blank" rel="noopener noreferrer" style={{ color: '#000', transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'} onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
                                         <Instagram size={18} strokeWidth={2.5} />
                                     </a>
                                 )}
                                 {author.social_links.website && (
-                                    <a href={author.social_links.website} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                    <a href={author.social_links.website} target="_blank" rel="noopener noreferrer" style={{ color: '#000', transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'} onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
                                         <Globe size={18} strokeWidth={2.5} />
                                     </a>
                                 )}
