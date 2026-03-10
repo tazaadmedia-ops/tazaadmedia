@@ -442,10 +442,8 @@ figcaption {
 
 .ProseMirror .related-article-card:hover,
 .article-content .related-article-card:hover {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
+  /* Removed background change and box shadow per user request */
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
 .ProseMirror .related-article-card .related-article-image,
@@ -482,6 +480,12 @@ figcaption {
   color: #111;
   text-decoration: none !important;
   margin: 0;
+}
+
+.ProseMirror .related-article-card:hover .related-article-title,
+.article-content .related-article-card:hover .related-article-title {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
 }
 
 /* Responsive Design */
