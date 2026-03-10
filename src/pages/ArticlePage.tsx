@@ -204,6 +204,49 @@ const ArticlePage: React.FC = () => {
         window.scrollTo(0, 0);
     }, [slug]);
 
+    // Text Reveal Animation Observer
+    useEffect(() => {
+        if (!article || (!article.content_json && !article.content_text)) return;
+
+        // Give the editor a moment to render content
+        const timeoutId = setTimeout(() => {
+            const elements = document.querySelectorAll('.article-content .ProseMirror > *');
+            if (elements.length === 0) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px' // Trigger slightly before it comes fully into view
+            });
+
+            elements.forEach((el, index) => {
+                // Add base class and slightly delay early elements so they don't pop instantly on load
+                el.classList.add('reveal-text');
+                if (index < 3) {
+                    setTimeout(() => {
+                        el.classList.add('is-visible');
+                        observer.unobserve(el);
+                    }, index * 100);
+                } else {
+                    observer.observe(el);
+                }
+            });
+
+            return () => {
+                elements.forEach(el => observer.unobserve(el));
+            };
+        }, 300); // 300ms delay to ensure Tiptap has mounted HTML
+
+        return () => clearTimeout(timeoutId);
+    }, [article, slug]); // Re-run when article changes
+
     const handleShare = () => {
         setShowShareOptions(!showShareOptions);
     };
