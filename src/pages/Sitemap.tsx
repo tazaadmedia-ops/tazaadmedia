@@ -7,7 +7,7 @@ const Sitemap: React.FC = () => {
             <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '2rem', marginTop: '2rem' }}>سائيٽ ميپ</h1>
             <ul style={{ listStyle: 'none', padding: 0 }}>
                 <li style={{ marginBottom: '1rem' }}>
-                    <Link to="/" style={{ fontSize: '1.2rem', fontWeight: 700, color: '#000', textDecoration: 'none' }}>هوم پيج</Link>
+                    <Link to="/" style={{ fontSize: '1.2rem', fontWeight: 700, color: '#000', textDecoration: 'none' }}>پھريون صفعو</Link>
                 </li>
                 <li style={{ marginBottom: '1rem' }}>
                     <Link to="/about" style={{ fontSize: '1.2rem', fontWeight: 700, color: '#000', textDecoration: 'none' }}>اسان بابت</Link>

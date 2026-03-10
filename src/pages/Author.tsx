@@ -70,7 +70,7 @@ const AuthorPage: React.FC = () => {
         return (
             <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}>
                 <h2 style={{ fontFamily: 'var(--font-main)' }}>ليکڪ نه مليو (Author Not Found)</h2>
-                <Link to="/" style={{ color: 'var(--color-accent)', fontWeight: 700 }}>واپس هوم پيج تي وڃو</Link>
+                <Link to="/" style={{ color: 'var(--color-accent)', fontWeight: 700 }}>واپس پھريون صفعو تي وڃو</Link>
             </div>
         );
     }

@@ -97,7 +97,7 @@ const Home: React.FC = () => {
     return (
         <div className="container" style={{ marginTop: '0', fontFamily: 'var(--font-main)' }}>
             <SEO
-                title="هوم"
+                title="پھريون صفعو"
                 description="Open Editorial provides in-depth analysis, special reports, and latest news from Sindh and beyond."
                 schemaType="WebSite"
             />

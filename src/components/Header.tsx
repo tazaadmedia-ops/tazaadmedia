@@ -11,7 +11,7 @@ const Header: React.FC = () => {
         (location.pathname !== '/' && location.pathname.split('/').length === 2 && !location.pathname.includes('.'));
 
     const [menuItems, setMenuItems] = useState<any[]>([
-        { to: "/", label: "هوم", alwaysShow: true }
+        { to: "/", label: "پھريون صفعو", alwaysShow: true }
     ]);
     const [tickerArticles, setTickerArticles] = useState<any[]>([]);
     const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
@@ -147,7 +147,7 @@ const Header: React.FC = () => {
             .order('display_order', { ascending: true });
 
         const items = [
-            { to: "/", label: "هوم", id: 'home' }
+            { to: "/", label: "پھريون صفعو", id: 'home' }
         ];
 
         if (categories) {
@@ -194,19 +194,20 @@ const Header: React.FC = () => {
     return (
         <>
             <header style={{
-                backgroundColor: '#fff',
+                backgroundColor: 'transparent',
                 position: 'sticky',
                 top: 0,
                 zIndex: 2000,
                 direction: 'rtl',
                 boxShadow: hideOnScroll ? 'none' : '0 2px 10px rgba(0,0,0,0.05)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                overflow: 'hidden'
             }}>
                 <div style={{
                     transform: hideOnScroll ? 'translateY(calc(-100% + 3px))' : 'translateY(0)',
-                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    backgroundColor: '#fff'
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    backgroundColor: '#fff',
+                    maxHeight: hideOnScroll ? '3px' : '200px',
+                    overflow: 'hidden'
                 }}>
                     {/* --- TOP BAR (WHITE) --- */}
                     <div className="container" style={{
@@ -235,7 +236,7 @@ const Header: React.FC = () => {
                                 <Menu size={24} strokeWidth={2.5} />
                             </button>
 
-                            <NavLink to="/" aria-label="هوم" style={{ display: 'flex', alignItems: 'center' }}>
+                            <NavLink to="/" aria-label="پھريون صفعو" style={{ display: 'flex', alignItems: 'center' }}>
                                 <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '34px', width: 'auto' }}>
                                     <path fill="#B70100" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
                                     <path fill="#B70100" d="M22.3,3.4v21.5h7v-10.2h4.3s.2,2.7.2,2.7c4.4-5.8,14-5.2,16.1,2.3s.1,5.2,1.9,5.2h40.7v-10.2h4.3v14.5h-44.7c-.4,0-2.3-1.5-2.7-1.9-.5.6-2.5,1.9-3.1,1.9h-28.3V3.4h4.3ZM45.7,24.9c2-10.8-11-8.7-12.1,0h12.1Z" />
