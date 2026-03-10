@@ -138,16 +138,15 @@ const CookieConsent: React.FC = () => {
                     .cookie-button-group {
                         display: flex;
                         gap: 12px;
-                        flex-direction: column;
+                        flex-wrap: wrap;
                     }
-                    @media (min-width: 480px) {
-                        .cookie-button-group {
-                            flex-direction: row;
-                            flex-wrap: wrap;
-                        }
-                        .cookie-btn {
-                            flex: 1;
-                        }
+                    .cookie-btn-half {
+                        flex: 1;
+                        min-width: 45%;
+                    }
+                    .cookie-link-full {
+                        width: 100%;
+                        margin-top: 4px;
                     }
                 `}
             </style>
@@ -159,9 +158,9 @@ const CookieConsent: React.FC = () => {
                         اسان توهان جي تجربي کي بهتر بڻائڻ لاءِ اينالائيٽڪس ڪوڪيز استعمال ڪندا آهيون. ڇا توهان ان جي اجازت ڏيندؤ؟
                     </p>
                     <div className="cookie-button-group">
-                        <button onClick={handleAcceptAll} className="cookie-btn cookie-btn-primary">سڀ قبول ڪريو</button>
-                        <button onClick={handleRejectAll} className="cookie-btn cookie-btn-secondary">سڀ رد ڪريو</button>
-                        <button onClick={() => setShowDetails(true)} className="cookie-btn cookie-link">انتظام ڪريو</button>
+                        <button onClick={handleAcceptAll} className="cookie-btn cookie-btn-primary cookie-btn-half">سڀ قبول ڪريو</button>
+                        <button onClick={handleRejectAll} className="cookie-btn cookie-btn-secondary cookie-btn-half">سڀ رد ڪريو</button>
+                        <button onClick={() => setShowDetails(true)} className="cookie-btn cookie-link cookie-link-full">انتظام ڪريو</button>
                     </div>
                 </>
             ) : (
@@ -195,8 +194,8 @@ const PreferencesView: React.FC<{ onSave: (a: boolean) => void; onBack: () => vo
             </div>
 
             <div className="cookie-button-group">
-                <button onClick={() => onSave(analytics)} className="cookie-btn cookie-btn-primary">محفوظ ڪريو</button>
-                <button onClick={onBack} className="cookie-btn cookie-btn-secondary">واپس</button>
+                <button onClick={() => onSave(analytics)} className="cookie-btn cookie-btn-primary cookie-btn-half">محفوظ ڪريو</button>
+                <button onClick={onBack} className="cookie-btn cookie-btn-secondary cookie-btn-half">واپس</button>
             </div>
         </div>
     );
