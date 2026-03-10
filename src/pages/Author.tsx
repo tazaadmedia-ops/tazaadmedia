@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SEO from '../components/SEO';
+import { Twitter, Facebook, Instagram, Globe, FileText } from 'lucide-react';
+
 
 const AuthorPage: React.FC = () => {
     const { username } = useParams<{ username: string }>();
@@ -120,8 +122,36 @@ const AuthorPage: React.FC = () => {
                     }}>
                         {author.bio || 'هن ليکڪ لاءِ ڪا به بايو موجود ناهي.'}
                     </p>
-                    <div className="meta-row" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', justifyContent: 'flex-start' }}>
-                        <span style={{ fontSize: '0.9rem', color: '#666', fontWeight: 600 }}>ليکڪ</span>
+                    <div className="meta-row" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', color: '#111', fontWeight: 800 }}>
+                            <FileText size={18} strokeWidth={2.5} />
+                            <span>{articles.length} لکڻيون</span>
+                        </div>
+
+                        {author.social_links && (Object.values(author.social_links).some(link => link)) && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', borderRight: '2px solid #eee', paddingRight: '1.25rem', marginRight: '0.25rem' }}>
+                                {author.social_links.twitter && (
+                                    <a href={author.social_links.twitter} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#1da1f2'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                        <Twitter size={20} fill="currentColor" strokeWidth={0} />
+                                    </a>
+                                )}
+                                {author.social_links.facebook && (
+                                    <a href={author.social_links.facebook} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#1877f2'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                        <Facebook size={20} fill="currentColor" strokeWidth={0} />
+                                    </a>
+                                )}
+                                {author.social_links.instagram && (
+                                    <a href={author.social_links.instagram} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#e4405f'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                        <Instagram size={20} strokeWidth={2.5} />
+                                    </a>
+                                )}
+                                {author.social_links.website && (
+                                    <a href={author.social_links.website} target="_blank" rel="noopener noreferrer" style={{ color: '#111', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'} onMouseLeave={(e) => e.currentTarget.style.color = '#111'}>
+                                        <Globe size={20} strokeWidth={2.5} />
+                                    </a>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
