@@ -12,6 +12,7 @@ interface Author {
     avatar_url: string;
     role: string;
     is_hidden?: boolean;
+    password?: string;
     social_links: {
         twitter?: string;
         facebook?: string;
@@ -53,18 +54,49 @@ const Authors: React.FC = () => {
             alert('Name, Username, and Email are required');
             return;
         }
+        
+        if (!formData.id && !formData.password) {
+            alert('Password is required for new authors');
+            return;
+        }
+        
         setIsSaving(true);
 
         const payload = { ...formData, updated_at: new Date().toISOString() };
+        const rawPassword = payload.password;
+        delete payload.password; // Do not send password to public users table
 
         if (formData.id) {
             // Update
             const { error } = await supabase.from('users').update(payload).eq('id', formData.id);
             if (error) alert(error.message);
         } else {
-            // Insert
-            const { error } = await supabase.from('users').insert([payload]);
-            if (error) alert(error.message);
+            // Insert - First create an Auth user using an alternate client so we don't log out the admin
+            const { createClient } = await import('@supabase/supabase-js');
+            const authClient = createClient(
+                import.meta.env.VITE_SUPABASE_URL,
+                import.meta.env.VITE_SUPABASE_ANON_KEY,
+                { auth: { persistSession: false } }
+            );
+
+            const { data: authData, error: authError } = await authClient.auth.signUp({
+                email: payload.email!,
+                password: rawPassword!
+            });
+
+            if (authError || !authData.user) {
+                alert('Error creating author account: ' + (authError?.message || 'Unknown error'));
+                setIsSaving(false);
+                return;
+            }
+
+            // Link the public.users record to the newly created auth ID
+            payload.id = authData.user.id;
+
+            // Give it a brief moment to allow any backend triggers to finish (if Supabase has auto public.users triggers)
+            // Just in case, we do an UPSERT (insert with onConflict) if there's a trigger, or standard insert if not.
+            const { error } = await supabase.from('users').upsert([payload]);
+            if (error) alert('Account created but error saving profile details: ' + error.message);
         }
 
         setIsSaving(false);
@@ -261,11 +293,25 @@ const Authors: React.FC = () => {
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '4px', color: '#555' }}>Email Address *</label>
                                     <input
                                         placeholder="john@example.com"
+                                        type="email"
                                         value={formData.email || ''}
                                         onChange={e => setFormData({ ...formData, email: e.target.value })}
                                         style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.95rem' }}
                                     />
                                 </div>
+
+                                {!formData.id && (
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '4px', color: '#555' }}>Login Password *</label>
+                                        <input
+                                            placeholder="Secure password for this author"
+                                            type="password"
+                                            value={formData.password || ''}
+                                            onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                            style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.95rem' }}
+                                        />
+                                    </div>
+                                )}
 
                                 <div>
                                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '4px', color: '#555' }}>Bio</label>

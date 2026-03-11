@@ -8,6 +8,7 @@ const Dashboard: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [userRole, setUserRole] = useState<string>('admin');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -16,12 +17,32 @@ const Dashboard: React.FC = () => {
 
     const fetchArticles = async () => {
         setLoading(true);
-        const { data } = await supabase
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single();
+        const role = userData?.role || 'admin';
+        setUserRole(role);
+
+        let query = supabase
             .from('articles')
-            .select('*')
+            .select(`
+                *,
+                article_authors (author_id)
+            `)
             .order('published_at', { ascending: false });
 
-        if (data) setArticles(data);
+        const { data } = await query;
+        
+        let finalData = data || [];
+        // If author, filter out articles they didn't write
+        if (role === 'author') {
+            finalData = finalData.filter(article => 
+                article.article_authors?.some((author: any) => author.author_id === user.id)
+            );
+        }
+
+        setArticles(finalData);
         setLoading(false);
     };
 
@@ -91,10 +112,12 @@ const Dashboard: React.FC = () => {
                 marginBottom: '3rem'
             }}>
                 {[
-                    { label: 'Total Articles', value: articles.length, color: '#000' },
+                    { label: userRole === 'author' ? 'My Articles' : 'Total Articles', value: articles.length, color: '#000' },
                     { label: 'Total Views', value: formatViews(totalViews), color: '#000' },
-                    { label: 'Active Editors', value: '3', color: '#000' },
-                    { label: 'System Status', value: 'Live', color: '#10b981' },
+                    ...(userRole !== 'author' ? [
+                        { label: 'Active Editors', value: '3', color: '#000' },
+                        { label: 'System Status', value: 'Live', color: '#10b981' },
+                    ] : [])
                 ].map((stat, i) => (
                     <div key={i} style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                         <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>{stat.label}</div>
@@ -225,22 +248,24 @@ const Dashboard: React.FC = () => {
                                                 >
                                                     <Edit2 size={16} /> Edit
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDelete(article.id, article.title)}
-                                                    style={{
-                                                        background: 'none',
-                                                        border: 'none',
-                                                        color: '#ef4444',
-                                                        cursor: 'pointer',
-                                                        padding: 0,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        transition: 'opacity 0.2s'
-                                                    }}
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                                {userRole !== 'author' && (
+                                                    <button
+                                                        onClick={() => handleDelete(article.id, article.title)}
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            color: '#ef4444',
+                                                            cursor: 'pointer',
+                                                            padding: 0,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            transition: 'opacity 0.2s'
+                                                        }}
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

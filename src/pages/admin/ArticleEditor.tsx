@@ -197,6 +197,8 @@ const ArticleEditor: React.FC = () => {
     useEffect(() => {
         const init = async () => {
             try {
+                const { data: { user: currentUser } } = await supabase.auth.getUser();
+
                 // 1. Fetch authors and categories
                 const { data: users } = await supabase.from('users').select('*');
                 if (users) setAllAuthors(users);
@@ -247,6 +249,12 @@ const ArticleEditor: React.FC = () => {
                         if (count && count > 0) {
                             setHasUpdates(true);
                         }
+                    }
+                } else if (currentUser && users) {
+                    // Pre-fill author for new articles
+                    const currentProfile = users.find(u => u.id === currentUser.id);
+                    if (currentProfile) {
+                        setSelectedAuthors([currentProfile]);
                     }
                 }
             } catch (error: any) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FileText, Users, FolderOpen, LogOut, ExternalLink, MessageSquare, Menu, X, Settings as SettingsIcon } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -35,6 +36,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -42,6 +44,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         };
         checkMobile();
         window.addEventListener('resize', checkMobile);
+        
+        const fetchRole = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data } = await supabase.from('users').select('role').eq('id', user.id).single();
+                if (data) setUserRole(data.role);
+            }
+        };
+        fetchRole();
+        
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
@@ -123,38 +135,47 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                             isActive={isActive('/admin/new')}
                             onClick={() => isMobile && setIsSidebarOpen(false)}
                         />
-                        <SidebarItem
-                            to="/admin/authors"
-                            icon={Users}
-                            label="Authors"
-                            isActive={isActive('/admin/authors')}
-                            onClick={() => isMobile && setIsSidebarOpen(false)}
-                        />
-                        <SidebarItem
-                            to="/admin/categories"
-                            icon={FolderOpen}
-                            label="Categories"
-                            isActive={isActive('/admin/categories')}
-                            onClick={() => isMobile && setIsSidebarOpen(false)}
-                        />
-                        <SidebarItem
-                            to="/admin/reports"
-                            icon={MessageSquare}
-                            label="Reports"
-                            isActive={isActive('/admin/reports')}
-                            onClick={() => isMobile && setIsSidebarOpen(false)}
-                        />
-                        <SidebarItem
-                            to="/admin/settings"
-                            icon={SettingsIcon}
-                            label="Site Settings"
-                            isActive={isActive('/admin/settings')}
-                            onClick={() => isMobile && setIsSidebarOpen(false)}
-                        />
+                        
+                        {/* Admin Only Routes */}
+                        {userRole !== 'author' && (
+                            <>
+                                <SidebarItem
+                                    to="/admin/authors"
+                                    icon={Users}
+                                    label="Authors"
+                                    isActive={isActive('/admin/authors')}
+                                    onClick={() => isMobile && setIsSidebarOpen(false)}
+                                />
+                                <SidebarItem
+                                    to="/admin/categories"
+                                    icon={FolderOpen}
+                                    label="Categories"
+                                    isActive={isActive('/admin/categories')}
+                                    onClick={() => isMobile && setIsSidebarOpen(false)}
+                                />
+                                <SidebarItem
+                                    to="/admin/reports"
+                                    icon={MessageSquare}
+                                    label="Reports"
+                                    isActive={isActive('/admin/reports')}
+                                    onClick={() => isMobile && setIsSidebarOpen(false)}
+                                />
+                                <SidebarItem
+                                    to="/admin/settings"
+                                    icon={SettingsIcon}
+                                    label="Site Settings"
+                                    isActive={isActive('/admin/settings')}
+                                    onClick={() => isMobile && setIsSidebarOpen(false)}
+                                />
+                            </>
+                        )}
                     </nav>
 
                     {/* Bottom Actions */}
                     <div style={{ marginTop: 'auto', borderTop: '1px solid #f3f4f6', paddingTop: '1rem' }}>
+                        <div style={{ padding: '0 16px 16px 16px', fontSize: '0.8rem', color: '#888', fontWeight: 600 }}>
+                            Role: {userRole || 'Loading...'}
+                        </div>
                         <SidebarItem
                             to="/"
                             icon={ExternalLink}
@@ -162,7 +183,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                             isActive={false}
                         />
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={async () => {
+                                await supabase.auth.signOut();
+                                navigate('/login');
+                            }}
                             style={{
                                 width: '100%',
                                 display: 'flex',
