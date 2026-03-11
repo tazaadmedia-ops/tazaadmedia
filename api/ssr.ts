@@ -146,6 +146,11 @@ export default async function handler(request: any, response: any) {
                         if (art.featured_image_url) {
                             meta.image = art.featured_image_url.startsWith('http') ? art.featured_image_url : `${baseUrl}${art.featured_image_url.startsWith('/') ? '' : '/'}${art.featured_image_url}`;
                         }
+                        
+                        // Extract plain text from HTML content for word count and clean articleBody
+                        const cleanContent = art.content_text ? art.content_text.replace(/<[^>]*>?/gm, '') : '';
+                        const wordCount = cleanContent.trim().split(/\s+/).length;
+
                         meta.schema = {
                             "@context": "https://schema.org",
                             "@type": isLive ? "LiveBlogPosting" : "NewsArticle",
@@ -155,17 +160,30 @@ export default async function handler(request: any, response: any) {
                             },
                             "headline": art.title,
                             "description": art.subdeck || art.title,
-                            "image": [meta.image],
+                            "image": [
+                                meta.image,
+                                // Provide multiple aspect ratios if possible for discoverability, here we just array-ify the main one
+                            ],
                             "datePublished": art.published_at || art.created_at,
                             "dateModified": art.updated_at || art.published_at,
-                            "author": { "@type": "Person", "name": "تضاد اسٽاف" },
+                            "author": [{
+                                "@type": "Organization",
+                                "name": "تضاد",
+                                "url": baseUrl
+                            }],
                             "publisher": {
                                 "@type": "Organization",
                                 "name": "تضاد",
-                                "logo": { "@type": "ImageObject", "url": `${baseUrl}/logo.png` }
+                                "logo": {
+                                    "@type": "ImageObject",
+                                    "url": `${baseUrl}/logo.png`,
+                                    "width": 600,
+                                    "height": 60
+                                }
                             },
                             "inLanguage": "sd",
-                            "articleBody": art.content_text
+                            "articleBody": cleanContent.substring(0, 5000), // Provide cleaned text, truncate if massive
+                            "wordCount": wordCount
                         };
 
                         // 5. CONTENT INJECTION
