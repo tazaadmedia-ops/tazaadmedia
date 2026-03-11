@@ -33,11 +33,11 @@
       "destination": "/api/ssr?type=author&slug=:slug"
     },
     {
-      "source": "/:slug((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/|live/|topic/|author/|admin/|login|search|about|submit|contact|privacy|terms|sitemap|feed|amp|sitemap-news).*)",
+      "source": "/:slug((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|robots\\.txt|llms\\.txt|assets/|live/|topic/|author/|admin/|login|search|about|submit|contact|privacy|terms|sitemap|feed|amp|sitemap-news).*)",
       "destination": "/api/ssr?type=article&slug=:slug"
     },
     {
-      "source": "/((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|assets/|feed.xml|sitemap-news.xml|amp/).*)",
+      "source": "/((?!api/|index.html|favicon.svg|default-og.jpg|logo.png|robots\\.txt|llms\\.txt|assets/|feed\\.xml|sitemap-news\\.xml|amp/).*)",
       "destination": "/index.html"
     }
   ],
