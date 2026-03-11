@@ -4,9 +4,10 @@ interface SafeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     fallbackText?: string;
     width?: string | number;
     height?: string | number;
+    fetchPriority?: "high" | "low" | "auto";
 }
 
-const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, width, height, ...props }) => {
+const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, width, height, fetchPriority, ...props }) => {
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -44,15 +45,17 @@ const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, wi
         );
     }
 
-    const optimizedSrc = src;
-    // Remove experimental optimization that might cause 404s on some Supabase setups
-    /* 
-    if (optimizedSrc && optimizedSrc.includes('supabase.co') && width) {
-        if (!optimizedSrc.includes('?')) {
-            optimizedSrc = `${optimizedSrc}?width=${width}&quality=80`;
-        }
+    let optimizedSrc = src;
+    
+    // Enable Supabase Image Transformations to fix Lighthouse "Improve Image Delivery" warnings.
+    // Automatically convert to WebP and resize based on passed width limits
+    if (optimizedSrc && optimizedSrc.includes('supabase.co') && !optimizedSrc.includes('?')) {
+        let qs = `?quality=80&format=webp`;
+        // if width is provided, instruct Supabase to resize it down to save bandwidth
+        if (width) qs += `&width=${width}`;
+        
+        optimizedSrc = `${optimizedSrc}${qs}`;
     }
-    */
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -92,6 +95,7 @@ const SafeImage: React.FC<SafeImageProps> = ({ src, alt, style, fallbackText, wi
                     aspectRatio: (width && height) ? `${width}/${height}` : undefined
                 } as any}
                 decoding="async"
+                fetchPriority={fetchPriority}
                 {...props}
             />
         </div>
