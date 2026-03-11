@@ -71,27 +71,34 @@ const Authors: React.FC = () => {
             const { error } = await supabase.from('users').update(payload).eq('id', formData.id);
             if (error) alert(error.message);
         } else {
-            // Insert - First create an Auth user using an alternate client so we don't log out the admin
-            const { createClient } = await import('@supabase/supabase-js');
-            const authClient = createClient(
-                import.meta.env.VITE_SUPABASE_URL,
-                import.meta.env.VITE_SUPABASE_ANON_KEY,
-                { auth: { persistSession: false } }
-            );
+            // Insert - Call Vercel serverless function to create user via Service Role Key
+            try {
+                const response = await fetch('/api/create-author', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: payload.email,
+                        password: rawPassword
+                    }),
+                });
 
-            const { data: authData, error: authError } = await authClient.auth.signUp({
-                email: payload.email!,
-                password: rawPassword!
-            });
+                const apiData = await response.json();
 
-            if (authError || !authData.user) {
-                alert('Error creating author account: ' + (authError?.message || 'Unknown error'));
+                if (!response.ok || !apiData.user) {
+                    alert('Error creating author account: ' + (apiData.error || 'Unknown error'));
+                    setIsSaving(false);
+                    return;
+                }
+
+                // Link the public.users record to the newly created auth ID
+                payload.id = apiData.user.id;
+            } catch (err: any) {
+                alert('Request failed: ' + err.message);
                 setIsSaving(false);
                 return;
             }
-
-            // Link the public.users record to the newly created auth ID
-            payload.id = authData.user.id;
 
             // Give it a brief moment to allow any backend triggers to finish (if Supabase has auto public.users triggers)
             // Just in case, we do an UPSERT (insert with onConflict) if there's a trigger, or standard insert if not.
