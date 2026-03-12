@@ -24,6 +24,11 @@ export class HesudharPipeline {
   private phase2 = new Phase2HehDisambiguator();
   private phase3 = new Phase3SecondaryNormalization();
   private citationDetector = new ArabicCitationDetector();
+  private dictionaryLookup?: (word: string) => string | null;
+
+  constructor(dictionaryLookup?: (word: string) => string | null) {
+    this.dictionaryLookup = dictionaryLookup;
+  }
 
   /**
    * Full pipeline execution.
@@ -49,6 +54,22 @@ export class HesudharPipeline {
       if (!this.isSindhiWord(token)) {
         correctedTokens.push(token);
         continue;
+      }
+
+      // -- PHASE 0: Dictionary Lookup --
+      if (this.dictionaryLookup) {
+        const lookup = this.dictionaryLookup(token);
+        if (lookup) {
+          if (lookup !== token) {
+            result.changesLog.push({
+              original: token,
+              corrected: lookup,
+              source: 'ALGORITHM' // Or 'DICTIONARY' if we add that source
+            });
+          }
+          correctedTokens.push(lookup);
+          continue;
+        }
       }
 
       // -- PHASE 4: Arabic citation bypass --

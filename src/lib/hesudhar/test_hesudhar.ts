@@ -1,5 +1,4 @@
 import { HesudharPipeline } from './HesudharPipeline';
-import { SindhiUnicode } from './SindhiUnicode';
 
 const pipeline = new HesudharPipeline();
 

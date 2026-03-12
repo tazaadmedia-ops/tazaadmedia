@@ -98,6 +98,7 @@ const ArticleEditor: React.FC = () => {
     const [showStyleMenu, setShowStyleMenu] = useState(false);
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
     const [isFloatingMenuOpen, setIsFloatingMenuOpen] = useState(false);
+    const [hesudharDictionary, setHesudharDictionary] = useState<Record<string, string>>({});
     const [articleSearchQuery, setArticleSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearchingArticles, setIsSearchingArticles] = useState(false);
@@ -258,6 +259,16 @@ const ArticleEditor: React.FC = () => {
                     if (currentProfile) {
                         setSelectedAuthors([currentProfile]);
                     }
+                }
+
+                // 4. Fetch Hesudhar Dictionary
+                const { data: dict } = await supabase.from('hesudhar_dictionary').select('word, correct');
+                if (dict) {
+                    const dictMap: Record<string, string> = {};
+                    dict.forEach(item => {
+                        dictMap[item.word] = item.correct;
+                    });
+                    setHesudharDictionary(dictMap);
                 }
             } catch (error: any) {
                 console.error('Error loading editor data:', error);
@@ -500,7 +511,11 @@ const ArticleEditor: React.FC = () => {
 
     const handleNormalizeSindhi = () => {
         if (!editor) return;
-        const pipeline = new HesudharPipeline();
+        
+        // Dictionary lookup function
+        const lookup = (word: string) => hesudharDictionary[word] || null;
+        
+        const pipeline = new HesudharPipeline(lookup);
         const content = editor.getJSON();
 
         // Helper to recursively process text nodes in Tiptap JSON
