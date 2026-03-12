@@ -14,6 +14,28 @@ interface Category {
     count?: number; // Optional, strict for now
 }
 
+const CategoriesSkeleton = () => (
+    <div style={{ padding: '2rem' }} className="reveal-text is-visible">
+        {[...Array(5)].map((_, i) => (
+            <div key={i} style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '1rem', 
+                padding: '1.2rem 0',
+                borderBottom: '1px solid #f0f0f0'
+            }}>
+                <div className="skeleton" style={{ width: '30%', height: '16px' }} />
+                <div className="skeleton" style={{ width: '20%', height: '14px' }} />
+                <div className="skeleton" style={{ width: '10%', height: '14px' }} />
+                <div className="skeleton" style={{ width: '10%', height: '14px' }} />
+                <div className="skeleton" style={{ width: '5%', height: '14px' }} />
+                <div style={{ flex: 1 }} />
+                <div className="skeleton" style={{ width: '24px', height: '24px', borderRadius: '4px' }} />
+            </div>
+        ))}
+    </div>
+);
+
 const Categories: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -119,10 +141,9 @@ const Categories: React.FC = () => {
                 </div>
 
                 {/* List */}
-                {/* List Container */}
                 <div style={{ backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                    <div style={{ overflowX: 'auto' }}>
-                        {loading ? <p style={{ padding: '2rem' }}>Loading...</p> : (
+                    <div style={{ overflowX: 'auto' }} className={!loading ? 'reveal-text is-visible' : ''}>
+                        {loading ? <CategoriesSkeleton /> : (
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                                 <thead style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
                                     <tr>
@@ -171,6 +192,7 @@ const Categories: React.FC = () => {
                         )}
                     </div>
                 </div>
+            </div>
 
                 {/* Modal */}
                 {showModal && (
@@ -274,8 +296,6 @@ const Categories: React.FC = () => {
                         </div>
                     </div>
                 )}
-
-            </div>
         </AdminLayout>
     );
 };

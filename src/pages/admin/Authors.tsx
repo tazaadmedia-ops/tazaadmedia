@@ -21,6 +21,24 @@ interface Author {
     };
 }
 
+const AuthorsSkeleton = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }} className="reveal-text is-visible">
+        {[...Array(6)].map((_, i) => (
+            <div key={i} style={{
+                backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '12px',
+                padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center',
+                textAlign: 'center'
+            }}>
+                <div className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '50%', marginBottom: '1rem' }} />
+                <div className="skeleton" style={{ width: '60%', height: '16px', marginBottom: '8px' }} />
+                <div className="skeleton" style={{ width: '40%', height: '12px', marginBottom: '16px' }} />
+                <div className="skeleton" style={{ width: '90%', height: '10px', marginBottom: '6px' }} />
+                <div className="skeleton" style={{ width: '70%', height: '10px' }} />
+            </div>
+        ))}
+    </div>
+);
+
 const Authors: React.FC = () => {
     const [authors, setAuthors] = useState<Author[]>([]);
     const [loading, setLoading] = useState(true);
@@ -198,8 +216,9 @@ const Authors: React.FC = () => {
                 </div>
 
                 {/* Grid */}
-                {loading ? <p>Loading team...</p> : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                <div className={!loading ? 'reveal-text is-visible' : ''}>
+                    {loading ? <AuthorsSkeleton /> : (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                         {filteredAuthors.map(author => (
                             <div key={author.id} style={{
                                 backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '12px',
@@ -232,8 +251,9 @@ const Authors: React.FC = () => {
                         ))}
                     </div>
                 )}
+            </div>
 
-                {/* Modal */}
+            {/* Modal */}
                 {showModal && (
                     <div style={{
                         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,

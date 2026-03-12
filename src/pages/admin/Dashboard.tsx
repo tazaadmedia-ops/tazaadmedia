@@ -4,6 +4,29 @@ import AdminLayout from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { Eye, Trash2, Edit2 } from 'lucide-react';
 
+const DashboardSkeleton = () => (
+    <div className="reveal-text is-visible" style={{ padding: '0 1.5rem 1.5rem' }}>
+        {[...Array(10)].map((_, i) => (
+            <div key={i} style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '1.5rem', 
+                padding: '1.2rem 0',
+                borderBottom: '1px solid #f0f0f0'
+            }}>
+                <div className="skeleton" style={{ width: '64px', height: '40px', borderRadius: '4px' }} />
+                <div style={{ flex: 1 }}>
+                    <div className="skeleton" style={{ width: '40%', height: '14px', marginBottom: '8px' }} />
+                    <div className="skeleton" style={{ width: '20%', height: '10px' }} />
+                </div>
+                <div className="skeleton" style={{ width: '80px', height: '24px', borderRadius: '20px' }} />
+                <div className="skeleton" style={{ width: '40px', height: '20px', borderRadius: '20px' }} />
+                <div className="skeleton" style={{ width: '100px', height: '18px' }} />
+            </div>
+        ))}
+    </div>
+);
+
 const Dashboard: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -163,8 +186,8 @@ const Dashboard: React.FC = () => {
                         />
                     </div>
                 </div>
-                <div style={{ overflowX: 'auto' }}>
-                    {loading ? <p style={{ padding: '2rem' }}>Loading...</p> : (
+                <div style={{ overflowX: 'auto' }} className={!loading ? 'reveal-text is-visible' : ''}>
+                    {loading ? <DashboardSkeleton /> : (
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
