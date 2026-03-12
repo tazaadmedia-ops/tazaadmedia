@@ -23,6 +23,8 @@ import FloatingMenuExtension from '@tiptap/extension-floating-menu';
 import AdminLayout from '../../components/admin/AdminLayout';
 import AdminTimelineEditor from '../../components/admin/AdminTimelineEditor';
 import { supabase } from '../../lib/supabase';
+import { HesudharPipeline } from '../../lib/hesudhar/HesudharPipeline';
+import { Sparkles } from 'lucide-react';
 
 // --- Components ---
 
@@ -494,6 +496,28 @@ const ArticleEditor: React.FC = () => {
         }
     };
 
+
+
+    const handleNormalizeSindhi = () => {
+        if (!editor) return;
+        const pipeline = new HesudharPipeline();
+        const content = editor.getJSON();
+
+        // Helper to recursively process text nodes in Tiptap JSON
+        const processNode = (node: any) => {
+            if (node.text && typeof node.text === 'string') {
+                const result = pipeline.process(node.text);
+                node.text = result.correctedText;
+            }
+            if (node.content && Array.isArray(node.content)) {
+                node.content.forEach(processNode);
+            }
+        };
+
+        processNode(content);
+        editor.commands.setContent(content);
+        alert('Sindhi text normalized successfully!');
+    };
 
 
     if (!editor) return null;
@@ -1158,6 +1182,12 @@ const ArticleEditor: React.FC = () => {
                             <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={editor.isActive('strike')} icon={<Strikethrough size={16} />} />
                             <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} isActive={editor.isActive('code')} icon={<Code size={16} />} />
                             <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()} icon={<X size={16} />} tooltip="Clear Formatting" />
+                            <ToolbarDivider />
+                            <ToolbarButton
+                                onClick={handleNormalizeSindhi}
+                                icon={<Sparkles size={16} color="#B70100" />}
+                                tooltip="Normalize Sindhi (Hesudhar)"
+                            />
                         </div>
 
                         <ToolbarDivider />
