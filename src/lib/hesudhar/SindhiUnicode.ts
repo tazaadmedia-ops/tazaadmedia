@@ -61,8 +61,8 @@ export const SindhiUnicode = {
     "\u0645",   // م — M
     "\u0644",   // ل — L
     "\u06AF",   // گ — G
-    "\u0DA9",   // ڙ — RR (retroflex R)
-    "\u0631",   // ر — R
+    "\u062C",   // ج — J
+    "\u0699",   // ڙ — RR (retroflex R)
     "\u06BB",   // ڻ — NN (retroflex N)
   ] as string[],
 

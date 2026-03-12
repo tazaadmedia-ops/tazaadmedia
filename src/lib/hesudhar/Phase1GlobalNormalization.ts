@@ -25,17 +25,17 @@ export class Phase1GlobalNormalization {
 
   private collapseTrigraphHacks(text: string): string {
     /**
-     * Pattern: U+06BE (ھ) followed by U+06C1 (ہ), U+06D5 (ە), or U+0647 (ه) at word boundary
+     * Historically, extra Heh variants (ہ, ه, ە) were used as "visual tails".
+     * Collapse multiple consecutive Hehs at word boundaries into a single Heh.
+     * Phase 2 will then force the correct phonetic variant.
      */
-    const pattern = /\u06BE[\u06C1\u06D5\u0647](?=[\s\u06D4\u060C\u061F!.,;:()\[\]"']|$)/gu;
-    return text.replace(pattern, "\u06BE");
+    const pattern = /([\u0647\u06BE\u06C1\u06C2\u06D5\u06C0]){2,}(?=[\s\u06D4\u060C\u061F!.,;:()\[\]"']|$)/gu;
+    return text.replace(pattern, "$1");
   }
 
   private normalizeYeh(text: string): string {
-    let result = text;
-    result = result.split(SindhiUnicode.YEH_FARSI).join(SindhiUnicode.YEH_ARABIC);
-    result = result.split(SindhiUnicode.YEH_ARABIC_MAX).join(SindhiUnicode.YEH_ARABIC);
-    return result;
+    // Preserve Alef Maqsura (U+0649) as it is reserved for Arabic loanwords.
+    return text.split(SindhiUnicode.YEH_FARSI).join(SindhiUnicode.YEH_ARABIC);
   }
 
   private normalizeHehGoalHamza(text: string): string {
