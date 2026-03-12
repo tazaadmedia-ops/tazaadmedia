@@ -9,11 +9,14 @@ const Dashboard: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [userRole, setUserRole] = useState<string>('admin');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const PAGE_SIZE = 10;
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchArticles();
-    }, []);
+    }, [currentPage, searchTerm]);
 
     const fetchArticles = async () => {
         setLoading(true);
@@ -28,21 +31,26 @@ const Dashboard: React.FC = () => {
             .from('articles')
             .select(`
                 *,
-                article_authors (author_id)
-            `)
-            .order('published_at', { ascending: false });
+                article_authors!inner (author_id)
+            `, { count: 'exact' });
 
-        const { data } = await query;
-        
-        let finalData = data || [];
-        // If author, filter out articles they didn't write
         if (role === 'author') {
-            finalData = finalData.filter(article => 
-                article.article_authors?.some((author: any) => author.author_id === user.id)
-            );
+            query = query.eq('article_authors.author_id', user.id);
         }
 
-        setArticles(finalData);
+        if (searchTerm) {
+            query = query.or(`title.ilike.%${searchTerm}%,slug.ilike.%${searchTerm}%`);
+        }
+
+        const from = (currentPage - 1) * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+
+        const { data, count } = await query
+            .order('published_at', { ascending: false })
+            .range(from, to);
+        
+        setArticles(data || []);
+        setTotalCount(count || 0);
         setLoading(false);
     };
 
@@ -78,10 +86,7 @@ const Dashboard: React.FC = () => {
         return num.toString();
     };
 
-    const filteredArticles = articles.filter(article =>
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.slug.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredArticles = articles; // Now filtered on server
 
     return (
         <AdminLayout>
@@ -273,6 +278,56 @@ const Dashboard: React.FC = () => {
                             </tbody>
                         </table>
                     )}
+                </div>
+
+                {/* Pagination Controls */}
+                <div style={{
+                    padding: '1.2rem 1.5rem',
+                    borderTop: '1px solid #f0f0f0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    backgroundColor: '#fafafa'
+                }}>
+                    <div style={{ fontSize: '0.85rem', color: '#666' }}>
+                        Showing {Math.min(articles.length, 1) + (currentPage - 1) * PAGE_SIZE} to {Math.min(totalCount, currentPage * PAGE_SIZE)} of {totalCount} entries
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                            disabled={currentPage === 1 || loading}
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                borderRadius: '6px',
+                                border: '1px solid #e5e7eb',
+                                backgroundColor: currentPage === 1 ? '#f9fafb' : '#fff',
+                                color: currentPage === 1 ? '#999' : '#333',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                cursor: currentPage === 1 ? 'default' : 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            disabled={currentPage * PAGE_SIZE >= totalCount || loading}
+                            onClick={() => setCurrentPage(prev => prev + 1)}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                borderRadius: '6px',
+                                border: '1px solid #e5e7eb',
+                                backgroundColor: currentPage * PAGE_SIZE >= totalCount ? '#f9fafb' : '#fff',
+                                color: currentPage * PAGE_SIZE >= totalCount ? '#999' : '#333',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                cursor: currentPage * PAGE_SIZE >= totalCount ? 'default' : 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
             </div>
         </AdminLayout>
