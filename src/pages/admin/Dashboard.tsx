@@ -168,7 +168,8 @@ const Dashboard: React.FC = () => {
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '40%' }}>Title</th>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '80px' }}>Cover</th>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666', width: '35%' }}>Title</th>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Slug</th>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Status</th>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.85rem', color: '#666' }}>Live</th>
@@ -178,6 +179,13 @@ const Dashboard: React.FC = () => {
                             <tbody>
                                 {filteredArticles.map((article) => (
                                     <tr key={article.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                        <td style={{ padding: '0.8rem 1.5rem' }}>
+                                            {article.featured_image_url ? (
+                                                <img src={article.featured_image_url} style={{ width: '64px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} alt="" />
+                                            ) : (
+                                                <div style={{ width: '64px', height: '40px', backgroundColor: '#f3f4f6', borderRadius: '4px', border: '1px solid #eee' }} />
+                                            )}
+                                        </td>
                                         <td style={{ padding: '1.2rem 1.5rem' }}>
                                             <div style={{ fontWeight: 600, fontSize: '0.95rem', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                 {article.title}
