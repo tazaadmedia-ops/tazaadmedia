@@ -102,6 +102,7 @@ const ArticleEditor: React.FC = () => {
     const [articleSearchQuery, setArticleSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearchingArticles, setIsSearchingArticles] = useState(false);
+    const [normalizationStatus, setNormalizationStatus] = useState<'idle' | 'running' | 'success'>('idle');
 
     // File Input Refs
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -284,6 +285,9 @@ const ArticleEditor: React.FC = () => {
     const handleSave = async () => {
         if (!title.trim()) return alert('Please enter a title');
         if (!editor) return;
+
+        // Auto-normalize before save
+        handleNormalizeSindhi(true);
 
         setIsSaving(true);
 
@@ -509,8 +513,10 @@ const ArticleEditor: React.FC = () => {
 
 
 
-    const handleNormalizeSindhi = () => {
+    const handleNormalizeSindhi = (silent = false) => {
         if (!editor) return;
+        
+        if (!silent) setNormalizationStatus('running');
         
         // Dictionary lookup function
         const lookup = (word: string) => hesudharDictionary[word] || null;
@@ -531,7 +537,11 @@ const ArticleEditor: React.FC = () => {
 
         processNode(content);
         editor.commands.setContent(content);
-        alert('Sindhi text normalized successfully!');
+        
+        if (!silent) {
+            setNormalizationStatus('success');
+            setTimeout(() => setNormalizationStatus('idle'), 3000);
+        }
     };
 
 
@@ -545,6 +555,35 @@ const ArticleEditor: React.FC = () => {
 
     return (
         <AdminLayout>
+            {/* Smooth Toast Notification */}
+            {normalizationStatus !== 'idle' && (
+                <div style={{
+                    position: 'fixed',
+                    top: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 9999,
+                    backgroundColor: normalizationStatus === 'running' ? '#000' : '#10b981',
+                    color: '#fff',
+                    padding: '10px 20px',
+                    borderRadius: '30px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    animation: 'slide-down 0.3s ease-out'
+                }}>
+                    {normalizationStatus === 'running' ? (
+                        <Loader size={16} className="animate-spin" />
+                    ) : (
+                        <Check size={16} />
+                    )}
+                    {normalizationStatus === 'running' ? 'نارملائيزنگ (Normalizing...)' : 'سنڌي لکڻي درست ڪئي وئي (Normalized!)'}
+                </div>
+            )}
+
             <input type="file" ref={imageInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleEditorImageUpload} />
             <input type="file" ref={featuredImageInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFeaturedImageUpload} />
 
@@ -1198,10 +1237,11 @@ const ArticleEditor: React.FC = () => {
                             <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} isActive={editor.isActive('code')} icon={<Code size={16} />} />
                             <ToolbarButton onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()} icon={<X size={16} />} tooltip="Clear Formatting" />
                             <ToolbarDivider />
-                            <ToolbarButton
-                                onClick={handleNormalizeSindhi}
-                                icon={<Sparkles size={16} color="#B70100" />}
+                             <ToolbarButton
+                                onClick={() => handleNormalizeSindhi()}
+                                icon={normalizationStatus === 'running' ? <Loader size={16} className="animate-spin" color="#B70100" /> : <Sparkles size={16} color="#B70100" />}
                                 tooltip="Normalize Sindhi (Hesudhar)"
+                                disabled={normalizationStatus === 'running'}
                             />
                         </div>
 
