@@ -64,6 +64,9 @@ export const SindhiUnicode = {
     "\u062C",   // ج — J
     "\u0699",   // ڙ — RR (retroflex R)
     "\u06BB",   // ڻ — NN (retroflex N)
+    "\u068F",   // ڏ — Implosive D (Trigger in specific contexts)
+    "\u0648",   // و — W/V
+    "\u0631",   // ر — R
   ] as string[],
 
   // -- VOWEL DIACRITICS ------------------------------------------------------

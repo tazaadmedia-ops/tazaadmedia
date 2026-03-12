@@ -62,4 +62,12 @@ test("Aspiration Trigger: RRA", "ڙه", "ڙھ");
 test("Preserve Alef Maqsura", "موسى", "موسى");
 test("Implosive Constraint: ڏه is Malfoozi", "\u068F\u0647", "\u068F\u0647");
 
+// 8. Advanced Phase 2 Rules
+test("Whitelisted Malfoozi: آهي", "آهي", "آهي");
+test("Whitelisted Malfoozi: رهي", "رهي", "رهي");
+test("Whitelisted Malfoozi: پنهنجو", "پنهنجو", "پنهنجو");
+test("Terminal Noon Rule: نہ", "\u0646\u06BE", "نه");
+test("Aspiration: ڻھ (NNH)", "\u06BB\u0647", "\u06BB\u06BE");
+test("Aspiration: مھ (MH)", "\u0645\u0647", "\u0645\u06BE");
+
 console.log("Tests completed.");

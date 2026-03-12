@@ -6,6 +6,17 @@ import { SindhiUnicode } from './SindhiUnicode';
  */
 export class Phase2HehDisambiguator {
   /**
+   * Words where Heh is always Malfoozi (Syllable Onset), not Aspiration.
+   */
+  private static readonly MALFOOZI_WHITELIST = [
+    'آهي', 'آهن', 'هيو', 'هئا', 'هئي', 'هيون', // Be verbs
+    'رهي', 'رهن', 'رھي', 'رھن',               // Progress verbs (input variants)
+    'انهن', 'انهن کي', 'ڪنهن', 'ڪنهن کي', 'پنهنجو', 'پنهنجي', // Pronouns
+    'هن', 'هنن', 'هتي', 'هتان', 'هتيءَ',        // Demonstratives
+    'باهه', 'جھه',                             // Collapsed tail-hacks often intend Malfoozi closure
+  ];
+
+  /**
    * Process a single Sindhi word token.
    */
   public processWord(word: string): string {
@@ -16,6 +27,18 @@ export class Phase2HehDisambiguator {
     // Skip words that are purely non-Arabic script
     if (!this.isArabicScript(word)) {
       return word;
+    }
+
+    // -- RULE 0: MALFOOZI WHITELIST -----------------------------------
+    // If the word is in the whitelist, we treat Heh as syllable onset.
+    // We normalize all Heh variants to U+0647.
+    const cleanWord = word.trim();
+    if (Phase2HehDisambiguator.MALFOOZI_WHITELIST.includes(cleanWord)) {
+      let corrected = word;
+      for (const h of SindhiUnicode.HEH_VARIANTS) {
+        corrected = corrected.split(h).join(SindhiUnicode.HEH_ARABIC);
+      }
+      return corrected;
     }
 
     const chars = Array.from(word);
@@ -43,10 +66,12 @@ export class Phase2HehDisambiguator {
       // -- RULE 2: ASPIRATION CHECK -------------------------------------
       // If a Heh follows an aspiration-triggering consonant AND
       // no vowel diacritic separates them. Covers both medial and final.
+      // EXCEPTION: Noon (N) at word-end is silent/weak (Mukhtafi), not aspirated.
       if (
         prevChar &&
         SindhiUnicode.ASPIRATION_TRIGGERS.includes(prevChar) &&
-        !hasVowelBetweenResult
+        !hasVowelBetweenResult &&
+        !(prevChar === "\u0646" && isWordFinalResult)
       ) {
         chars[i] = SindhiUnicode.HEH_DOACHASHMEE; // ھ U+06BE
         continue;
