@@ -46,6 +46,10 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll at root level */
+  position: relative;
 }
 
 body {
@@ -53,24 +57,14 @@ body {
   color: var(--color-text);
   font-family: var(--font-main);
   line-height: 1.9;
-  /* Increased for better readability */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Better font rendering on macOS */
   font-size: 17px;
-  /* Slightly larger for comfort */
   direction: rtl;
   word-spacing: 0.05em;
-  /* Better word spacing for Sindhi */
   letter-spacing: 0.01em;
-  /* Subtle letter spacing for better kerning */
   font-feature-settings: 'kern' 1, 'liga' 1;
-  /* Enable kerning and ligatures */
-  /* Better text rendering */
-  width: 100%;
   min-height: 100dvh;
-  overflow-x: hidden;
-  /* Prevent horizontal scroll */
 }
 
 h1,
@@ -240,6 +234,8 @@ img {
 .prose,
 .ProseMirror {
   max-width: var(--article-width);
+  width: 100%;
+  /* Ensure it doesn't exceed parent */
   margin: 0 auto;
   font-size: 1.2rem;
   line-height: 1.6;
@@ -552,9 +548,9 @@ figcaption {
   }
 
   .full-bleed-mobile {
-    margin-left: calc(-1 * var(--spacing-lg)) !important;
-    margin-right: calc(-1 * var(--spacing-lg)) !important;
-    width: calc(100% + 2 * var(--spacing-lg)) !important;
+    margin-left: calc(-1 * var(--spacing-md)) !important;
+    margin-right: calc(-1 * var(--spacing-md)) !important;
+    width: calc(100% + 2 * var(--spacing-md)) !important;
     max-width: none !important;
     border-radius: 0 !important;
   }
@@ -651,6 +647,22 @@ figcaption {
   .header-white-bar {
     height: auto !important;
     padding: 10px 0;
+    width: 100vw !important;
+    position: relative;
+    left: 50% !important;
+    right: 50% !important;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
+    display: block !important;
+  }
+
+  .news-ticker-full-width {
+    width: 100vw !important;
+    position: relative;
+    left: 50% !important;
+    right: 50% !important;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
   }
 
   .header-container {

@@ -396,15 +396,17 @@ const ArticlePage: React.FC = () => {
 
             {/* Featured Image */}
             {article.featured_image_url && (
-                <div className="full-bleed-mobile" style={{ marginBottom: '1rem', width: '100%', maxWidth: '1080px', margin: '0 auto 1rem auto' }}>
-                    <SafeImage
-                        src={article.featured_image_url}
-                        alt={article.title}
-                        fetchPriority="high"
-                        width="1200"
-                        height="675"
-                        style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }}
-                    />
+                <div style={{ marginBottom: '1.5rem', width: '100%' }}>
+                    <div className="full-bleed-mobile">
+                        <SafeImage
+                            src={article.featured_image_url}
+                            alt={article.title}
+                            fetchPriority="high"
+                            width="1200"
+                            height="675"
+                            style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }}
+                        />
+                    </div>
                     {article.featured_image_caption && (
                         <figcaption className="featured-image-caption">
                             {article.featured_image_caption}

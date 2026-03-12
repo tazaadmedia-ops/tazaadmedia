@@ -199,10 +199,11 @@ const Header: React.FC = () => {
                 top: 0,
                 zIndex: 2000,
                 direction: 'rtl',
+                width: '100%',
                 boxShadow: hideOnScroll ? 'none' : '0 2px 10px rgba(0,0,0,0.05)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}>
-                <div style={{
+                <div className="header-white-bar" style={{
                     transform: hideOnScroll ? 'translateY(calc(-100% + 3px))' : 'translateY(0)',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     backgroundColor: '#fff',
@@ -295,7 +296,7 @@ const Header: React.FC = () => {
                     </div>
 
                     {/* --- BOTTOM BAR (RED NEWS SLIDER) --- */}
-                    <div style={{ backgroundColor: 'var(--color-accent)', width: '100%' }}>
+                    <div className="news-ticker-full-width" style={{ backgroundColor: 'var(--color-accent)' }}>
                         <div className="container">
                             <div className="news-ticker-bar">
                                 <div className="news-ticker-label">
