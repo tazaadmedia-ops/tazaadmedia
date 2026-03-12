@@ -40,13 +40,13 @@ const Header: React.FC = () => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
 
-            // Header collapse logic
-            if (currentScrollY <= 100) {
-                setIsScrolled(false);
-            } else if (currentScrollY > lastScrollY.current) {
-                setIsScrolled(true);
-            } else {
-                setIsScrolled(false);
+            // Header collapse logic - smarter direction detection
+            if (currentScrollY <= 80) {
+                setIsScrolled(false); // Always show near top
+            } else if (currentScrollY > lastScrollY.current + 5) {
+                setIsScrolled(true); // Scrolling down - hide
+            } else if (currentScrollY < lastScrollY.current - 10) {
+                setIsScrolled(false); // Scrolling up significantly - show
             }
 
             lastScrollY.current = currentScrollY <= 0 ? 0 : currentScrollY;
@@ -188,7 +188,7 @@ const Header: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const hideOnScroll = isArticlePage && isScrolled && isMobile;
+    const hideOnScroll = isScrolled && isMobile;
 
 
     return (
@@ -200,98 +200,104 @@ const Header: React.FC = () => {
                 zIndex: 2000,
                 direction: 'rtl',
                 width: '100%',
-                boxShadow: hideOnScroll ? 'none' : '0 2px 10px rgba(0,0,0,0.05)',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                pointerEvents: 'none' // Allow clicks through the sticky wrapper if needed, but children will override
             }}>
-                <div className="header-white-bar" style={{
-                    transform: hideOnScroll ? 'translateY(calc(-100% + 3px))' : 'translateY(0)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    backgroundColor: '#fff',
-                    maxHeight: hideOnScroll ? '3px' : '200px',
-                    overflow: 'hidden'
+                {/* Wrapper for the parts that hide */}
+                <div style={{
+                    transform: hideOnScroll ? 'translateY(-100%)' : 'translateY(0)',
+                    transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                    width: '100%',
+                    pointerEvents: 'auto',
+                    boxShadow: (hideOnScroll || !isScrolled) ? 'none' : '0 2px 10px rgba(0,0,0,0.05)'
                 }}>
-                    {/* --- TOP BAR (WHITE) --- */}
-                    <div className="container" style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        height: '65px',
-                        width: '100%'
+                    <div className="header-white-bar" style={{
+                        backgroundColor: '#fff',
+                        width: '100%',
+                        overflow: 'hidden'
                     }}>
-                        {/* Right Area: Menu Button (Mobile) + Logo + Nav (Desktop) */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <button
-                                className="show-mobile"
-                                onClick={() => setIsMenuOpen(true)}
-                                aria-label="مينيو"
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: '8px',
-                                    cursor: 'pointer',
-                                    color: '#111',
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Menu size={24} strokeWidth={2.5} />
-                            </button>
+                        {/* --- TOP BAR (WHITE) --- */}
+                        <div className="container" style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            height: '65px',
+                            width: '100%'
+                        }}>
+                            {/* Right Area: Menu Button (Mobile) + Logo + Nav (Desktop) */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <button
+                                    className="show-mobile"
+                                    onClick={() => setIsMenuOpen(true)}
+                                    aria-label="مينيو"
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '8px',
+                                        cursor: 'pointer',
+                                        color: '#111',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <Menu size={24} strokeWidth={2.5} />
+                                </button>
 
-                            <NavLink to="/" aria-label="پھريون صفعو" style={{ display: 'flex', alignItems: 'center' }}>
-                                <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '34px', width: 'auto' }}>
-                                    <path fill="#B70100" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
-                                    <path fill="#B70100" d="M22.3,3.4v21.5h7v-10.2h4.3s.2,2.7.2,2.7c4.4-5.8,14-5.2,16.1,2.3s.1,5.2,1.9,5.2h40.7v-10.2h4.3v14.5h-44.7c-.4,0-2.3-1.5-2.7-1.9-.5.6-2.5,1.9-3.1,1.9h-28.3V3.4h4.3ZM45.7,24.9c2-10.8-11-8.7-12.1,0h12.1Z" />
-                                    <path fill="#B70100" d="M111.3,33.1c0,0,.5.6,0,.2-5.8-7.7,5-13.7,5.4-21.3l1,2.1c1.7,5.4-2.9,9.2-5.2,13.5s-1.2,2.6-1.2,3.0c0,.8,0,1.7,0,2.5Z" />
-                                    <path fill="#B70100" d="M113.9,35.1c-.4,0-.2,0-.3-.2-2.3-5.0,6.3-11.1,5.8-16.9,0-.4-.3-.8-.2-1.2.8,1.0,1.6,2.3,1.9,3.6,1.4,6.0-6.0,9.4-7.2,14.7Z" />
-                                    <path fill="#B70100" d="M0,29.2v-4.3h9.8c0.6-6.8-1.2-8.1-7.8-7.4v-3.9h7.2c0.4,0,2.2,1,2.6,1.3,3.4,3,1.3,9.5,2.2,13.5l-.5,0.8H0Z" />
-                                    <path fill="#B70100" d="M91.3,7c3.2-.5,3.6,5.4-.4,4.2s-1.7-3.8.4-4.2Z" />
-                                    <path fill="#B70100" d="M97.1,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
-                                    <path fill="#B70100" d="M41.7,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
-                                </svg>
-                            </NavLink>
+                                <NavLink to="/" aria-label="پھريون صفعو" style={{ display: 'flex', alignItems: 'center' }}>
+                                    <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 121.3 35.1" style={{ height: '34px', width: 'auto' }}>
+                                        <path fill="#B70100" d="M112.5,2.1c10.4,11-7.5,18-4.5,28.5.5,1.7,1.5,3.2,2.7,4.5h-.2c-5.4-3.6-9.6-7.1-6.7-14.2,1.8-4.2,7.6-11.2,7.7-15.3,0-1.9-.6-3.9-1.5-5.6.1,0,.8.4.9.6.6.5,1.1,1,1.6,1.6Z" />
+                                        <path fill="#B70100" d="M22.3,3.4v21.5h7v-10.2h4.3s.2,2.7.2,2.7c4.4-5.8,14-5.2,16.1,2.3s.1,5.2,1.9,5.2h40.7v-10.2h4.3v14.5h-44.7c-.4,0-2.3-1.5-2.7-1.9-.5.6-2.5,1.9-3.1,1.9h-28.3V3.4h4.3ZM45.7,24.9c2-10.8-11-8.7-12.1,0h12.1Z" />
+                                        <path fill="#B70100" d="M111.3,33.1c0,0,.5.6,0,.2-5.8-7.7,5-13.7,5.4-21.3l1,2.1c1.7,5.4-2.9,9.2-5.2,13.5s-1.2,2.6-1.2,3.0c0,.8,0,1.7,0,2.5Z" />
+                                        <path fill="#B70100" d="M113.9,35.1c-.4,0-.2,0-.3-.2-2.3-5.0,6.3-11.1,5.8-16.9,0-.4-.3-.8-.2-1.2.8,1.0,1.6,2.3,1.9,3.6,1.4,6.0-6.0,9.4-7.2,14.7Z" />
+                                        <path fill="#B70100" d="M0,29.2v-4.3h9.8c0.6-6.8-1.2-8.1-7.8-7.4v-3.9h7.2c0.4,0,2.2,1,2.6,1.3,3.4,3,1.3,9.5,2.2,13.5l-.5,0.8H0Z" />
+                                        <path fill="#B70100" d="M91.3,7c3.2-.5,3.6,5.4-.4,4.2s-1.7-3.8.4-4.2Z" />
+                                        <path fill="#B70100" d="M97.1,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
+                                        <path fill="#B70100" d="M41.7,7c2.6-.4,3.4,3.9.7,4.2s-3.3-3.8-.7-4.2Z" />
+                                    </svg>
+                                </NavLink>
 
-                            {/* Navigation - Compressed (Desktop) */}
-                            <nav className="nav-scroll hide-mobile" style={{ marginRight: '1rem' }}>
-                                {menuItems.map((item) => (
-                                    <NavMenuItem
-                                        key={item.to}
-                                        to={item.to}
-                                        label={item.label}
-                                        active={location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))}
-                                    />
-                                ))}
-                            </nav>
-                        </div>
-
-                        {/* Left Area: Socials + Search Icon */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div className="header-socials hide-mobile">
-                                <a href="https://facebook.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Facebook">
-                                    <Facebook size={19} fill="currentColor" strokeWidth={0} />
-                                </a>
-                                <a href="https://instagram.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Instagram">
-                                    <Instagram size={19} strokeWidth={2.5} />
-                                </a>
-                                <a href="https://x.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
-                                    <Twitter size={19} fill="currentColor" strokeWidth={0} />
-                                </a>
+                                {/* Navigation - Compressed (Desktop) */}
+                                <nav className="nav-scroll hide-mobile" style={{ marginRight: '1rem' }}>
+                                    {menuItems.map((item) => (
+                                        <NavMenuItem
+                                            key={item.to}
+                                            to={item.to}
+                                            label={item.label}
+                                            active={location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))}
+                                        />
+                                    ))}
+                                </nav>
                             </div>
 
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                aria-label="ڳوليو"
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    cursor: 'pointer',
-                                    color: '#333'
-                                }}
-                            >
-                                <Search size={22} strokeWidth={2.5} />
-                            </button>
+                            {/* Left Area: Socials + Search Icon */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div className="header-socials hide-mobile">
+                                    <a href="https://facebook.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Facebook">
+                                        <Facebook size={19} fill="currentColor" strokeWidth={0} />
+                                    </a>
+                                    <a href="https://instagram.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Instagram">
+                                        <Instagram size={19} strokeWidth={2.5} />
+                                    </a>
+                                    <a href="https://x.com/thetazaad" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
+                                        <Twitter size={19} fill="currentColor" strokeWidth={0} />
+                                    </a>
+                                </div>
+
+                                <button
+                                    onClick={() => setIsSearchOpen(true)}
+                                    aria-label="ڳوليو"
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '8px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        color: '#333'
+                                    }}
+                                >
+                                    <Search size={22} strokeWidth={2.5} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -324,20 +330,19 @@ const Header: React.FC = () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-                {/* Reading Progress Bar - Outside inner div to prevent clipping during scroll animation */}
+                {/* Reading Progress Bar - Outside hiding wrapper to stay pinned at top 0 */}
                 {isArticlePage && (
                     <div style={{
                         height: '4px',
                         width: '100%',
                         backgroundColor: 'rgba(0,0,0,0.05)',
                         position: 'absolute',
-                        bottom: 0,
+                        top: 0,
                         left: 0,
                         overflow: 'hidden',
-                        zIndex: 2001
+                        zIndex: 2001,
+                        pointerEvents: 'none'
                     }}>
                         <div style={{
                             position: 'absolute',
