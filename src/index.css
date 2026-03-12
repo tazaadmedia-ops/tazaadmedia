@@ -547,8 +547,8 @@ figcaption {
     font-size: 2rem !important;
   }
 
-  .author-header .meta-row {
-    justify-content: center !important;
+  .page-top-margin {
+    margin-top: 0 !important;
   }
 
   .full-bleed-mobile {
@@ -557,19 +557,22 @@ figcaption {
     width: calc(100% + 2 * var(--spacing-md)) !important;
     max-width: none !important;
     border-radius: 0 !important;
+    margin-bottom: 0 !important;
   }
 
   .compact-article-header {
-    margin-bottom: 1rem !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
   }
 
   .compact-article-title {
     font-size: 1.8rem !important;
-    margin-bottom: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+    line-height: 1.1 !important;
   }
 
   .compact-meta-row {
-    margin-bottom: 1rem !important;
+    margin-bottom: 0 !important;
   }
 }
 
