@@ -50,4 +50,8 @@ test("Yeh Farsi to Yeh Arabic", "یار", "يار"); // ی (U+06CC) -> ي (U+064
 // 5. Arabic Citation Bypass
 test("Arabic Citation", "بسم الله الرحمن الرحيم", "بسم الله الرحمن الرحيم"); // Should remain unchanged
 
+// 6. Regression: Final Heh Goal (Mukhtafi)
+test("Teh + Heh Goal", "ته", "ته");
+test("Beh + Heh Goal", "به", "به");
+
 console.log("Tests completed.");

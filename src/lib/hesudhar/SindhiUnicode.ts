@@ -61,19 +61,9 @@ export const SindhiUnicode = {
     "\u0645",   // م — M
     "\u0644",   // ل — L
     "\u06AF",   // گ — G
-    "\u0DA0",   // (fallback gaf variant)
     "\u0DA9",   // ڙ — RR (retroflex R)
-    "\u062C",   // ج — J
     "\u0631",   // ر — R
     "\u06BB",   // ڻ — NN (retroflex N)
-    "\u0686",   // چ — CH
-    "\u062F",   // د — D
-    "\u062A",   // ت — T
-    "\u067D",   // ٽ — TT (retroflex T)
-    "\u0688",   // ڈ — DD
-    "\u067A",   // ٺ — TTH
-    "\u067C",   // ټ — variant
-    "\u067F",   // ٿ — TH
   ] as string[],
 
   // -- VOWEL DIACRITICS ------------------------------------------------------
