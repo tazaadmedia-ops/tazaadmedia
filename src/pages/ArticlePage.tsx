@@ -404,7 +404,6 @@ const ArticlePage: React.FC = () => {
                         width="1200"
                         height="675"
                         style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }}
-                        className="full-bleed-mobile"
                     />
                     {article.featured_image_caption && (
                         <figcaption className="featured-image-caption">

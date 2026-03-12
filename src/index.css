@@ -552,9 +552,9 @@ figcaption {
   }
 
   .full-bleed-mobile {
-    margin-left: calc(-1 * var(--spacing-md)) !important;
-    margin-right: calc(-1 * var(--spacing-md)) !important;
-    width: calc(100% + 2 * var(--spacing-md)) !important;
+    margin-left: calc(-1 * var(--spacing-lg)) !important;
+    margin-right: calc(-1 * var(--spacing-lg)) !important;
+    width: calc(100% + 2 * var(--spacing-lg)) !important;
     max-width: none !important;
     border-radius: 0 !important;
   }

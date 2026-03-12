@@ -348,7 +348,6 @@ const LiveArticlePage: React.FC = () => {
                         width="1200"
                         height="675"
                         style={{ width: '100%', maxHeight: '65vh', objectFit: 'cover', objectPosition: 'center' }}
-                        className="full-bleed-mobile"
                     />
                     {article.featured_image_caption && (
                         <div className="container" style={{ maxWidth: '1000px' }}>
