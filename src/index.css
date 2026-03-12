@@ -551,6 +551,26 @@ figcaption {
     justify-content: center !important;
   }
 
+  .full-bleed-mobile {
+    margin-left: calc(-1 * var(--spacing-md)) !important;
+    margin-right: calc(-1 * var(--spacing-md)) !important;
+    width: calc(100% + 2 * var(--spacing-md)) !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+  }
+
+  .compact-article-header {
+    margin-bottom: 1rem !important;
+  }
+
+  .compact-article-title {
+    font-size: 1.8rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .compact-meta-row {
+    margin-bottom: 1rem !important;
+  }
 }
 
 /* Navbar Base Styles (Desktop & General) */

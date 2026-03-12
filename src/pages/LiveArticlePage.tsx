@@ -348,6 +348,7 @@ const LiveArticlePage: React.FC = () => {
                         width="1200"
                         height="675"
                         style={{ width: '100%', maxHeight: '65vh', objectFit: 'cover', objectPosition: 'center' }}
+                        className="full-bleed-mobile"
                     />
                     {article.featured_image_caption && (
                         <div className="container" style={{ maxWidth: '1000px' }}>
@@ -362,12 +363,12 @@ const LiveArticlePage: React.FC = () => {
             <div className="container page-top-margin" style={{ maxWidth: '1000px', display: 'grid', gridTemplateColumns: '1fr', gap: '3rem', paddingTop: article.featured_image_url ? '0' : undefined }}>
                 <div>
                     {/* Header Content Below Image */}
-                    <div style={{ marginBottom: '2.5rem', textAlign: 'right', direction: 'rtl' }}>
+                    <div className="compact-article-header" style={{ marginBottom: '2.5rem', textAlign: 'right', direction: 'rtl' }}>
                         <div style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'flex-start' }}>
                             <LivePulseIndicator text="لائيو" />
                         </div>
 
-                        <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: 900, lineHeight: 1.25, color: '#111827', marginBottom: '1.5rem', letterSpacing: '-0.02em', fontFeatureSettings: "'kern' 1" }}>
+                        <h1 className="compact-article-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: 900, lineHeight: 1.25, color: '#111827', marginBottom: '1.5rem', letterSpacing: '-0.02em', fontFeatureSettings: "'kern' 1" }}>
                             {article.title}
                         </h1>
 
@@ -377,7 +378,7 @@ const LiveArticlePage: React.FC = () => {
                             </p>
                         )}
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
+                        <div className="compact-meta-row" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
                             {/* Author Row */}
                             {authorName && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

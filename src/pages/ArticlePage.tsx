@@ -272,11 +272,11 @@ const ArticlePage: React.FC = () => {
             />
 
             {/* Header */}
-            <header className="article-header" style={{ marginBottom: '3rem', textAlign: 'right', direction: 'rtl', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
+            <header className="article-header compact-article-header" style={{ marginBottom: '3rem', textAlign: 'right', direction: 'rtl', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
                 <div style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     ● {categoryName}
                 </div>
-                <h1 className="article-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.1, marginBottom: '1.5rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>
+                <h1 className="article-title compact-article-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', lineHeight: 1.1, marginBottom: '1.5rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>
                     {article.title}
                 </h1>
 
@@ -286,7 +286,7 @@ const ArticlePage: React.FC = () => {
                     </p>
                 )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
+                <div className="compact-meta-row" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
                     {/* Author Row */}
                     {authorName && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -396,7 +396,7 @@ const ArticlePage: React.FC = () => {
 
             {/* Featured Image */}
             {article.featured_image_url && (
-                <div style={{ marginBottom: '1rem', width: '100%', maxWidth: '1080px', margin: '0 auto 1rem auto' }}>
+                <div className="full-bleed-mobile" style={{ marginBottom: '1rem', width: '100%', maxWidth: '1080px', margin: '0 auto 1rem auto' }}>
                     <SafeImage
                         src={article.featured_image_url}
                         alt={article.title}
@@ -404,6 +404,7 @@ const ArticlePage: React.FC = () => {
                         width="1200"
                         height="675"
                         style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }}
+                        className="full-bleed-mobile"
                     />
                     {article.featured_image_caption && (
                         <figcaption className="featured-image-caption">
