@@ -790,7 +790,7 @@ const ArticleEditor: React.FC = () => {
                                     backgroundColor: '#f3f4f6', borderRadius: '6px', border: '1px solid #e5e7eb',
                                     fontSize: '0.85rem', fontWeight: 600, color: '#374151', cursor: 'pointer'
                                 }}>
-                                {categoryId ? categories.find(c => c.id === categoryId)?.name : 'Select Topic'}
+                                {categoryId ? categories.find(c => c.id === categoryId)?.name : 'موضوع چونڊيو'}
                                 <ChevronDown size={14} />
                             </button>
                             {showCategoryMenu && (
@@ -799,7 +799,7 @@ const ArticleEditor: React.FC = () => {
                                     background: 'white', border: '1px solid #eee', borderRadius: '8px',
                                     padding: '6px', zIndex: 60, minWidth: '180px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
                                 }}>
-                                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#999', padding: '8px', textTransform: 'uppercase' }}>Category</div>
+                                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#999', padding: '8px', textTransform: 'uppercase' }}>زمرو (Category)</div>
                                     {categories.map(c => (
                                         <div
                                             key={c.id}
@@ -824,7 +824,7 @@ const ArticleEditor: React.FC = () => {
                                             padding: '8px 10px', fontSize: '0.85rem', cursor: 'pointer', borderTop: '1px solid #eee',
                                             marginTop: '4px', color: 'var(--color-accent)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px'
                                         }}>
-                                        <Plus size={14} /> Add New Category
+                                        <Plus size={14} /> نئين ڪيٽيگري شامل ڪريو
                                     </div>
                                 </div>
                             )}
@@ -840,7 +840,7 @@ const ArticleEditor: React.FC = () => {
                             fontSize: '0.9rem',
                             fontWeight: 600
                         }}>
-                            {title || 'Untitled'}
+                            {title || 'بغير عنوان جي'}
                         </span>
                     </div>
 
@@ -858,7 +858,7 @@ const ArticleEditor: React.FC = () => {
                                 fontSize: '0.9rem', whiteSpace: 'nowrap'
                             }}>
                             {isSaving && <Loader size={14} className="animate-spin" />}
-                            {isSaving ? 'Saving' : (id && id !== 'new' ? 'Update' : 'Publish')}
+                            {isSaving ? 'محفوظ ٿي رهيو آهي' : (id && id !== 'new' ? 'اپڊيٽ ڪريو' : 'شايع ڪريو')}
                         </button>
                     </div>
                 </div>
@@ -882,19 +882,19 @@ const ArticleEditor: React.FC = () => {
                     {!featuredImageUrl && !isUploadingFeatured && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#999', fontSize: '0.9rem' }}>
                             <ImageIcon size={20} />
-                            <span>Add Featured Image</span>
+                            <span>خاص تصوير شامل ڪريو</span>
                         </div>
                     )}
                     {featuredImageUrl && !isUploadingFeatured && (
                         <div style={{ position: 'absolute', bottom: '10px', right: '10px', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>
-                            Change Cover
+                            ڪور تبديل ڪريو
                         </div>
                     )}
                 </div>
 
                 {/* Title & Deck */}
                 <textarea
-                    placeholder="Article Title"
+                    placeholder="مضمون جو عنوان"
                     value={title}
                     onChange={(e) => {
                         const newTitle = e.target.value;
@@ -945,9 +945,9 @@ const ArticleEditor: React.FC = () => {
 
                 <div style={{ position: 'relative', marginBottom: '2rem' }}>
                     <textarea
-                        placeholder="Add a short intro..."
+                        placeholder="مختصر تعارف شامل ڪريو..."
                         value={subdeck}
-                        maxLength={250}
+                        maxLength={150}
                         onChange={(e) => {
                             setSubdeck(e.target.value);
                             // Auto-resize
@@ -970,10 +970,10 @@ const ArticleEditor: React.FC = () => {
                         bottom: '-20px',
                         left: '0',
                         fontSize: '0.75rem',
-                        color: subdeck.length >= 250 ? 'red' : '#ccc',
+                        color: subdeck.length >= 150 ? 'red' : '#ccc',
                         fontVariantNumeric: 'tabular-nums'
                     }}>
-                        {subdeck.length}/250
+                        {subdeck.length}/150
                     </div>
                 </div>
 
