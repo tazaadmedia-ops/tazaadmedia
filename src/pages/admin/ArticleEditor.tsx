@@ -522,6 +522,20 @@ const ArticleEditor: React.FC = () => {
         const lookup = (word: string) => hesudharDictionary[word] || null;
         
         const pipeline = new HesudharPipeline(lookup);
+
+        // 1. Normalize Title
+        if (title) {
+            const normalizedTitle = pipeline.process(title);
+            setTitle(normalizedTitle.correctedText);
+        }
+
+        // 2. Normalize Subdeck
+        if (subdeck) {
+            const normalizedSubdeck = pipeline.process(subdeck);
+            setSubdeck(normalizedSubdeck.correctedText);
+        }
+
+        // 3. Normalize Editor Content
         const content = editor.getJSON();
 
         // Helper to recursively process text nodes in Tiptap JSON
