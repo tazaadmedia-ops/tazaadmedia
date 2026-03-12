@@ -208,7 +208,7 @@ const Home: React.FC = () => {
                                 to={`/topic/${section.slug}`}
                                 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#666', textDecoration: 'none' }}
                             >
-                                ڏسو سڀ →
+                                ڏسو سڀ ←
                             </Link>
                         </div>
 
