@@ -466,7 +466,7 @@ const ArticlePage: React.FC = () => {
             {/* Footer with Minimal Separator */}
             <footer style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid #f0f0f0', maxWidth: '800px', margin: '4rem auto 0', color: '#888' }}>
                 <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '1rem' }}>
-                    <span>واپس وڃو</span> <span>→</span>
+                    <span>→</span> <span>واپس وڃو</span>
                 </Link>
             </footer>
         </article>
