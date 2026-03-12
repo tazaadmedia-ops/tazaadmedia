@@ -340,7 +340,7 @@ const LiveArticlePage: React.FC = () => {
 
             {/* Featured Media - Full Bleed Top */}
             {article.featured_image_url && (
-                <div className="full-bleed-mobile" style={{ width: '100%', marginBottom: '1.5rem' }}>
+                <div style={{ width: '100%', marginBottom: '1.5rem' }}>
                     <SafeImage
                         src={article.featured_image_url}
                         alt={article.title}

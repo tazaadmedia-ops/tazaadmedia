@@ -40,21 +40,21 @@ const Header: React.FC = () => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
 
+            // Header collapse logic
             if (currentScrollY <= 100) {
                 setIsScrolled(false);
             } else if (currentScrollY > lastScrollY.current) {
-                // Scrolling down
                 setIsScrolled(true);
             } else {
-                // Scrolling up
                 setIsScrolled(false);
             }
 
             lastScrollY.current = currentScrollY <= 0 ? 0 : currentScrollY;
 
-            // Note: The second check is for the "short slug" URLs like /slug-name
+            // Progress bar calculation
             if (isArticlePage) {
-                const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const docElement = document.documentElement;
+                const totalScroll = docElement.scrollHeight - docElement.clientHeight;
                 if (totalScroll > 0) {
                     const currentProgress = (currentScrollY / totalScroll) * 100;
                     setScrollProgress(currentProgress);
@@ -324,32 +324,35 @@ const Header: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Reading Progress Bar (Now below the ticker) - Only on article pages */}
-                    {isArticlePage && (
-                        <div style={{
-                            height: '3px',
-                            width: '100%',
-                            backgroundColor: 'rgba(0,0,0,0.05)',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}>
-                            <div style={{
-                                position: 'absolute',
-                                top: 0,
-                                right: 0,
-                                height: '100%',
-                                backgroundColor: '#B70100',
-                                width: '100%',
-                                transform: `scaleX(${scrollProgress / 100})`,
-                                transformOrigin: 'right',
-                                transition: 'transform 0.1s linear',
-                                opacity: scrollProgress > 0 ? 1 : 0,
-                                zIndex: 10
-                            }} />
-
-                        </div>
-                    )}
                 </div>
+
+                {/* Reading Progress Bar - Outside inner div to prevent clipping during scroll animation */}
+                {isArticlePage && (
+                    <div style={{
+                        height: '4px',
+                        width: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.05)',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        overflow: 'hidden',
+                        zIndex: 2001
+                    }}>
+                        <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            height: '100%',
+                            backgroundColor: '#B70100',
+                            width: '100%',
+                            transform: `scaleX(${scrollProgress / 100})`,
+                            transformOrigin: 'right',
+                            transition: 'transform 0.1s linear',
+                            opacity: scrollProgress > 5 ? 1 : 0, // Show only after some scrolling
+                            zIndex: 10
+                        }} />
+                    </div>
+                )}
             </header>
 
 
