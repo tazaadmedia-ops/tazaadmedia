@@ -2,6 +2,7 @@ import { Phase1AtomicNormalization } from './Phase1AtomicNormalization';
 import { Phase2GlobalStandardization } from './Phase2GlobalStandardization';
 import { Phase3HehDisambiguator } from './Phase3HehDisambiguator';
 import { Phase4WordNetValidation } from './Phase4WordNetValidation';
+import { Phase4PostProcessingFixes } from './Phase4PostProcessingFixes';
 import { ArabicCitationDetector } from './ArabicCitationDetector';
 
 export interface HesudharChange {
@@ -24,13 +25,14 @@ export class HesudharPipeline {
   private phase1 = new Phase1AtomicNormalization();
   private phase2 = new Phase2GlobalStandardization();
   private phase3 = new Phase3HehDisambiguator();
-  private phase4 = new Phase4WordNetValidation();
+  private phase4Fixes = new Phase4PostProcessingFixes();
+  private phase4Validation = new Phase4WordNetValidation();
   private citationDetector = new ArabicCitationDetector();
   private dictionaryLookup?: (word: string) => string | null;
 
   constructor(dictionaryLookup?: (word: string) => string | null) {
     this.dictionaryLookup = dictionaryLookup;
-    this.phase4 = new Phase4WordNetValidation(dictionaryLookup);
+    this.phase4Validation = new Phase4WordNetValidation(dictionaryLookup);
   }
 
   /**
@@ -86,8 +88,11 @@ export class HesudharPipeline {
       // -- PHASE 3: Heh Phonetic Disambiguation --
       correctedToken = this.phase3.processWord(correctedToken, isArabic);
 
-      // -- PHASE 4: WordNet Validation + Feedback --
-      this.phase4.validate(correctedToken);
+      // -- PHASE 4: Post-Processing Fixes & Patch Table --
+      correctedToken = this.phase4Fixes.run(correctedToken);
+
+      // -- PHASE 5: WordNet Validation + Feedback --
+      this.phase4Validation.validate(correctedToken);
       // Future: handle candidate logging in validation.
 
       // -- Log changes --

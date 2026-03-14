@@ -59,7 +59,12 @@ test("Initial Implosive Override (Ten)", "ڏھ", "ڏه");
 test("Semantic Minimal Pair: Home (Malfoozi)", "گھر", "گهر"); // Input was aspirated, output is Malfoozi because it's in the whitelist
 test("Semantic Minimal Pair: Home Plural", "گهرن", "گهرن");
 
-// 6. Large Text Verification
+// 6. Post-Processing Fixes (Phase 4)
+test("Lam Aspiration Patch (ڳالہ -> ڳالھ)", "ڳالہ", "ڳالھ");
+test("Lam Aspiration Patch (ٻولہ -> ٻولھ)", "ٻولہ", "ٻولھ");
+test("Standalone particle نھ -> نہ", "نھ", "نہ");
+
+// 7. Large Text Verification
 const sampleInput = `اڳوڻي وفاقي وزير ۽ اڳوڻي صدر پرويز مشرف جي ترجمان رھي چڪي ماروي ميمڻ جي سياسي سرگرمين بابت ھڪ ڀيرو ٻيھر بحث شروع ٿي ويو آھي. تازو ڪراچي جي علائقي ڊي ايڇ اي فيز 8 ۾ ٿيل ھڪ لڳ ڳ پنج ڪلاڪن تي ٻڌل بند ڪمري واري ملاقات کانپوءِ سياسي حلقن ۾ سندس ممڪن واپسي بابت ڳالھيون تيز ٿي ويون آھن.`;
 const expectedOutput = `اڳوڻي وفاقي وزير ۽ اڳوڻي صدر پرويز مشرف جي ترجمان رهي چڪي ماروي ميمڻ جي سياسي سرگرمين بابت هڪ ڀيرو ٻيهر بحث شروع ٿي ويو آهي. تازو ڪراچي جي علائقي ڊي ايڇ اي فيز 8 ۾ ٿيل هڪ لڳ ڳ پنج ڪلاڪن تي ٻڌل بند ڪمري واري ملاقات کانپوءِ سياسي حلقن ۾ سندس ممڪن واپسي بابت ڳالھيون تيز ٿي ويون آهن.`;
 
