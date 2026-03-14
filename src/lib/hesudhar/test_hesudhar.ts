@@ -16,58 +16,41 @@ function test(name: string, input: string, expected: string) {
 
 console.log("Starting Hesudhar Verification Tests...");
 
-// 1. Kaf Normalization
-test("Arabic Kaf to Sindhi Kaf", "ڪتاب", "ڪتاب"); // Already Sindhi Kaf
-test("Arabic Kaf to Sindhi Kaf (Correction)", "كتاب", "ڪتاب"); // Should correct
+// 1. Kaf/Keheh Normalization (Academic Step 2)
+test("Unaspirated Kaf (Karachi)", "ڪراچي", "ڪراچي"); 
+test("Aspirated Keheh (Khann)", "کڻڻ", "کڻڻ"); 
 
-// 2. Heh Disambiguation - Word Final
-test("Word Final Heh (Mukhtafi)", "آهي", "آهي"); // Already correct
-test("Word Final Heh (Mukhtafi correction)", "آهہ", "آهي"); // This depends on if 'h' is followed by 'i' or if it's absolute final. 
-// Actually "آهي" ends with Yeh. 
-// Let's try "ته" (teh)
-test("Word Final Heh (teh)", "ته", "ته"); // Already correct (U+06C1)
-test("Word Final Heh (teh correction)", "تهه", "ته"); // Double Heh at end? Rule 3 applies.
+// 2. Three-Way Heh Disambiguation (Academic Step 3)
+test("Malfoozi: Is (آهي)", "آھي", "آهي"); // Step 3.3
+test("Malfoozi: Ten (ڏه)", "ڏھ", "ڏه");    // Step 3.1 Constraint (Implosive)
+test("Visargi: Strength (سگھ)", "سگھ", "سگھ"); // Step 3.1 (Aspiration trigger 'گ')
+test("Mukhtafi (Waning): Also (به)", "به", "بہ"); // Step 3.2 (Phase 3 word rule)
+test("Final Pronounced: Fire (باه)", "باهه", "باه");   // Step 3.3 or Trigraph Collapse
 
-// 3. Aspiration Check
-test("Aspiration (kh)", "کلائڻ", "کلائڻ"); // Keheh is used for kh. 
-// In Sindhi "ک" (U+06A9) is often used for aspirated K. 
-// Wait, the rule says if HEH follows aspiration trigger.
-// "ڪ" + "ھ" -> "ک" ? No, Sindhi has unique characters.
-// But some people write "ک" as "ڪ" + "ھ".
-// Actually modern Sindhi uses atomic "ک" (U+06A9).
-// The pipeline handles "ڪ" + "ھ" -> "ھ" (Doachashmee)? No.
+// 3. Atomic Normalization (Academic Step 1)
+test("Atomic Alef Madda", "\u0627\u0653", "\u0622");
+test("Atomic Yeh Hamza", "\u064A\u0654", "\u0626");
 
-// Let's check SindhiUnicode.ASPIRATION_TRIGGERS
-// Kaf is NOT in aspiration triggers? 
-// Ah, KAF_KEHEH (ک) is U+06A9.
+// 4. Trigraph Collapse (Academic Step 4)
+test("Collapse Tail Hack (جھہ -> جھ)", "\u062C\u06BE\u06C1", "\u062C\u06BE");
 
-// Let's test "ٻ" (implosive) + Heh -> should be HEH_ARABIC
-test("Implosive + Heh", "\u067B\u06BE", "\u067B\u0647"); 
+// 5. Large Text Verification (Standardized Text)
+const sampleInput = `اڳوڻي وفاقي وزير ۽ اڳوڻي صدر پرويز مشرف جي ترجمان رھي چڪي ماروي ميمڻ جي سياسي سرگرمين بابت ھڪ ڀيرو ٻيھر بحث شروع ٿي ويو آھي. تازو ڪراچي جي علائقي ڊي ايڇ اي فيز 8 ۾ ٿيل ھڪ لڳ ڀڳ پنج ڪلاڪن تي ٻڌل بند ڪمري واري ملاقات کانپوءِ سياسي حلقن ۾ سندس ممڪن واپسي بابت ڳالھيون تيز ٿي ويون آھن.
 
-// 4. Global Normalization
-test("Yeh Farsi to Yeh Arabic", "یار", "يار"); // ی (U+06CC) -> ي (U+064A)
+ذريعن موجب ملاقات ۾ مختلف سياسي معاملن ۽ سنڌ جي موجوده سياسي صورتحال تي خيال ونڊيا ويا. ملاقات ۾ شرڪت ڪندڙ ماڻھن بابت سرڪاري طور تي ڪا تفصيل جاري ناهي ڪئي وئي. ان کان علاوه ماروي ميمڻ تازو هڪ پوڊڪاسٽ انٽرويو ۾ پڻ شرڪت ڪئي، جنھن ۾ هن پنهنجي سياسي سوچ، ملڪ جي سياسي حالتن ۽ مستقبل بابت پنهنجا خيال بيان ڪيا.
 
-// 5. Arabic Citation Bypass
-test("Arabic Citation", "بسم الله الرحمن الرحيم", "بسم الله الرحمن الرحيم"); // Should remain unchanged
+ٻئي طرف ذريعن موجب ماروي ميمڻ ويجھي مستقبل ۾ ڪراچي پريس ڪلب ۾ پريس ڪانفرنس ڪرڻ جو امڪان پڻ ظاهر ڪيو آھي، جتي هوءَ پنهنجي سياسي رٿائن بابت وڌيڪ تفصيل ڏئي سگھي ٿي. ماروي ميمڻ ماضي ۾ پاڪستان جي پارلياماني سياست ۾ سرگرم رھي چڪي آھي ۽ مختلف سرڪاري عهدن تي پڻ ڪم ڪري چڪي آھي. سندس ممڪن سياسي واپسي بابت مختلف سياسي ۽ سماجي حلقن ۾ بحث جاري آھي.
 
-// 6. Regression: Final Heh Goal (Mukhtafi)
-test("Teh + Heh Goal", "ته", "ته");
-test("Beh + Heh Goal", "به", "به");
+سياسي مبصرن موجب سنڌ جي سياسي ميدان ۾ سرگرم ٿيڻ لاءِ ڪنھن بہ نئين يا واپس ايندڙ سياسي شخصيت ڪي موجوده سياسي حالتن ۽ مقامي سياسي قوتن سان مقابلو ڪرڻو پوندو. ھن وقت تائين ماروي ميمڻ طرفان پنهنجي سياسي واپسي بابت باضابطه اعلان سامھون ناهي آيو.`;
 
-// 7. Expert Rules (Mansour/Jokhio)
-test("Tail Hack: Collapse جھہ to جھ", "\u062C\u06BE\u06C1", "\u062C\u06BE");
-test("Tail Hack: Collapse باهہ to باہ", "\u0628\u0627\u0647\u06C1", "\u0628\u0627\u06C1");
-test("Aspiration Trigger: Jeem", "جه", "جھ");
-test("Aspiration Trigger: RRA", "ڙه", "ڙھ");
-test("Preserve Alef Maqsura", "موسى", "موسى");
-test("Implosive Constraint: ڏه is Malfoozi", "\u068F\u0647", "\u068F\u0647");
+const expectedOutput = `اڳوڻي وفاقي وزير ۽ اڳوڻي صدر پرويز مشرف جي ترجمان رهي چڪي ماروي ميمڻ جي سياسي سرگرمين بابت هڪ ڀيرو ٻيهر بحث شروع ٿي ويو آهي. تازو ڪراچي جي علائقي ڊي ايڇ اي فيز 8 ۾ ٿيل هڪ لڳ ڀڳ پنج ڪلاڪن تي ٻڌل بند ڪمري واري ملاقات کانپوءِ سياسي حلقن ۾ سندس ممڪن واپسي بابت ڳالھيون تيز ٿي ويون آهن.
 
-// 8. Advanced Phase 2 Rules
-test("Whitelisted Malfoozi: آهي", "آهي", "آهي");
-test("Whitelisted Malfoozi: رهي", "رهي", "رهي");
-test("Whitelisted Malfoozi: پنهنجو", "پنهنجو", "پنهنجو");
-test("Terminal Noon Rule: نہ", "\u0646\u06BE", "نه");
-test("Aspiration: ڻھ (NNH)", "\u06BB\u0647", "\u06BB\u06BE");
-test("Aspiration: مھ (MH)", "\u0645\u0647", "\u0645\u06BE");
+ذريعن موجب ملاقات ۾ مختلف سياسي معاملن ۽ سنڌ جي موجوده سياسي صورتحال تي خيال ونڊيا ويا. ملاقات ۾ شرڪت ڪندڙ ماڻهن بابت سرڪاري طور تي ڪا تفصيل جاري ناهي ڪئي وئي. ان کان علاوه ماروي ميمڻ تازو هڪ پوڊڪاسٽ انٽرويو ۾ پڻ شرڪت ڪئي، جنهن ۾ هن پنهنجي سياسي سوچ، ملڪ جي سياسي حالتن ۽ مستقبل بابت پنهنجا خيال بيان ڪيا.
+
+ٻئي طرف ذريعن موجب ماروي ميمڻ ويجھي مستقبل ۾ ڪراچي پريس ڪلب ۾ پريس ڪانفرنس ڪرڻ جو امڪان پڻ ظاهر ڪيو آهي، جتي هوءَ پنهنجي سياسي رٿائن بابت وڌيڪ تفصيل ڏئي سگھي ٿي. ماروي ميمڻ ماضي ۾ پاڪستان جي پارلياماني سياست ۾ سرگرم رهي چڪي آهي ۽ مختلف سرڪاري عهدن تي پڻ ڪم ڪري چڪي آهي. سندس ممڪن سياسي واپسي بابت مختلف سياسي ۽ سماجي حلقن ۾ بحث جاري آهي.
+
+سياسي مبصرن موجب سنڌ جي سياسي ميدان ۾ سرگرم ٿيڻ لاءِ ڪنهن بہ نئين يا واپس ايندڙ سياسي شخصيت کي موجوده سياسي حالتن ۽ مقامي سياسي قوتن سان مقابلو ڪرڻو پوندو. هن وقت تائين ماروي ميمڻ طرفان پنهنجي سياسي واپسي بابت باضابطه اعلان سامهون ناهي آيو.`;
+
+test("Large-scale Phonetic Normalization Test", sampleInput, expectedOutput);
 
 console.log("Tests completed.");

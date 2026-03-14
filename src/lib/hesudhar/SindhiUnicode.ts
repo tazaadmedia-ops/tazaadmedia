@@ -39,6 +39,9 @@ export const SindhiUnicode = {
     "\u06CC",
     "\u0649"
   ] as string[],
+  YEH_HAMZA_ATOMIC: "\u0626",   // ئ — Atomic Yeh with Hamza
+  YEH_HAMZA_SEQ: "\u064A\u0654", // ي + ٔ — Decomposed sequence
+  HAMZA_ABOVE: "\u0654",         // ٔ — Hamza Above
 
   // -- ALEF FAMILY -----------------------------------------------------------
   ALEF_MADDA: "\u0622",   // آ — atomic preferred
@@ -57,16 +60,15 @@ export const SindhiUnicode = {
 
   // -- ASPIRATION-TRIGGERING CONSONANTS --------------------------------------
   ASPIRATION_TRIGGERS: [
+    "\u06BB",   // ڻ — NN (retroflex N)
+    "\u06AF",   // گ — G
     "\u0646",   // ن — N
     "\u0645",   // م — M
     "\u0644",   // ل — L
-    "\u06AF",   // گ — G
     "\u062C",   // ج — J
     "\u0699",   // ڙ — RR (retroflex R)
-    "\u06BB",   // ڻ — NN (retroflex N)
-    "\u068F",   // ڏ — Implosive D (Trigger in specific contexts)
-    "\u0648",   // و — W/V
     "\u0631",   // ر — R
+    "\u0648",   // و — W/V
   ] as string[],
 
   // -- VOWEL DIACRITICS ------------------------------------------------------

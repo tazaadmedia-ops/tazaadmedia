@@ -11,6 +11,8 @@ export class Phase1GlobalNormalization {
     text = this.collapseTrigraphHacks(text);
     text = this.normalizeYeh(text);
     text = this.normalizeHehGoalHamza(text);
+    text = this.normalizeHamza(text);
+    text = this.normalizeKaf(text);
     return text;
   }
 
@@ -25,9 +27,15 @@ export class Phase1GlobalNormalization {
 
   private collapseTrigraphHacks(text: string): string {
     /**
-     * Historically, extra Heh variants (ہ, ه, ە) were used as "visual tails".
-     * Collapse multiple consecutive Hehs at word boundaries into a single Heh.
-     * Phase 2 will then force the correct phonetic variant.
+     * HISTORICAL CONTEXT (Mansour 2023): Trigraph Hacks.
+     * Legacy systems added a "tail" (ہ) to aspirated consonants in the final position.
+     * Action: Collapse <U+06BE (Aspirate) + U+06C1 (Weak Heh)> into just <U+06BE>.
+     */
+    const trigraphPattern = /\u06BE\u06C1/gu;
+    text = text.replace(trigraphPattern, "\u06BE");
+
+    /**
+     * Also collapse multiple consecutive Hehs at word boundaries (general cleanup).
      */
     const pattern = /([\u0647\u06BE\u06C1\u06C2\u06D5\u06C0]){2,}(?=[\s\u06D4\u060C\u061F!.,;:()\[\]"']|$)/gu;
     return text.replace(pattern, "$1");
@@ -40,5 +48,17 @@ export class Phase1GlobalNormalization {
 
   private normalizeHehGoalHamza(text: string): string {
     return text.split(SindhiUnicode.HEH_GOAL_HAMZA).join(SindhiUnicode.HEH_GOAL);
+  }
+
+  private normalizeKaf(text: string): string {
+    // Normalize Arabic Kaf (U+0643) to Sindhi Swash Kaf (U+06AA)
+    // Keheh (U+06A9) is preserved for specific phonetic contexts (like 'kh' or 'khi').
+    return text.split(SindhiUnicode.KAF_ARABIC).join(SindhiUnicode.KAF_SINDHI_SWASH);
+  }
+
+  private normalizeHamza(text: string): string {
+    // Mandatory Atomic Normalization (Evans 2021)
+    // Convert YEH_HAMZA_SEQ <U+064A, U+0654> into YEH_HAMZA_ATOMIC <U+0626>
+    return text.split(SindhiUnicode.YEH_HAMZA_SEQ).join(SindhiUnicode.YEH_HAMZA_ATOMIC);
   }
 }

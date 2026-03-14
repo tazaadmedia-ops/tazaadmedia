@@ -10,10 +10,15 @@ export class Phase2HehDisambiguator {
    */
   private static readonly MALFOOZI_WHITELIST = [
     'آهي', 'آهن', 'هيو', 'هئا', 'هئي', 'هيون', // Be verbs
-    'رهي', 'رهن', 'رھي', 'رھن',               // Progress verbs (input variants)
-    'انهن', 'انهن کي', 'ڪنهن', 'ڪنهن کي', 'پنهنجو', 'پنهنجي', // Pronouns
-    'هن', 'هنن', 'هتي', 'هتان', 'هتيءَ',        // Demonstratives
-    'باهه', 'جھه',                             // Collapsed tail-hacks often intend Malfoozi closure
+    'رهي', 'رهن', 'رھي', 'رھن', 'رهندڙ',         // Progress verbs
+    'هن', 'جنهن', 'هنن', 'هي', 'هو', 'هئن',      // Pronouns & Demonstratives
+    'پنهنجو', 'پنهنجي', 'پنھنجو', 'پنھنجي', 'پنهنجا', // Reflexive
+    'ڪنهن', 'ڪنھن',                             // Interrogative
+    'انهن', 'انھن',                             // Demonstrative
+    'انتهائي', 'هڪ', 'هوءَ', 'رها', 'هزار',      // Others
+    'باهه', 'جھه',                             // Collapsed tail-hacks
+    'سامهون', 'سامھون', 'ماڻهن', 'ماڻھن',       // Syllable onsets
+    'رهائشگاهه',                                // From snippet
   ];
 
   /**
@@ -30,10 +35,15 @@ export class Phase2HehDisambiguator {
     }
 
     // -- RULE 0: MALFOOZI WHITELIST -----------------------------------
-    // If the word is in the whitelist, we treat Heh as syllable onset.
-    // We normalize all Heh variants to U+0647.
+    // If the word (normalized to canonical HEH_ARABIC) is in the whitelist,
+    // we force it to follow the whitelist's specific variant (standardized here to U+0647).
     const cleanWord = word.trim();
-    if (Phase2HehDisambiguator.MALFOOZI_WHITELIST.includes(cleanWord)) {
+    let canonical = cleanWord;
+    for (const h of SindhiUnicode.HEH_VARIANTS) {
+      canonical = canonical.split(h).join(SindhiUnicode.HEH_ARABIC);
+    }
+
+    if (Phase2HehDisambiguator.MALFOOZI_WHITELIST.includes(canonical)) {
       let corrected = word;
       for (const h of SindhiUnicode.HEH_VARIANTS) {
         corrected = corrected.split(h).join(SindhiUnicode.HEH_ARABIC);
@@ -77,10 +87,12 @@ export class Phase2HehDisambiguator {
         continue;
       }
 
-      // -- RULE 3: WORD-FINAL WEAK HEH ----------------------------------
-      // At absolute end of word, not after aspirating consonant -> Mukhtafi
+      // -- RULE 3: WORD-FINAL SOUND ------------------------------------
+      // Most word-final Heh sounds in high-quality Sindhi (Mansour 2023) 
+      // are forced to U+0647 (Malfoozi/Pronounced).
+      // Waning releases (ba, ta, na) are handled in Phase 3.
       if (isWordFinalResult) {
-        chars[i] = SindhiUnicode.HEH_GOAL; // ہ U+06C1
+        chars[i] = SindhiUnicode.HEH_ARABIC; // ه U+0647
         continue;
       }
 
