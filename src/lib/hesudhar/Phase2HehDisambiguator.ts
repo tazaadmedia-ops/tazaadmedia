@@ -9,8 +9,8 @@ export class Phase2HehDisambiguator {
    * Words where Heh is always Malfoozi (Syllable Onset), not Aspiration.
    */
   private static readonly MALFOOZI_WHITELIST = [
-    'آهي', 'آهن', 'هيو', 'هئا', 'هئي', 'هيون', // Be verbs
     'رهي', 'رهن', 'رھي', 'رھن', 'رهندڙ',         // Progress verbs
+    'آهي', 'آهن', 'ناهي', 'ناهن', 'هيو', 'هئا', 'هئي', 'هيون', // Verbs
     'هن', 'جنهن', 'هنن', 'هي', 'هو', 'هئن',      // Pronouns & Demonstratives
     'پنهنجو', 'پنهنجي', 'پنھنجو', 'پنھنجي', 'پنهنجا', // Reflexive
     'ڪنهن', 'ڪنھن',                             // Interrogative
@@ -87,12 +87,25 @@ export class Phase2HehDisambiguator {
         continue;
       }
 
-      // -- RULE 3: WORD-FINAL SOUND ------------------------------------
-      // Most word-final Heh sounds in high-quality Sindhi (Mansour 2023) 
-      // are forced to U+0647 (Malfoozi/Pronounced).
-      // Waning releases (ba, ta, na) are handled in Phase 3.
+      // -- RULE 3: WORD-FINAL HEH (Mansour 2023 / Evans 2021) -----------
+      // At word-end, we distinguish between a pronounced /h/ and a waning release.
       if (isWordFinalResult) {
-        chars[i] = SindhiUnicode.HEH_ARABIC; // ه U+0647
+        // 3a. If it follows a vowel or an implosive, it is Pronounced (Malfoozi).
+        // Common vowel characters: Alef (ا), Waw (و) in vowel role, Yeh (ي) in vowel role.
+        const isVowelPrior = prevChar && (
+          prevChar === SindhiUnicode.ALEF_PLAIN || 
+          prevChar === SindhiUnicode.ALEF_MADDA ||
+          hasVowelBetweenResult
+        );
+        const isImplosivePrior = prevChar && SindhiUnicode.IMPLOSIVES.includes(prevChar);
+
+        if (isVowelPrior || isImplosivePrior) {
+          chars[i] = SindhiUnicode.HEH_ARABIC; // ه U+0647
+        } else {
+          // 3b. Otherwise (follows any other consonant), it is Terminal Weak (Mukhtafi).
+          // Action: Force to U+06C1 (ہ) as per recent user correction.
+          chars[i] = SindhiUnicode.HEH_GOAL; // ہ U+06C1
+        }
         continue;
       }
 
