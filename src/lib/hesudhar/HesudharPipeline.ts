@@ -1,6 +1,7 @@
-import { Phase1GlobalNormalization } from './Phase1GlobalNormalization';
-import { Phase2HehDisambiguator } from './Phase2HehDisambiguator';
-import { Phase3SecondaryNormalization } from './Phase3SecondaryNormalization';
+import { Phase1AtomicNormalization } from './Phase1AtomicNormalization';
+import { Phase2GlobalStandardization } from './Phase2GlobalStandardization';
+import { Phase3HehDisambiguator } from './Phase3HehDisambiguator';
+import { Phase4WordNetValidation } from './Phase4WordNetValidation';
 import { ArabicCitationDetector } from './ArabicCitationDetector';
 
 export interface HesudharChange {
@@ -16,22 +17,22 @@ export interface HesudharResult {
 }
 
 /**
- * Master pipeline for the Hesudhar Sindhi text normalization engine.
- * Ported from Hesudhar PHP/Python Reference Implementation.
+ * Master pipeline for the HESUDHAR Sindhi text normalization engine.
+ * Based on the 4-phase formal specification.
  */
 export class HesudharPipeline {
-  private phase1 = new Phase1GlobalNormalization();
-  private phase2 = new Phase2HehDisambiguator();
-  private phase3 = new Phase3SecondaryNormalization();
+  private phase1 = new Phase1AtomicNormalization();
+  private phase2 = new Phase2GlobalStandardization();
+  private phase3 = new Phase3HehDisambiguator();
+  private phase4 = new Phase4WordNetValidation();
   private citationDetector = new ArabicCitationDetector();
-  private dictionaryLookup?: (word: string) => string | null;
 
-  constructor(dictionaryLookup?: (word: string) => string | null) {
-    this.dictionaryLookup = dictionaryLookup;
+  constructor(dictionaryData: string[] = []) {
+    this.phase4 = new Phase4WordNetValidation(dictionaryData);
   }
 
   /**
-   * Full pipeline execution.
+   * Full 4-Phase Pipeline Execution.
    */
   public process(text: string): HesudharResult {
     const result: HesudharResult = {
@@ -40,7 +41,7 @@ export class HesudharPipeline {
       changesLog: []
     };
 
-    // -- PHASE 1: Global pre-normalization --
+    // -- PHASE 1: Atomic Pre-processing (Unicode Cleanup) --
     let processedText = this.phase1.run(text);
 
     // -- Tokenize into words --
@@ -50,39 +51,24 @@ export class HesudharPipeline {
     for (const token of tokens) {
       const originalToken = token;
 
-      // Skip non-Sindhi tokens (punctuation, numbers, Latin)
+      // Skip non-Sindhi tokens
       if (!this.isSindhiWord(token)) {
         correctedTokens.push(token);
         continue;
       }
 
-      // -- PHASE 0: Dictionary Lookup --
-      if (this.dictionaryLookup) {
-        const lookup = this.dictionaryLookup(token);
-        if (lookup) {
-          if (lookup !== token) {
-            result.changesLog.push({
-              original: token,
-              corrected: lookup,
-              source: 'ALGORITHM' // Or 'DICTIONARY' if we add that source
-            });
-          }
-          correctedTokens.push(lookup);
-          continue;
-        }
-      }
+      // -- Arabic Citation Bypassing (Ref 3.1.2) --
+      const isArabic = this.citationDetector.isArabicCitation(token);
 
-      // -- PHASE 4: Arabic citation bypass --
-      if (this.citationDetector.isArabicCitation(token)) {
-        correctedTokens.push(token);
-        continue;
-      }
+      // -- PHASE 2: Global Character Standardization (Kaf, Yeh, Alef) --
+      let correctedToken = this.phase2.run(token);
 
-      // -- PHASE 2: Heh disambiguation --
-      let correctedToken = this.phase2.processWord(token);
+      // -- PHASE 3: Heh Phonetic Disambiguation --
+      correctedToken = this.phase3.processWord(correctedToken, isArabic);
 
-      // -- PHASE 3: Secondary normalization --
-      correctedToken = this.phase3.run(correctedToken);
+      // -- PHASE 4: WordNet Validation + Feedback --
+      this.phase4.validate(correctedToken);
+      // Future: handle candidate logging in validation.
 
       // -- Log changes --
       if (correctedToken !== originalToken) {
@@ -101,10 +87,6 @@ export class HesudharPipeline {
   }
 
   private tokenize(text: string): string[] {
-    /**
-     * Split text into tokens while preserving separators.
-     * Pattern: capture everything that's NOT a separator OR capture the separators themselves.
-     */
     const pattern = /([^\s\u06D4\u060C\u061F!.,;:()\[\]"']+|[\s\u06D4\u060C\u061F!.,;:()\[\]"']+)/gu;
     return text.match(pattern) || [text];
   }
