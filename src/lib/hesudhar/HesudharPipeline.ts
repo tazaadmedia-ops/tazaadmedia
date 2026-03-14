@@ -26,9 +26,11 @@ export class HesudharPipeline {
   private phase3 = new Phase3HehDisambiguator();
   private phase4 = new Phase4WordNetValidation();
   private citationDetector = new ArabicCitationDetector();
+  private dictionaryLookup?: (word: string) => string | null;
 
-  constructor(dictionaryData: string[] = []) {
-    this.phase4 = new Phase4WordNetValidation(dictionaryData);
+  constructor(dictionaryLookup?: (word: string) => string | null) {
+    this.dictionaryLookup = dictionaryLookup;
+    this.phase4 = new Phase4WordNetValidation(dictionaryLookup);
   }
 
   /**
@@ -55,6 +57,24 @@ export class HesudharPipeline {
       if (!this.isSindhiWord(token)) {
         correctedTokens.push(token);
         continue;
+      }
+
+      // -- PHASE 0: Pre-flight Dictionary Override --
+      // If the admin defined a manual hotfix for this word, use it directly and skip algorithmic phases.
+      if (this.dictionaryLookup) {
+        const lookup = this.dictionaryLookup(token);
+        if (lookup && lookup !== token) {
+            result.changesLog.push({
+              original: token,
+              corrected: lookup,
+              source: 'ALGORITHM'
+            });
+            correctedTokens.push(lookup);
+            continue;
+        } else if (lookup === token) {
+            correctedTokens.push(token);
+            continue;
+        }
       }
 
       // -- Arabic Citation Bypassing (Ref 3.1.2) --

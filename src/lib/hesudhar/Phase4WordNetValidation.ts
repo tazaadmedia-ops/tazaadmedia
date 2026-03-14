@@ -3,15 +3,18 @@
  * Placeholder for dictionary-based verification.
  */
 export class Phase4WordNetValidation {
-  private dictionary: Set<string>;
+  private dictionaryLookup?: (word: string) => string | null;
 
-  constructor(dictionaryData: string[] = []) {
-    this.dictionary = new Set(dictionaryData);
+  constructor(dictionaryLookup?: (word: string) => string | null) {
+    this.dictionaryLookup = dictionaryLookup;
   }
 
   public validate(word: string): { isValid: boolean; suggested?: string } {
-    if (this.dictionary.has(word)) {
-      return { isValid: true };
+    if (this.dictionaryLookup) {
+      const lookupResult = this.dictionaryLookup(word);
+      if (lookupResult) {
+        return { isValid: true, suggested: lookupResult };
+      }
     }
     
     // Future: Add fuzzy matching or candidate logging
