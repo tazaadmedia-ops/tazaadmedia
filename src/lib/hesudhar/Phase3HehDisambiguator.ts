@@ -19,6 +19,7 @@ export class Phase3HehDisambiguator {
     'باهه', 'جھه',                             // Legacy hacks (before collapse)
     'سامهون', 'سامھون', 'ماڻهن', 'ماڻھن',       // Syllable onsets
     'رهائشگاهه',                                // From snippet
+    'گهر', 'گهرن', 'گهران', 'گهرو',             // Semantic minimal pair for "Home" (vs گھر meaning Jalebi)
   ];
 
   /**
@@ -69,19 +70,16 @@ export class Phase3HehDisambiguator {
         continue;
       }
 
-      // -- 3.1: RULE A - ASPIRATION
-      if (
-        prevChar &&
-        SindhiUnicode.ASPIRATION_TRIGGERS.includes(prevChar) &&
-        !hasVowel &&
-        !(prevChar === "\u0646" && isFinal) && // Noon word-final edge case
-        !(prevChar === "\u0648" && isFinal)    // Waw word-final exception (e.g. अलावा)
-      ) {
+      // -- 3.1.2: PRESERVE post-collapse terminal aspirate
+      // If the character is already U+06BE, is word-final, and is NOT preceded by a trigger, preserve it.
+      // (This catches genuine terminal aspirates like تباھ and گروھ that survived Phase 1)
+      if (chars[i] === SindhiUnicode.HEH_DOACHASHMEE && isFinal && 
+          prevChar && !SindhiUnicode.ASPIRATION_TRIGGERS.includes(prevChar)) {
         resultChars[i] = SindhiUnicode.HEH_DOACHASHMEE;
         continue;
       }
 
-      // -- 3.2: RULE B - WEAK / SILENT HEH
+      // -- 3.2: RULE B - WEAK / SILENT HEH (Word-final only)
       if (isFinal) {
         // Only force Malfoozi if preceded by vowel or implosive
         const isVowelPrior = prevChar && (
@@ -97,7 +95,10 @@ export class Phase3HehDisambiguator {
         continue;
       }
 
-      // -- 3.3: RULE C - PRONOUNCED (DEFAULT)
+      // -- 3.3: RULE C - PRONOUNCED (DEFAULT FOR UNKNOWN WORDS)
+      // v3.0 Critical Correction: Do NOT automatically assign aspiration (U+06BE) here.
+      // Trigger+Heh is a semantic minimal pair (e.g., گهر vs گھر).
+      // For unknown words, U+0647 is the safest default to prevent meaning destruction.
       resultChars[i] = SindhiUnicode.HEH_ARABIC;
     }
 

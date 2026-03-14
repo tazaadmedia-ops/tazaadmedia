@@ -68,7 +68,6 @@ export const SindhiUnicode = {
     "\u062C",   // ج — J
     "\u0631",   // ر — Reh
     "\u0648",   // و — Waw
-    "\u068F",   // ڏ — Dal with dot above (Aspirates except in word-final 'ten')
   ] as string[],
 
   // -- VOWEL DIACRITICS ------------------------------------------------------
