@@ -79,6 +79,7 @@ const ArticleEditor: React.FC = () => {
     const [isLive, setIsLive] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
     const [publishedAt, setPublishedAt] = useState<string | null>(null);
+    const [status, setStatus] = useState<'draft' | 'published' | 'scheduled'>('draft');
     const [hasUpdates, setHasUpdates] = useState(false);
 
     // Featured Image
@@ -236,6 +237,7 @@ const ArticleEditor: React.FC = () => {
                         setIsLive(article.is_live || false);
                         setIsPinned(article.is_pinned || false);
                         setPublishedAt(article.published_at);
+                        setStatus(article.status || 'draft');
 
                         if (article.article_authors) {
                             const authors = article.article_authors.map((aa: any) => aa.users).filter(Boolean);
@@ -306,7 +308,7 @@ const ArticleEditor: React.FC = () => {
             featured_image_caption: featuredImageCaption,
             content_json: editor.getJSON(),
             content_text: editor.getText(),
-            status: 'published',
+            status: status,
             is_live: isLive,
             is_pinned: isPinned,
             updated_at: new Date().toISOString(),
@@ -844,7 +846,25 @@ const ArticleEditor: React.FC = () => {
                         </span>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '0.75rem', marginLeft: 'auto' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', marginLeft: 'auto', alignItems: 'center' }}>
+                        <select
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value as any)}
+                            style={{
+                                padding: '0.55rem',
+                                borderRadius: '6px',
+                                border: '1px solid #e5e7eb',
+                                backgroundColor: '#f9fafb',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                outline: 'none',
+                                cursor: 'pointer',
+                                color: status === 'published' ? '#166534' : '#666'
+                            }}
+                        >
+                            <option value="draft">اڻڇپيل (Draft)</option>
+                            <option value="published">شايع ٿيل (Published)</option>
+                        </select>
                         <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '8px' }}>
                             <MoreHorizontal size={20} />
                         </button>
@@ -858,7 +878,7 @@ const ArticleEditor: React.FC = () => {
                                 fontSize: '0.9rem', whiteSpace: 'nowrap'
                             }}>
                             {isSaving && <Loader size={14} className="animate-spin" />}
-                            {isSaving ? 'محفوظ ٿي رهيو آهي' : (id && id !== 'new' ? 'اپڊيٽ ڪريو' : 'شايع ڪريو')}
+                            {isSaving ? 'محفوظ ٿي رهيو آهي' : 'محفوظ ڪريو (Save)'}
                         </button>
                     </div>
                 </div>
