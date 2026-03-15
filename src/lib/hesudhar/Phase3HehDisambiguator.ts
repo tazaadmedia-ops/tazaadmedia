@@ -26,7 +26,7 @@ export class Phase3HehDisambiguator {
    * Words that specifically use a Weak Heh (Mukhtafi) despite phonetic triggers.
    */
   private static readonly MUKHTAFI_WHITELIST = [
-    'علاوه', 'هونداهوا', 'هئا',
+    'علاوه', 'هونداهوا', 'هئا', 'به'
   ];
 
   public processWord(word: string, isArabicCitation: boolean = false): string {
@@ -45,10 +45,14 @@ export class Phase3HehDisambiguator {
 
     // -- RULE 0.1: Mukhtafi Whitelist
     if (Phase3HehDisambiguator.MUKHTAFI_WHITELIST.includes(workWord)) {
-      // Force terminal weak heh if it ends with a heh variant
+      if (workWord === 'به') {
+        return 'به'; // User explicit exception for particle "ba"
+      }
+      
       const resultChars = Array.from(word);
       if (resultChars.length > 0 && SindhiUnicode.HEH_VARIANTS.includes(resultChars[resultChars.length - 1])) {
-        resultChars[resultChars.length - 1] = SindhiUnicode.HEH_GOAL;
+        // Strip the old variant and append the new 3.0 standard: هہ
+        return word.substring(0, word.length - 1) + SindhiUnicode.HEH_ARABIC + SindhiUnicode.HEH_GOAL;
       }
       return resultChars.join('');
     }
@@ -87,10 +91,16 @@ export class Phase3HehDisambiguator {
           prevChar === SindhiUnicode.ALEF_MADDA ||
           hasVowel
         );
+        
+        // Specific Word Checks based on incoming new standards (اولهہ, به)
+        if (workWord === 'اوله') {
+          return workWord.substring(0, workWord.length - 1) + SindhiUnicode.HEH_ARABIC + SindhiUnicode.HEH_GOAL; // اولهہ
+        }
+
         if (isVowelPrior) {
           resultChars[i] = SindhiUnicode.HEH_ARABIC;
         } else {
-          resultChars[i] = SindhiUnicode.HEH_GOAL;
+          resultChars[i] = SindhiUnicode.HEH_ARABIC + SindhiUnicode.HEH_GOAL; // Fallback to هہ for all word-final waning breaths
         }
         continue;
       }

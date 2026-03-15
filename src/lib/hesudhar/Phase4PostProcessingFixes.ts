@@ -5,6 +5,7 @@ export class Phase4PostProcessingFixes {
   private static readonly PATCH_TABLE: Record<string, string> = {
     // ڳالهه (Talk / Speech) variations
     'ڳالهه': 'ڳالھ',
+    'ڳالهہ': 'ڳالھ', // Updated for new Phase 3 mapping
     'ڳالہ': 'ڳالھ',
     'ڳالهي': 'ڳالھي',
     'ڳالهيون': 'ڳالھيون',
@@ -13,15 +14,17 @@ export class Phase4PostProcessingFixes {
     
     // ٻولهه (Conversation continuation) variations
     'ٻولهه': 'ٻولھ',
+    'ٻولهہ': 'ٻولھ', // Updated
     'ٻولہ': 'ٻولھ',
     
     // سنڀالهه (Care) variations
     'سنڀالهه': 'سنڀالھ',
+    'سنڀالهہ': 'سنڀالھ', // Updated
     'سنڀالہ': 'سنڀالھ',
-    'سنڀالهڻ': 'سنڀالھڻ',
-
+    
     // ٿالهه (Platter) variations
     'ٿالهه': 'ٿالھ',
+    'ٿالهہ': 'ٿالھ', // Updated
     'ٿالہ': 'ٿالھ',
   };
 
@@ -33,9 +36,9 @@ export class Phase4PostProcessingFixes {
       return SindhiUnicode.KAF_KEHEH + SindhiUnicode.YEH_ARABIC;
     }
 
-    // 2. Standalone particle نھ → نہ
-    if (corrected === '\u0646\u06BE') {
-      return '\u0646\u06C1';
+    // 2. Standalone particle نھ → نهہ
+    if (corrected === '\u0646\u06BE' || corrected === 'نهہ' || corrected === 'نہ') {
+      return 'نهہ'; // Updated
     }
 
     // 3. Patch Table application
@@ -46,3 +49,4 @@ export class Phase4PostProcessingFixes {
     return corrected;
   }
 }
+
