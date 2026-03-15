@@ -32,7 +32,9 @@ export class Phase4PostProcessingFixes {
     'ڪجهہ': 'ڪجھ',
     'ڪجھ': 'ڪجھ',
     'گهڻي': 'گھڻي',
+    'گهڻو': 'گھڻو',
     'سگهجن': 'سگھجن',
+    'جڳه': 'جڳھ',
   };
 
   public run(token: string): string {

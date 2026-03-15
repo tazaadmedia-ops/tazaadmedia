@@ -20,13 +20,14 @@ export class Phase3HehDisambiguator {
     'سامهون', 'سامھون', 'ماڻهن', 'ماڻھن',       // Syllable onsets
     'رهائشگاهه',                                // From snippet
     'گهر', 'گهرن', 'گهران', 'گهرو',             // Semantic minimal pair for "Home" (vs گھر meaning Jalebi)
+    'ته', 'هميشه', 'موجوده', 'زنده', 'جڳهه',     // v3.2 Particles & Loanwords (Single Heh standard)
   ];
 
   /**
    * Words that specifically use a Weak Heh (Mukhtafi) despite phonetic triggers.
    */
   private static readonly MUKHTAFI_WHITELIST = [
-    'علاوه', 'هونداهوا', 'هئا', 'به'
+    'علاوه', 'هونداهوا', 'هئا', 'به', 'ته', 'هميشه', 'موجوده', 'زنده', 'جڳهه'
   ];
 
   public processWord(word: string, isArabicCitation: boolean = false): string {

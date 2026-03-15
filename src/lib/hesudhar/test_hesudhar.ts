@@ -82,6 +82,15 @@ test("Aspirated Heh: Something (ڪجھ)", "ڪجھ", "ڪجھ");
 test("Aspirated Heh: Many (گھڻي)", "گهڻي", "گھڻي");
 test("Aspirated Heh: Can (سگھجن)", "سگهجن", "سگھجن");
 
+// 6.6 v3.2 Refinements (Particles, Loanwords, Missing Aspirations)
+test("Standard Particle: (ته)", "تهہ", "ته");
+test("Standard Particle: (به)", "به", "به"); // Should remain single
+test("Loanword Standard: (هميشه)", "هميشهہ", "هميشه");
+test("Loanword Standard: (موجوده)", "موجودهہ", "موجوده");
+test("Loanword Standard: (زنده)", "زندهہ", "زنده");
+test("Aspiration: Much (گھڻو)", "گهڻو اڳ", "گھڻو اڳ");
+test("Aspiration: Place (جڳھ)", "جڳه", "جڳھ");
+
 // 7. Large Text Verification
 const sampleInput = `اڳوڻي وفاقي وزير ۽ اڳوڻي صدر پرويز مشرف جي ترجمان رھي چڪي ماروي ميمڻ جي سياسي سرگرمين بابت ھڪ ڀيرو ٻيھر بحث شروع ٿي ويو آھي. تازو ڪراچي جي علائقي ڊي ايڇ اي فيز 8 ۾ ٿيل ھڪ لڳ ڳ پنج ڪلاڪن تي ٻڌل بند ڪمري واري ملاقات کانپوءِ سياسي حلقن ۾ سندس ممڪن واپسي بابت ڳالھيون تيز ٿي ويون آھن.`;
 const expectedOutput = `اڳوڻي وفاقي وزير ۽ اڳوڻي صدر پرويز مشرف جي ترجمان رهي چڪي ماروي ميمڻ جي سياسي سرگرمين بابت هڪ ڀيرو ٻيهر بحث شروع ٿي ويو آهي. تازو ڪراچي جي علائقي ڊي ايڇ اي فيز 8 ۾ ٿيل هڪ لڳ ڳ پنج ڪلاڪن تي ٻڌل بند ڪمري واري ملاقات کانپوءِ سياسي حلقن ۾ سندس ممڪن واپسي بابت ڳالھيون تيز ٿي ويون آهن.`;
