@@ -26,6 +26,13 @@ export class Phase4PostProcessingFixes {
     'ٿالهه': 'ٿالھ',
     'ٿالهہ': 'ٿالھ', // Updated
     'ٿالہ': 'ٿالھ',
+
+    // New Gold Standard Essentials
+    'ڪجھه': 'ڪجھ',
+    'ڪجهہ': 'ڪجھ',
+    'ڪجھ': 'ڪجھ',
+    'گهڻي': 'گھڻي',
+    'سگهجن': 'سگھجن',
   };
 
   public run(token: string): string {

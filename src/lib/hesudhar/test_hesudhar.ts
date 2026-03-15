@@ -6,6 +6,9 @@ const mockWordNet: Record<string, string> = {
   "سگھن": "سگھن",       // "They can" uses actual Gaf aspiration
   "سگھ": "سگھ",         // "Strength" uses actual Gaf aspiration (word-final)
   "جھ": "جھ",           // Core trigraph collapse test relies on WordNet
+  "ڪجھ": "ڪجھ",         // Something
+  "گھڻي": "گھڻي",       // Many
+  "سگھجن": "سگھجن",     // Can be
 };
 
 const pipeline = new HesudharPipeline((word) => mockWordNet[word] || null);
@@ -67,6 +70,17 @@ test("Final Weak Heh: Particle (به)", "بھ", "به");
 test("Lam Aspiration Patch (ڳالہ -> ڳالھ)", "ڳالہ", "ڳالھ");
 test("Lam Aspiration Patch (ٻولہ -> ٻولھ)", "ٻولہ", "ٻولھ");
 test("Standalone particle نھ -> نہ", "نھ", "نہ");
+
+// 6.5 New Gold Standard Examples (Latest feedback)
+test("Pronounced Heh: Interrogative (ڪنهن)", "ڪنھن", "ڪنهن");
+test("Pronounced Heh: First (پهريون)", "پھريون", "پهريون");
+test("Pronounced Heh: Anyway (بهرحال)", "بھرحال", "بهرحال");
+test("Pronounced Heh: Front (سامهون)", "سامھون", "سامهون");
+test("Pronounced Heh: Those (انهن)", "انھن", "انهن");
+
+test("Aspirated Heh: Something (ڪجھ)", "ڪجھ", "ڪجھ");
+test("Aspirated Heh: Many (گھڻي)", "گهڻي", "گھڻي");
+test("Aspirated Heh: Can (سگھجن)", "سگهجن", "سگھجن");
 
 // 7. Large Text Verification
 const sampleInput = `اڳوڻي وفاقي وزير ۽ اڳوڻي صدر پرويز مشرف جي ترجمان رھي چڪي ماروي ميمڻ جي سياسي سرگرمين بابت ھڪ ڀيرو ٻيھر بحث شروع ٿي ويو آھي. تازو ڪراچي جي علائقي ڊي ايڇ اي فيز 8 ۾ ٿيل ھڪ لڳ ڳ پنج ڪلاڪن تي ٻڌل بند ڪمري واري ملاقات کانپوءِ سياسي حلقن ۾ سندس ممڪن واپسي بابت ڳالھيون تيز ٿي ويون آھن.`;
