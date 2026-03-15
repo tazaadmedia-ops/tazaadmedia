@@ -36,9 +36,9 @@ export class Phase4PostProcessingFixes {
       return SindhiUnicode.KAF_KEHEH + SindhiUnicode.YEH_ARABIC;
     }
 
-    // 2. Standalone particle نھ → نهہ
+    // 2. Standalone particle نھ → نہ
     if (corrected === '\u0646\u06BE' || corrected === 'نهہ' || corrected === 'نہ') {
-      return 'نهہ'; // Updated
+      return 'نہ'; // Standardizing to single Mukhtafi per request
     }
 
     // 3. Patch Table application
