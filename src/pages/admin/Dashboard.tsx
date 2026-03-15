@@ -50,15 +50,20 @@ const Dashboard: React.FC = () => {
         const role = userData?.role || 'admin';
         setUserRole(role);
 
-        let query = supabase
-            .from('articles')
-            .select(`
-                *,
-                article_authors!inner (author_id)
-            `, { count: 'exact' });
-
+        let query;
+        
         if (role === 'author') {
-            query = query.eq('article_authors.author_id', user.id);
+            query = supabase
+                .from('articles')
+                .select(`
+                    *,
+                    article_authors!inner (author_id)
+                `, { count: 'exact' })
+                .eq('article_authors.author_id', user.id);
+        } else {
+            query = supabase
+                .from('articles')
+                .select('*', { count: 'exact' });
         }
 
         if (searchTerm) {
