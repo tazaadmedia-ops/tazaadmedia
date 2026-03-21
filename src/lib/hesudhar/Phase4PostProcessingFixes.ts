@@ -40,14 +40,14 @@ export class Phase4PostProcessingFixes {
   public run(token: string): string {
     let corrected = token;
 
-    // 1. Postposition ڪي → کي (Kaf + Yeh Arabic/Farsi -> Keheh + Yeh Arabic)
+    // 1. Postposition ڪي → کي (Kaf Swash -> Keheh + Yeh Arabic)
     if (corrected === '\u06AA\u064A' || corrected === '\u06AA\u06CC') {
       return SindhiUnicode.KAF_KEHEH + SindhiUnicode.YEH_ARABIC;
     }
 
-    // 2. Standalone particle نھ → نہ
-    if (corrected === '\u0646\u06BE' || corrected === 'نهہ' || corrected === 'نہ') {
-      return 'نہ'; // Standardizing to single Mukhtafi per request
+    // 2. Standalone particle نہ (Force single Mukhtafi per Gold Standard)
+    if (corrected === 'نھ' || corrected === 'نهہ' || corrected === 'نه') {
+      return '\u0646' + SindhiUnicode.HEH_GOAL;
     }
 
     // 3. Patch Table application

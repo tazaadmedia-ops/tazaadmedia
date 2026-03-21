@@ -66,8 +66,7 @@ export const SindhiUnicode = {
     "\u0645",   // م — M
     "\u0644",   // ل — L
     "\u062C",   // ج — J
-    "\u0631",   // ر — Reh
-    "\u0648",   // و — Waw
+    "\u0691",   // ڙ — Retroflex R
   ] as string[],
 
   // -- VOWEL DIACRITICS ------------------------------------------------------

@@ -18,16 +18,16 @@ export class Phase3HehDisambiguator {
     'انتهائي', 'هڪ', 'هوءَ', 'رها', 'هزار',      // Others
     'باهه', 'جھه',                             // Legacy hacks (before collapse)
     'سامهون', 'سامھون', 'ماڻهن', 'ماڻھن',       // Syllable onsets
-    'رهائشگاهه',                                // From snippet
+    'رهائشگاهه', 'سربراهه',                     // From snippet
     'گهر', 'گهرن', 'گهران', 'گهرو',             // Semantic minimal pair for "Home" (vs گھر meaning Jalebi)
-    'ته', 'هميشه', 'موجوده', 'زنده', 'جڳهه',     // v3.2 Particles & Loanwords (Single Heh standard)
+    'جڳهه',                                     // v3.2 Particles & Loanwords (Single Heh standard)
   ];
 
   /**
    * Words that specifically use a Weak Heh (Mukhtafi) despite phonetic triggers.
    */
   private static readonly MUKHTAFI_WHITELIST = [
-    'علاوه', 'هونداهوا', 'هئا', 'به', 'ته', 'هميشه', 'موجوده', 'زنده', 'جڳهه'
+    'علاوه', 'هونداهوا', 'هئا', 'به', 'ته', 'هميشه', 'موجوده', 'زنده'
   ];
 
   public processWord(word: string, isArabicCitation: boolean = false): string {
@@ -46,14 +46,10 @@ export class Phase3HehDisambiguator {
 
     // -- RULE 0.1: Mukhtafi Whitelist
     if (Phase3HehDisambiguator.MUKHTAFI_WHITELIST.includes(workWord)) {
-      if (workWord === 'به') {
-        return 'به'; // User explicit exception for particle "ba"
-      }
-      
       const resultChars = Array.from(word);
       if (resultChars.length > 0 && SindhiUnicode.HEH_VARIANTS.includes(resultChars[resultChars.length - 1])) {
-        // Strip the old variant and append the new 3.0 standard: هہ
-        return word.substring(0, word.length - 1) + SindhiUnicode.HEH_ARABIC + SindhiUnicode.HEH_GOAL;
+        // Strip the old variant and append the new Gold Standard: ہ (U+06C1)
+        return word.substring(0, word.length - 1) + SindhiUnicode.HEH_GOAL;
       }
       return resultChars.join('');
     }
@@ -75,6 +71,12 @@ export class Phase3HehDisambiguator {
         continue;
       }
 
+      // -- 3.1.2: Trigger + No Vowel = Force Aspiration (Hesudhar Logic)
+      if (prevChar && SindhiUnicode.ASPIRATION_TRIGGERS.includes(prevChar) && !hasVowel) {
+        resultChars[i] = SindhiUnicode.HEH_DOACHASHMEE;
+        continue;
+      }
+
       // -- 3.1.2: PRESERVE post-collapse terminal aspirate
       // If the character is already U+06BE, is word-final, and is NOT preceded by a trigger, preserve it.
       // (This catches genuine terminal aspirates like تباھ and گروھ that survived Phase 1)
@@ -93,15 +95,10 @@ export class Phase3HehDisambiguator {
           hasVowel
         );
         
-        // Specific Word Checks based on incoming new standards (اولهہ, به)
-        if (workWord === 'اوله') {
-          return workWord.substring(0, workWord.length - 1) + SindhiUnicode.HEH_ARABIC + SindhiUnicode.HEH_GOAL; // اولهہ
-        }
-
         if (isVowelPrior) {
           resultChars[i] = SindhiUnicode.HEH_ARABIC;
         } else {
-          resultChars[i] = SindhiUnicode.HEH_ARABIC + SindhiUnicode.HEH_GOAL; // Fallback to هہ for all word-final waning breaths
+          resultChars[i] = SindhiUnicode.HEH_GOAL; // Fallback to ہ (U+06C1) for all word-final waning breaths
         }
         continue;
       }

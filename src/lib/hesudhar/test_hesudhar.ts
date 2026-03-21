@@ -42,10 +42,10 @@ test("Malfoozi: Is (آهي)", "آھي", "آهي");
 test("Malfoozi: Negative (ناهي)", "ناھي", "ناهي"); 
 test("Malfoozi: Ten (ڏه)", "ڏھ", "ڏه");    
 test("Visargi: Strength (سگھ)", "سگھ", "سگھ"); 
-test("Mukhtafi (Waning): Also (به)", "به", "به"); // Updated to new standard
-test("Mukhtafi (Waning): Besides (علاوە)", "علاوھ", "علاوهہ"); 
-test("Mukhtafi (Waning): Official (باضابطہ)", "باضابطه", "باضابطهہ");
-test("Final Pronounced: Fire (باہ)", "باہه", "باه");   
+test("Mukhtafi (Waning): Also (به)", "به", "ب\u06C1"); // Updated to new standard
+test("Mukhtafi (Waning): Besides (علاوه)", "علاوھ", "علاو\u06C1"); 
+test("Mukhtafi (Waning): Official (باضابطه)", "باضابطه", "باضابط\u06C1");
+test("Final Pronounced: Fire (باه)", "باهه", "باه");   
 
 // 4. Atomic Normalization & Trigraph Collapse (Phase 1)
 test("Atomic Alef Madda", "\u0627\u0653", "\u0622");
@@ -63,13 +63,13 @@ test("Semantic Minimal Pair: Home (Malfoozi)", "گھر", "گهر"); // Input was
 test("Semantic Minimal Pair: Home Plural", "گهرن", "گهرن");
 
 // 5.5 Word-Final Weak Heh (Mukhtafi)
-test("Final Weak Heh: West (اولهہ)", "اولھ", "اولهہ");
-test("Final Weak Heh: Particle (به)", "بھ", "به");
+test("Final Weak Heh: West (اولهہ)", "اولھ", "اول\u06C1");
+test("Final Weak Heh: Particle (به)", "بھ", "ب\u06C1");
 
 // 6. Post-Processing Fixes (Phase 4)
 test("Lam Aspiration Patch (ڳالہ -> ڳالھ)", "ڳالہ", "ڳالھ");
 test("Lam Aspiration Patch (ٻولہ -> ٻولھ)", "ٻولہ", "ٻولھ");
-test("Standalone particle نھ -> نہ", "نھ", "نہ");
+test("Standalone particle نھ -> نہ", "نھ", "ن\u06C1");
 
 // 6.5 New Gold Standard Examples (Latest feedback)
 test("Pronounced Heh: Interrogative (ڪنهن)", "ڪنھن", "ڪنهن");
@@ -83,11 +83,11 @@ test("Aspirated Heh: Many (گھڻي)", "گهڻي", "گھڻي");
 test("Aspirated Heh: Can (سگھجن)", "سگهجن", "سگھجن");
 
 // 6.6 v3.2 Refinements (Particles, Loanwords, Missing Aspirations)
-test("Standard Particle: (ته)", "تهہ", "ته");
-test("Standard Particle: (به)", "به", "به"); // Should remain single
-test("Loanword Standard: (هميشه)", "هميشهہ", "هميشه");
-test("Loanword Standard: (موجوده)", "موجودهہ", "موجوده");
-test("Loanword Standard: (زنده)", "زندهہ", "زنده");
+test("Standard Particle: (ته)", "تهہ", "ت\u06C1");
+test("Standard Particle: (به)", "به", "ب\u06C1"); // Should remain single
+test("Loanword Standard: (هميشه)", "هميشهہ", "هميش\u06C1");
+test("Loanword Standard: (موجوده)", "موجودهہ", "موجود\u06C1");
+test("Loanword Standard: (زنده)", "زندهہ", "زند\u06C1");
 test("Aspiration: Much (گھڻو)", "گهڻو اڳ", "گھڻو اڳ");
 test("Aspiration: Place (جڳھ)", "جڳه", "جڳھ");
 
