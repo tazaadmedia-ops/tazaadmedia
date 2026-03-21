@@ -1,6 +1,6 @@
 import { HesudharPipeline } from './HesudharPipeline';
 
-const pipeline = new HesudharPipeline((word) => null); // No dictionary needed for this snippet
+const pipeline = new HesudharPipeline(() => null); // No dictionary needed for this snippet
 
 const input = `ڪراچي پريس ڪلب ٻاهران جبري گمشدگين خلاف وائس فار مسنگ پرسنز آف سنڌ (وي ايم پي) پاران لڳايل احتجاجي ڪئمپ دوران ڪيترن ئي ڪارڪنن ۽ وڪيلن جي گرفتاري جون رپورٽون سامھون آيون آھن.
 
